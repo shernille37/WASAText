@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: WASAText
+  description: |
+    This API for the WASAText Project
+  version: 0.0.1
+
+paths:
+  /conversations:
+    get:
+      summary: Get the list of all conversations
+      description: |
+        Fetch the list of all conversations based 
+        on the Logged In User
+      
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
+
+
+components:
+  schemas:
+    Conversation:
+      type: object
+      properties:
+        name:
+          type: string
+        
+        image:
+          type: string
+        
+        latestMessage:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              
+            isImage:
+              type: boolean
+            
+            message:
+              type: string
+            
+  

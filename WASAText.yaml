@@ -11,40 +11,208 @@ paths:
       summary: Get the list of all conversations
       description: |
         Fetch the list of all conversations based 
-        on the Logged In User
-      
+        on the Logged-In User
+      operationId: getMyConversations
+      security:
+        - bearerAuth: []
+
       responses:
         "200":
           description: Successful fetch
           content:
             application/json:
               schema:
+                allOf:
+                  - $ref: "#/components/schemas/Conversation"
+                  - type: object
+                    properties:
+                      latestMessage:
+                        type: object
+                        properties:
+                          timestamp:
+                            type: string
+                            example: 06/06/2024 13:00
+
+                          isImage:
+                            type: boolean
+
+                          message:
+                            type: string
+                            example: Hello this is John Doe
+
+        "404":
+          description: Unauthorized
+
+    post:
+      summary: Add a conversation
+      description: |
+        Create a new conversation with another user or group of users
+
+      operationId: addConversation
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        description: Members of the conversation and the first message
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                members:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+
+                message:
+                  type: string
+                  example: Hello this is Johnny Doe
+
+      responses:
+        "200":
+          description: Conversation added successfuly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversationID:
+                    type: string
+                    format: uuid
+
+        "400":
+          description: Conversation already exists
+
+        "404":
+          description: Unauthorized
+
+  /conversations/{id}:
+    get:
+      summary: Get a conversation based on id
+      description: |
+        Get a conversation based on ID
+
+      operationId: getConversation
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          description: The id of the conversation
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        "200":
+          description: Fetch successfuly
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Conversation"
+                  - type: object
+                    properties:
+                      members:
+                        type: array
+                        items:
+                          type: string
+                          format: uuid
+
+        "404":
+          description: Conversation not found
+
+  /conversations/{id}/messages:
+    get:
+      summary: Get all the messages of a conversation
+      description: |
+        Get all of the messages of a conversation based on ID
+
+      operationId: getMessages
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          description: The id of the conversation
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        "200":
+          description: Fetch Successfuly
+          content:
+            application/json:
+              schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Conversation"
-
+                  $ref: "#/components/schemas/Message"
 
 components:
   schemas:
     Conversation:
       type: object
       properties:
+        conversationID:
+          type: string
+          format: uuid
+
         name:
           type: string
-        
+
         image:
           type: string
-        
-        latestMessage:
-          type: object
-          properties:
-            timestamp:
-              type: string
-              
-            isImage:
-              type: boolean
-            
-            message:
-              type: string
-            
-  
+          format: uri
+
+        isGroup:
+          type: boolean
+
+    Message:
+      type: object
+      properties:
+        messageID:
+          type: string
+          format: uuid
+
+        senderID:
+          type: string
+          format: uuid
+
+        message:
+          type: string
+          example: Hello this is John Doe
+
+        isDelivered:
+          type: boolean
+
+        isRead:
+          type: boolean
+
+    User:
+      type: object
+      properties:
+        userID:
+          type: string
+          format: uuid
+
+        name:
+          type: string
+          example: John Doe
+
+        image:
+          type: string
+          format: uri
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

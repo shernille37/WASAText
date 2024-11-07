@@ -14,15 +14,19 @@ paths:
         and an identifier is returned.
         If the user exists, the user identifier is returned
 
+      tags: ["Authentication"]
+
       operationId: doLogin
       requestBody:
         description: User details
         content:
           application/json:
             schema:
+              description: "Username"
               type: object
               properties:
                 name:
+                  description: "Name of the user"
                   type: string
                   example: Maria
                   pattern: "^.*?$"
@@ -36,11 +40,11 @@ paths:
           content:
             application/json:
               schema:
+                description: "User ID that has been authenticated"
                 type: object
                 properties:
                   identifier:
-                    type: string
-                    format: uuid
+                    $ref: "#/components/schemas/UUID"
 
   /conversations:
     get:
@@ -48,6 +52,8 @@ paths:
       description: |
         Fetch the list of all conversations based 
         on the Logged-In User
+
+      tags: ["Conversations"]
       operationId: getMyConversations
       security:
         - bearerAuth: []
@@ -58,26 +64,41 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Conversation"
-                  - type: object
-                    properties:
-                      latestMessage:
-                        type: object
-                        properties:
-                          timestamp:
-                            type: string
-                            example: 06/06/2024 13:00
+                description: "List of all the conversation"
+                type: array
+                minItems: 0
+                maxItems: 100
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/Conversation"
+                    - type: object
+                      properties:
+                        latestMessage:
+                          description: "Details of the lastest message"
+                          type: object
+                          properties:
+                            timestamp:
+                              description: "Date and Time of the message sent"
+                              type: string
+                              example: 06/06/2024 13:00
+                              minLength: 1
+                              maxLength: 20
+                              pattern: "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([0-9]{4}) ([01][0-9]|2[0-3]):([0-5][0-9])$"
 
-                          isImage:
-                            type: boolean
-                            example: false
+                            isImage:
+                              description: "Describes if the image is an Image or not"
+                              type: boolean
+                              example: false
 
-                          message:
-                            type: string
-                            example: Hello this is John Doe
+                            message:
+                              description: "Text of the message sent"
+                              type: string
+                              example: Hello this is John Doe
+                              pattern: "^.*?$"
+                              minLength: 1
+                              maxLength: 2000
 
-        "404":
+        "401":
           description: Unauthorized
 
     post:
@@ -85,6 +106,7 @@ paths:
       description: |
         Create a new conversation with another user or group of users
 
+      tags: ["Conversations"]
       operationId: addConversation
 
       security:
@@ -95,20 +117,28 @@ paths:
         content:
           application/json:
             schema:
+              description: "Details of the conversation to be added"
               type: object
               properties:
                 isGroup:
+                  description: "Describes if the conversation is a Group or not"
                   type: boolean
 
                 members:
+                  description: "Identifiers of the members of the conversation"
                   type: array
+                  minItems: 1
+                  maxItems: 100
                   items:
-                    type: string
-                    format: uuid
+                    $ref: "#/components/schemas/UUID"
 
                 message:
+                  description: "Text of the message sent"
                   type: string
-                  example: Hello this is Johnny Doe
+                  example: Hello this is John Doe
+                  pattern: "^.*?$"
+                  minLength: 1
+                  maxLength: 2000
 
       responses:
         "200":
@@ -116,37 +146,194 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  conversationID:
-                    type: string
-                    format: uuid
+                description: "List of all the conversation"
+                type: array
+                minItems: 0
+                maxItems: 100
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/Conversation"
+                    - type: object
+                      properties:
+                        latestMessage:
+                          description: "Details of the lastest message"
+                          type: object
+                          properties:
+                            timestamp:
+                              description: "Date and Time of the message sent"
+                              type: string
+                              example: 06/06/2024 13:00
+                              minLength: 1
+                              maxLength: 20
+                              pattern: "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([0-9]{4}) ([01][0-9]|2[0-3]):([0-5][0-9])$"
+
+                            isImage:
+                              description: "Describes if the image is an Image or not"
+                              type: boolean
+                              example: false
+
+                            message:
+                              description: "Text of the message sent"
+                              type: string
+                              example: Hello this is John Doe
+                              pattern: "^.*?$"
+                              minLength: 1
+                              maxLength: 2000
 
         "400":
           description: Conversation already exists
 
-        "404":
+        "401":
           description: Unauthorized
 
-  /conversations/{id}:
+  /conversations/groups/{chatId}/name:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
+    put:
+      summary: Update group name
+      description: Set a new group name
+      tags: ["Groups"]
+
+      operationId: setGroupName
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        description: "New name of the group"
+        content:
+          application/json:
+            schema:
+              description: Name of the group
+              type: object
+              properties:
+                groupName:
+                  description: "Name of the group"
+                  type: string
+                  example: Group 1
+                  pattern: "^.*?$"
+                  minLength: 3
+                  maxLength: 16
+
+      responses:
+        "204":
+          description: Group name updated succesfuly
+
+        "401":
+          description: Unauthorized
+
+  /conversations/groups/{chatId}/photo:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
+    put:
+      summary: Update group Photo
+      description: Set a new group photo
+      tags: ["Groups"]
+
+      operationId: setGroupPhoto
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        description: New photo
+        content:
+          application/json:
+            schema:
+              description: "Photo File"
+              type: object
+              properties:
+                image:
+                  description: "URI of new photo"
+                  type: string
+                  format: file
+                  pattern: '^(.+)\/([^\/]+)$'
+                  example: "assets/images/img1.jpg"
+                  minLength: 1
+                  maxLength: 1000
+
+      responses:
+        "204":
+          description: Group photo updated succesfuly
+
+        "401":
+          description: Unauthorized
+
+  /conversations/groups/{chatId}/members:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
+    post:
+      summary: Add a member to a group
+      description: |
+        Add a member to a specific group
+
+      tags: ["Groups"]
+
+      operationId: addToGroup
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        description: Identifier of the new member
+        content:
+          application/json:
+            schema:
+              description: Identifier of the new member
+              type: object
+              properties:
+                userId:
+                  $ref: "#/components/schemas/UUID"
+
+      responses:
+        "204":
+          description: Member added successfuly
+        "401":
+          description: Unauthorized
+
+  /conversations/groups/{chatId}/leave:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
+    post:
+      summary: Leave a group
+      description: |
+        The user currently authenticated can leave the group
+
+      tags: ["Groups"]
+
+      operationId: leaveGroup
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        "204":
+          description: Leaved the group successfuly
+
+        "400":
+          description: Not allowed on a personal conversation
+
+        "401":
+          description: "Unauthorized"
+
+  /conversations/{chatId}:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
     get:
       summary: Get a conversation based on id
       description: |
         Get a conversation based on ID
 
+      tags: ["Conversations"]
       operationId: getConversation
 
       security:
         - bearerAuth: []
-
-      parameters:
-        - name: id
-          in: path
-          description: The id of the conversation
-          schema:
-            type: string
-            format: uuid
-          required: true
 
       responses:
         "200":
@@ -154,38 +341,37 @@ paths:
           content:
             application/json:
               schema:
+                description: "Details of the fetched conversation"
                 allOf:
                   - $ref: "#/components/schemas/Conversation"
                   - type: object
                     properties:
                       members:
+                        description: "Identifers of the members of the conversation"
                         type: array
+                        minItems: 1
+                        maxItems: 100
                         items:
-                          type: string
-                          format: uuid
+                          $ref: "#/components/schemas/UUID"
 
         "404":
           description: Conversation not found
 
-  /conversations/{id}/messages:
+  /conversations/{chatId}/messages:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
     get:
       summary: Get all the messages of a conversation
       description: |
         Get all of the messages of a conversation based on ID
 
+      tags: ["Messages"]
+
       operationId: getMessages
 
       security:
         - bearerAuth: []
-
-      parameters:
-        - name: id
-          in: path
-          description: The id of the conversation
-          schema:
-            type: string
-            format: uuid
-          required: true
 
       responses:
         "200":
@@ -193,53 +379,138 @@ paths:
           content:
             application/json:
               schema:
+                description: "Details of the messages in a conversation"
                 type: array
+                minItems: 1
+                maxItems: 100
                 items:
                   $ref: "#/components/schemas/Message"
+
+        "401":
+          description: "Unauthorized"
 
     post:
       summary: Send a message
       description: |
         Sends a message to a specific conversation
 
+      tags: ["Messages"]
+
       operationId: sendMessage
 
       security:
         - bearerAuth: []
-
-      parameters:
-        - name: id
-          in: path
-          description: The id of the conversation
-          schema:
-            type: string
-            format: uuid
-          required: true
 
       requestBody:
         description: Message details
         content:
           application/json:
             schema:
+              description: "Details of the message to be sent"
               type: object
               properties:
                 senderID:
-                  type: string
-                  format: uuid
+                  $ref: "#/components/schemas/UUID"
 
                 isImage:
+                  description: "Describes if the message is an Image or not"
                   type: boolean
                   example: false
 
-                message:
+                imageUri:
+                  description: "URI of the image sent"
                   type: string
-                  example: Hello how are you?
+                  format: file
+                  pattern: '^(.+)\/([^\/]+)$'
+                  example: "assets/images/img1.jpg"
+                  minLength: 1
+                  maxLength: 1000
+
+                message:
+                  description: "Text of the message sent"
+                  type: string
+                  example: Hello this is John Doe
+                  pattern: "^.*?$"
+                  minLength: 1
+                  maxLength: 2000
 
       responses:
         "200":
           description: Message sent successfuly
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
 
-  /conversation/{id}/messages/{messageId}/reactions:
+        "401":
+          description: "Unauthorized"
+
+  /conversation/{chatId}/messages/{messageId}:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+      - $ref: "#/components/parameters/MessageID"
+
+    delete:
+      summary: Delete a message
+      description: Delete a message in a Conversation
+
+      security:
+        - bearerAuth: []
+
+      tags: ["Messages"]
+
+      operationId: deleteMessage
+
+      responses:
+        "204":
+          description: Message deleted successfuly
+        "401":
+          description: Unauthorized
+
+  /messages/{messageId}/forward:
+    parameters:
+      - $ref: "#/components/parameters/MessageID"
+
+    post:
+      summary: Forward a message
+      description: Forwards a message to a conversation
+
+      security:
+        - bearerAuth: []
+
+      tags: ["Messages"]
+
+      operationId: forwardMessage
+
+      requestBody:
+        description: |
+          The Conversation ID on which 
+          the message will be forwarded
+
+        content:
+          application/json:
+            schema:
+              description: Conversation ID
+              type: object
+              properties:
+                conversationId:
+                  $ref: "#/components/schemas/UUID"
+
+      responses:
+        "204":
+          description: Message successfuly forwarded
+
+        "401":
+          description: Unauthorized
+
+        "404":
+          description: Message not found
+
+  /conversation/{chatId}/messages/{messageId}/reactions:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+      - $ref: "#/components/parameters/MessageID"
+
     post:
       summary: React to a message in a conversation
       description: |
@@ -248,38 +519,24 @@ paths:
       security:
         - bearerAuth: []
 
+      tags: ["Reactions"]
+
       operationId: commentMessage
-
-      parameters:
-        - name: id
-          in: path
-          description: The id of the conversation
-          schema:
-            type: string
-            format: uuid
-          required: true
-
-        - name: messageId
-          in: path
-          description: Thee id of the message
-          schema:
-            type: string
-            format: uuid
-
-          required: true
 
       requestBody:
         description: Reaction details
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties:
-                    senderID:
-                      type: string
-                      format: uuid
-                - $ref: "#/components/schemas/Reaction"
+              description: |
+                Unicode of the emoji and the senderID
+              type: object
+              properties:
+                senderId:
+                  $ref: "#/components/schemas/UUID"
+
+                unicode:
+                  $ref: "#/components/schemas/Unicode"
 
       responses:
         "200":
@@ -287,72 +544,51 @@ paths:
           content:
             application/json:
               schema:
-                type: string
-                format: unicode
+                description: "Unicode of the emoji done by the user"
+                type: object
+                properties:
+                  unicode:
+                    $ref: "#/components/schemas/Unicode"
 
         "401":
           description: Unauthorized
 
-  /conversation/{id}/messages/{messageId}/reactions/{reactionId}:
+  /conversation/{chatId}/messages/{messageId}/reactions/{reactionId}:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+      - $ref: "#/components/parameters/MessageID"
+      - $ref: "#/components/parameters/ReactionID"
+
     delete:
       summary: Remove reaction from a message in a conversation
       description: |
         Remove the reaction from a specific message in a conversation
+
+      tags: ["Reactions"]
 
       operationId: uncommentMessage
 
       security:
         - bearerAuth: []
 
-      parameters:
-        - name: id
-          in: path
-          description: The id of the conversation
-          schema:
-            type: string
-            format: uuid
-          required: true
-
-        - name: messageId
-          in: path
-          description: The id of the message
-          schema:
-            type: string
-            format: uuid
-
-          required: true
-
-        - name: reactionId
-          in: path
-          description: The id of the reaction
-          schema:
-            type: string
-            format: uuid
-
-          required: true
-
       responses:
-        "200":
+        "204":
           description: Reaction deleted successfuly
 
         "401":
           description: Unauthorized
 
-  /users/{id}:
+  /users/{userId}/username:
+    parameters:
+      - $ref: "#/components/parameters/UserID"
+
     put:
       summary: Update username
       description: Update the username based on id
 
-      operationId: setMyUserName
+      tags: ["Users"]
 
-      parameters:
-        - name: id
-          in: path
-          description: The id of the conversation
-          schema:
-            type: string
-            format: uuid
-          required: true
+      operationId: setMyUserName
 
       security:
         - bearerAuth: []
@@ -362,101 +598,245 @@ paths:
         content:
           application/json:
             schema:
+              description: "Username"
               type: object
               properties:
                 username:
                   type: string
-                  example: John
+                  example: John Doe
+                  pattern: "^.*?$"
+                  minLength: 3
+                  maxLength: 16
 
       responses:
         "204":
           description: Update successfuly
 
+  /users/{userId}/photo:
+    parameters:
+      - $ref: "#/components/parameters/UserID"
+
+    put:
+      summary: Update profile photo
+      description: Update the photo based on id
+
+      tags: ["Users"]
+
+      operationId: setMyPhoto
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        description: New photo
+        content:
+          application/json:
+            schema:
+              description: "Photo File"
+              type: object
+              properties:
+                image:
+                  description: "URI of new photo"
+                  type: string
+                  format: file
+                  pattern: '^(.+)\/([^\/]+)$'
+                  example: "assets/images/img1.jpg"
+                  minLength: 1
+                  maxLength: 1000
+
+      responses:
+        "204":
+          description: Update successfuly
+
+tags:
+  - name: Authentication
+    description: Endpoints related to authentication
+
+  - name: Conversations
+    description: Endpoints related to Conversations
+
+  - name: Groups
+    description: Endpoints related to Group Conversations
+
+  - name: Messages
+    description: Endpoints related to Messages
+
+  - name: Reactions
+    description: Endpoints related to Reactions
+
+  - name: Users
+    description: Endpoints related to Users
+
 components:
   schemas:
     Conversation:
+      description: "Structure of a conversation"
       type: object
       properties:
         conversationID:
-          type: string
-          format: uuid
+          $ref: "#/components/schemas/UUID"
 
         name:
           type: string
+          description: "Name of the User or the Group"
+          example: John Doe
+          pattern: "^.*?$"
+          minLength: 3
+          maxLength: 16
 
         image:
+          description: "URI of the image"
           type: string
-          format: uri
+          format: file
+          pattern: '^(.+)\/([^\/]+)$'
+          example: "assets/images/img1.jpg"
+          minLength: 1
+          maxLength: 1000
 
         isGroup:
+          description: "Describes if the conversation is a Group or not"
           type: boolean
 
     Message:
+      description: "Structure of a Message"
       type: object
       properties:
         messageID:
-          type: string
-          format: uuid
+          $ref: "#/components/schemas/UUID"
 
         senderID:
-          type: string
-          format: uuid
+          $ref: "#/components/schemas/UUID"
 
         isImage:
+          description: "Describes if the Message is an Image or not"
           type: boolean
           example: false
 
+        imageUri:
+          description: "URI of the image sent"
+          type: string
+          format: file
+          pattern: '^(.+)\/([^\/]+)$'
+          example: "assets/images/img1.jpg"
+          minLength: 1
+          maxLength: 1000
+
         message:
+          description: "Text of the message sent"
           type: string
           example: Hello this is John Doe
+          pattern: "^.*?$"
+          minLength: 1
+          maxLength: 2000
 
         isDelivered:
+          description: "Describes if the Message is Delivered"
           type: boolean
           default: false
 
         isRead:
+          description: "Describes if the Message is Read"
           type: boolean
           default: false
 
         reactions:
           type: array
+          minItems: 0
+          maxItems: 10
           items:
             type: object
             properties:
               unicode:
-                type: string
-                format: unicode
+                $ref: "#/components/schemas/Unicode"
 
               count:
+                description: "Number of users who reacted"
                 type: integer
 
     Reaction:
+      description: "Structure of a reaction"
       type: object
       properties:
         reactionID:
-          type: string
-          format: unicode
+          $ref: "#/components/schemas/UUID"
 
         unicode:
-          type: string
-          format: unicode
+          $ref: "#/components/schemas/Unicode"
 
     User:
+      description: "Structure of a User"
       type: object
       properties:
         userID:
-          type: string
-          format: uuid
+          $ref: "#/components/schemas/UUID"
 
         name:
           type: string
           example: John Doe
+          pattern: "^.*?$"
+          minLength: 3
+          maxLength: 16
 
         image:
+          description: "URI of the image sent"
           type: string
-          format: uri
+          format: file
+          pattern: '^(.+)\/([^\/]+)$'
+          example: "assets/images/img1.jpg"
+          minLength: 1
+          maxLength: 1000
+
+    UUID:
+      description: "Universally Unique Identifier"
+      type: string
+      format: uuid
+      minLength: 1
+      maxLength: 32
+      pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+
+    Unicode:
+      description: "Unicode of the emoji"
+      type: string
+      format: unicode
+      example: "U+1F600"
+      pattern: '[^\u0000-\u007F]+'
+      minLength: 1
+      maxLength: 100
 
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+
+  parameters:
+    UserID:
+      name: userId
+      in: path
+      required: true
+      description: User Identifier
+      schema:
+        $ref: "#/components/schemas/UUID"
+
+    ConversationID:
+      name: chatId
+      in: path
+      required: true
+      description: Conversation Identifier
+      schema:
+        $ref: "#/components/schemas/UUID"
+
+    MessageID:
+      name: messageId
+      in: path
+      required: true
+      description: Message Identifier
+      schema:
+        $ref: "#/components/schemas/UUID"
+
+    ReactionID:
+      name: reactionId
+      in: path
+      required: true
+      description: Reaction Identifier
+      schema:
+        $ref: "#/components/schemas/UUID"

@@ -618,7 +618,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /conversation/{chatId}/messages/{messageId}:
+  /conversations/{chatId}/messages/{messageId}:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
       - $ref: "#/components/parameters/MessageID"
@@ -684,7 +684,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /conversation/{chatId}/messages/{messageId}/reactions:
+  /conversations/{chatId}/messages/{messageId}/reactions:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
       - $ref: "#/components/parameters/MessageID"
@@ -761,7 +761,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /conversation/{chatId}/messages/{messageId}/reactions/{reactionId}:
+  /conversations/{chatId}/messages/{messageId}/reactions/{reactionId}:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
       - $ref: "#/components/parameters/MessageID"

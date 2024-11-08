@@ -2,7 +2,8 @@ openapi: 3.0.3
 info:
   title: WASAText
   description: |
-    This API for the WASAText Project
+    This API is for the WASAText Project
+    a full stack messaging application
   version: 0.0.1
 
 paths:
@@ -43,8 +44,11 @@ paths:
                 description: "User ID that has been authenticated"
                 type: object
                 properties:
-                  identifier:
+                  userId:
                     $ref: "#/components/schemas/UUID"
+
+        "500":
+          description: Internal Server Error
 
   /conversations:
     get:
@@ -101,36 +105,34 @@ paths:
         "401":
           description: Unauthorized
 
+        "500":
+          description: Internal Server Error
+
     post:
-      summary: Add a conversation
+      summary: Add a private conversation
       description: |
-        Create a new conversation with another user or group of users
+        Create a new conversation with another user
 
       tags: ["Conversations"]
+
       operationId: addConversation
 
       security:
         - bearerAuth: []
 
       requestBody:
-        description: Members of the conversation and the first message
+        description: The receiver user and the message
         content:
           application/json:
             schema:
               description: "Details of the conversation to be added"
               type: object
               properties:
-                isGroup:
-                  description: "Describes if the conversation is a Group or not"
-                  type: boolean
+                senderId:
+                  $ref: "#/components/schemas/UUID"
 
-                members:
-                  description: "Identifiers of the members of the conversation"
-                  type: array
-                  minItems: 1
-                  maxItems: 100
-                  items:
-                    $ref: "#/components/schemas/UUID"
+                receiverId:
+                  $ref: "#/components/schemas/UUID"
 
                 message:
                   description: "Text of the message sent"
@@ -141,12 +143,70 @@ paths:
                   maxLength: 2000
 
       responses:
-        "200":
+        "201":
           description: Conversation added successfuly
           content:
             application/json:
               schema:
-                description: "List of all the conversation"
+                description: "The conversation added"
+                type: object
+                allOf:
+                  - $ref: "#/components/schemas/Conversation"
+                  - type: object
+                    properties:
+                      latestMessage:
+                        description: "Details of the lastest message"
+                        type: object
+                        properties:
+                          timestamp:
+                            description: "Date and Time of the message sent"
+                            type: string
+                            example: 06/06/2024 13:00
+                            minLength: 1
+                            maxLength: 20
+                            pattern: "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([0-9]{4}) ([01][0-9]|2[0-3]):([0-5][0-9])$"
+
+                          isImage:
+                            description: "Describes if the image is an Image or not"
+                            type: boolean
+                            example: false
+
+                          message:
+                            description: "Text of the message sent"
+                            type: string
+                            example: Hello this is John Doe
+                            pattern: "^.*?$"
+                            minLength: 1
+                            maxLength: 2000
+
+        "400":
+          description: Conversation already exists
+
+        "401":
+          description: Unauthorized
+
+  /conversations/groups:
+    get:
+      summary: Get the list of all conversations
+
+      description: |
+        Get all of the group conversations based on 
+        logged-in user
+
+      tags: ["Groups"]
+
+      operationId: getGroupConversations
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                description: "List of all group conversations"
                 type: array
                 minItems: 0
                 maxItems: 100
@@ -180,11 +240,104 @@ paths:
                               minLength: 1
                               maxLength: 2000
 
-        "400":
-          description: Conversation already exists
+        "500":
+          description: Internal Server Error
+
+    post:
+      summary: Add a group conversation
+      description: Add a group conversation with corresponding members
+
+      tags: ["Groups"]
+
+      operationId: addGroupConversation
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        description: |
+          Members and details of the group and the message
+        content:
+          application/json:
+            schema:
+              description: Details of the group
+              type: object
+              properties:
+                groupName:
+                  description: "Name of the group"
+                  type: string
+                  example: Group 1
+                  pattern: "^.*?$"
+                  minLength: 3
+                  maxLength: 16
+
+                members:
+                  description: "Identifers of the members of the conversation"
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  items:
+                    $ref: "#/components/schemas/UUID"
+
+                message:
+                  description: "Text of the message sent"
+                  type: string
+                  example: Hello this is John Doe
+                  pattern: "^.*?$"
+                  minLength: 1
+                  maxLength: 2000
+
+                groupImage:
+                  description: "URI of the group image sent"
+                  type: string
+                  format: file
+                  pattern: '^(.+)\/([^\/]+)$'
+                  example: "assets/images/img1.jpg"
+                  minLength: 1
+                  maxLength: 1000
+
+      responses:
+        "201":
+          description: Group added successfuly
+          content:
+            application/json:
+              schema:
+                description: "The conversation added"
+                type: object
+                allOf:
+                  - $ref: "#/components/schemas/Conversation"
+                  - type: object
+                    properties:
+                      latestMessage:
+                        description: "Details of the lastest message"
+                        type: object
+                        properties:
+                          timestamp:
+                            description: "Date and Time of the message sent"
+                            type: string
+                            example: 06/06/2024 13:00
+                            minLength: 1
+                            maxLength: 20
+                            pattern: "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([0-9]{4}) ([01][0-9]|2[0-3]):([0-5][0-9])$"
+
+                          isImage:
+                            description: "Describes if the image is an Image or not"
+                            type: boolean
+                            example: false
+
+                          message:
+                            description: "Text of the message sent"
+                            type: string
+                            example: Hello this is John Doe
+                            pattern: "^.*?$"
+                            minLength: 1
+                            maxLength: 2000
 
         "401":
           description: Unauthorized
+
+        "500":
+          description: Internal Server Error
 
   /conversations/groups/{chatId}/name:
     parameters:
@@ -222,6 +375,9 @@ paths:
 
         "401":
           description: Unauthorized
+
+        "500":
+          description: Internal Server Error
 
   /conversations/groups/{chatId}/photo:
     parameters:
@@ -261,6 +417,9 @@ paths:
         "401":
           description: Unauthorized
 
+        "500":
+          description: Internal Server Error
+
   /conversations/groups/{chatId}/members:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
@@ -293,6 +452,8 @@ paths:
           description: Member added successfuly
         "401":
           description: Unauthorized
+        "500":
+          description: Internal Server Error
 
   /conversations/groups/{chatId}/leave:
     parameters:
@@ -319,6 +480,9 @@ paths:
 
         "401":
           description: "Unauthorized"
+
+        "500":
+          description: Internal Server Error
 
   /conversations/{chatId}:
     parameters:
@@ -357,6 +521,9 @@ paths:
         "404":
           description: Conversation not found
 
+        "500":
+          description: Internal Server Error
+
   /conversations/{chatId}/messages:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
@@ -388,6 +555,9 @@ paths:
 
         "401":
           description: "Unauthorized"
+
+        "500":
+          description: Internal Server Error
 
     post:
       summary: Send a message
@@ -445,6 +615,9 @@ paths:
         "401":
           description: "Unauthorized"
 
+        "500":
+          description: Internal Server Error
+
   /conversation/{chatId}/messages/{messageId}:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
@@ -466,6 +639,8 @@ paths:
           description: Message deleted successfuly
         "401":
           description: Unauthorized
+        "500":
+          description: Internal Server Error
 
   /messages/{messageId}/forward:
     parameters:
@@ -506,10 +681,40 @@ paths:
         "404":
           description: Message not found
 
+        "500":
+          description: Internal Server Error
+
   /conversation/{chatId}/messages/{messageId}/reactions:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
       - $ref: "#/components/parameters/MessageID"
+
+    get:
+      summary: List of all the reactions in a message
+      description: |
+        Get the list of all the reactions in a message
+        together with the user who reacted and the count
+
+      security:
+        - bearerAuth: []
+
+      tags: ["Reactions"]
+
+      responses:
+        "200":
+          description: Fetch successfuly
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 0
+                maxItems: 10
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/Reaction"
+
+        "500":
+          description: Internal Server Error
 
     post:
       summary: React to a message in a conversation
@@ -539,7 +744,7 @@ paths:
                   $ref: "#/components/schemas/Unicode"
 
       responses:
-        "200":
+        "201":
           description: Reaction added successfuly
           content:
             application/json:
@@ -552,6 +757,9 @@ paths:
 
         "401":
           description: Unauthorized
+
+        "500":
+          description: Internal Server Error
 
   /conversation/{chatId}/messages/{messageId}/reactions/{reactionId}:
     parameters:
@@ -577,6 +785,41 @@ paths:
 
         "401":
           description: Unauthorized
+
+        "500":
+          description: Internal Server Error
+
+  /users:
+    get:
+      summary: Get all of the users
+      description: |
+        Fetch all of the users of the app
+
+      tags: ["Users"]
+
+      operationId: getUsers
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Fetch Successfuly
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 0
+                maxItems: 100
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/User"
+
+        "401":
+          description: Unauthorized
+
+        "500":
+          description: Internal Server Error
 
   /users/{userId}/username:
     parameters:
@@ -611,6 +854,9 @@ paths:
       responses:
         "204":
           description: Update successfuly
+
+        "500":
+          description: Internal Server Error
 
   /users/{userId}/photo:
     parameters:
@@ -647,6 +893,9 @@ paths:
       responses:
         "204":
           description: Update successfuly
+
+        "500":
+          description: Internal Server Error
 
 tags:
   - name: Authentication
@@ -762,6 +1011,9 @@ components:
 
         unicode:
           $ref: "#/components/schemas/Unicode"
+
+        reactor:
+          $ref: "#/components/schemas/User"
 
     User:
       description: "Structure of a User"

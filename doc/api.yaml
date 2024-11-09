@@ -448,8 +448,16 @@ paths:
                   $ref: "#/components/schemas/UUID"
 
       responses:
-        "204":
+        "201":
           description: Member added successfuly
+          content:
+            application/json:
+              schema:
+                description: Identifier of the new member
+                type: object
+                properties:
+                  userId:
+                    $ref: "#/components/schemas/UUID"
         "401":
           description: Unauthorized
         "500":
@@ -605,7 +613,7 @@ paths:
                   maxLength: 2000
 
       responses:
-        "200":
+        "201":
           description: Message sent successfuly
           content:
             application/json:
@@ -672,8 +680,12 @@ paths:
                   $ref: "#/components/schemas/UUID"
 
       responses:
-        "204":
-          description: Message successfuly forwarded
+        "201":
+          description: Message sent successfuly
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
 
         "401":
           description: Unauthorized
@@ -1023,6 +1035,7 @@ components:
           $ref: "#/components/schemas/UUID"
 
         name:
+          description: Name of the user
           type: string
           example: John Doe
           pattern: "^.*?$"

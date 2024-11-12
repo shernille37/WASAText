@@ -951,7 +951,7 @@ paths:
 
 tags:
   - name: Authentication
-    description: Endpoints related to authentication
+    description: Endpoints related to Authentication
 
   - name: Conversations
     description: Endpoints related to Conversations

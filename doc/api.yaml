@@ -609,9 +609,6 @@ paths:
       summary: Delete a message
       description: Delete a message in a Conversation
 
-      security:
-        - bearerAuth: []
-
       tags: ["Messages"]
 
       operationId: deleteMessage
@@ -717,12 +714,15 @@ paths:
 
       tags: ["Reactions"]
 
+      operationId: getAllReactions
+
       responses:
         "200":
           description: Fetch successfuly
           content:
             application/json:
               schema:
+                description: All of the reactions of a message
                 type: array
                 minItems: 0
                 maxItems: 10
@@ -763,11 +763,7 @@ paths:
           content:
             application/json:
               schema:
-                description: "Unicode of the emoji done by the user"
-                type: object
-                properties:
-                  unicode:
-                    $ref: "#/components/schemas/Unicode"
+                $ref: "#/components/schemas/Reaction"
 
         "401":
           description: Unauthorized
@@ -816,6 +812,7 @@ paths:
           content:
             application/json:
               schema:
+                description: All of the users
                 type: array
                 minItems: 0
                 maxItems: 100
@@ -850,6 +847,7 @@ paths:
               type: object
               properties:
                 username:
+                  description: Username of the user
                   type: string
                   example: John Doe
                   pattern: "^.*?$"
@@ -996,6 +994,7 @@ components:
           default: false
 
         reactions:
+          description: "Describes all of the reactions of a Message"
           type: array
           minItems: 0
           maxItems: 10
@@ -1059,7 +1058,7 @@ components:
       type: string
       format: unicode
       example: "U+1F600"
-      pattern: '[^\u0000-\u007F]+'
+      pattern: '[^:\s]*(?:::[^:\s]*)*'
       minLength: 1
       maxLength: 100
 

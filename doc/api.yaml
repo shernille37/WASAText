@@ -6,6 +6,9 @@ info:
     a full stack messaging application
   version: 0.0.1
 
+servers:
+  - url: http://localhost:3000
+
 security:
   - bearerAuth: []
 
@@ -301,6 +304,29 @@ paths:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
 
+    get:
+      summary: Get the list of all the members of a group
+      description: |
+        Fetch the list of all the members of a specific 
+        group conversation
+
+      tags: ["Groups"]
+
+      operationId: getGroupMembers
+
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                description: List of all members of a group
+                type: array
+                minItems: 2
+                maxItems: 100
+                items:
+                  $ref: "#/components/schemas/User"
+
     post:
       summary: Add a member to a group
       description: |
@@ -327,21 +353,13 @@ paths:
           content:
             application/json:
               schema:
-                description: Identifier of the new member
-                type: object
-                properties:
-                  userId:
-                    $ref: "#/components/schemas/UUID"
+                $ref: "#/components/schemas/User"
         "401":
           description: Unauthorized
         "500":
           description: Internal Server Error
 
-  /conversations/groups/{chatId}/leave:
-    parameters:
-      - $ref: "#/components/parameters/ConversationID"
-
-    post:
+    put:
       summary: Leave a group
       description: |
         The user currently authenticated can leave the group
@@ -349,6 +367,17 @@ paths:
       tags: ["Groups"]
 
       operationId: leaveGroup
+
+      requestBody:
+        description: Identifier of the member to leave
+        content:
+          application/json:
+            schema:
+              description: Identifier of the member to leave
+              type: object
+              properties:
+                userId:
+                  $ref: "#/components/schemas/UUID"
 
       responses:
         "204":
@@ -573,12 +602,8 @@ paths:
                   $ref: "#/components/schemas/UUID"
 
       responses:
-        "201":
-          description: Message sent successfuly
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Message"
+        "204":
+          description: Message forwarded successfuly
 
         "401":
           description: Unauthorized

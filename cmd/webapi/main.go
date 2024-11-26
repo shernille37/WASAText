@@ -54,6 +54,7 @@ func run() error {
 		return fmt.Errorf("creating AppDatabase: %w", err)
 	}
 
+	// Start the API Server
 	logger.Info("Init API Server")
 
 	shutdown := make(chan os.Signal, 1)

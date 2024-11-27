@@ -102,22 +102,7 @@ paths:
         content:
           application/json:
             schema:
-              description: "Details of the conversation to be added"
-              type: object
-              properties:
-                senderId:
-                  $ref: "#/components/schemas/UUID"
-
-                receiverId:
-                  $ref: "#/components/schemas/UUID"
-
-                message:
-                  description: "Text of the message sent"
-                  type: string
-                  example: Hello this is John Doe
-                  pattern: "^.*?$"
-                  minLength: 1
-                  maxLength: 2000
+              $ref: "#/components/schemas/Conversation"
 
       responses:
         "201":
@@ -175,41 +160,7 @@ paths:
         content:
           application/json:
             schema:
-              description: Details of the group
-              type: object
-              properties:
-                groupName:
-                  description: "Name of the group"
-                  type: string
-                  example: Group 1
-                  pattern: "^.*?$"
-                  minLength: 3
-                  maxLength: 16
-
-                members:
-                  description: "Identifers of the members of the conversation"
-                  type: array
-                  minItems: 1
-                  maxItems: 100
-                  items:
-                    $ref: "#/components/schemas/UUID"
-
-                message:
-                  description: "Text of the message sent"
-                  type: string
-                  example: Hello this is John Doe
-                  pattern: "^.*?$"
-                  minLength: 1
-                  maxLength: 2000
-
-                groupImage:
-                  description: "URI of the group image sent"
-                  type: string
-                  format: file
-                  pattern: '^(.+)\/([^\/]+)$'
-                  example: "assets/images/img1.jpg"
-                  minLength: 1
-                  maxLength: 1000
+              $ref: "#/components/schemas/Conversation"
 
       responses:
         "201":
@@ -341,11 +292,7 @@ paths:
         content:
           application/json:
             schema:
-              description: Identifier of the new member
-              type: object
-              properties:
-                userId:
-                  $ref: "#/components/schemas/UUID"
+              $ref: "#/components/schemas/User"
 
       responses:
         "201":
@@ -475,33 +422,7 @@ paths:
         content:
           application/json:
             schema:
-              description: "Details of the message to be sent"
-              type: object
-              properties:
-                senderID:
-                  $ref: "#/components/schemas/UUID"
-
-                isImage:
-                  description: "Describes if the message is an Image or not"
-                  type: boolean
-                  example: false
-
-                imageUri:
-                  description: "URI of the image sent"
-                  type: string
-                  format: file
-                  pattern: '^(.+)\/([^\/]+)$'
-                  example: "assets/images/img1.jpg"
-                  minLength: 1
-                  maxLength: 1000
-
-                message:
-                  description: "Text of the message sent"
-                  type: string
-                  example: Hello this is John Doe
-                  pattern: "^.*?$"
-                  minLength: 1
-                  maxLength: 2000
+              $ref: "#/components/schemas/Message"
 
       responses:
         "201":
@@ -659,15 +580,7 @@ paths:
         content:
           application/json:
             schema:
-              description: |
-                Unicode of the emoji and the senderID
-              type: object
-              properties:
-                senderId:
-                  $ref: "#/components/schemas/UUID"
-
-                unicode:
-                  $ref: "#/components/schemas/Unicode"
+              $ref: "#/components/schemas/Reaction"
 
       responses:
         "201":
@@ -834,7 +747,9 @@ components:
       type: object
       properties:
         conversationID:
-          $ref: "#/components/schemas/UUID"
+          allOf:
+            - $ref: "#/components/schemas/UUID"
+            - readOnly: true
 
         name:
           type: string
@@ -887,7 +802,9 @@ components:
       type: object
       properties:
         messageID:
-          $ref: "#/components/schemas/UUID"
+          allOf:
+            - $ref: "#/components/schemas/UUID"
+            - readOnly: true
 
         senderID:
           $ref: "#/components/schemas/UUID"
@@ -949,7 +866,9 @@ components:
       type: object
       properties:
         reactionID:
-          $ref: "#/components/schemas/UUID"
+          allOf:
+            - $ref: "#/components/schemas/UUID"
+            - readOnly: true
 
         unicode:
           $ref: "#/components/schemas/Unicode"
@@ -962,7 +881,9 @@ components:
       type: object
       properties:
         userID:
-          $ref: "#/components/schemas/UUID"
+          allOf:
+            - $ref: "#/components/schemas/UUID"
+            - readOnly: true
 
         name:
           description: Name of the user

@@ -788,11 +788,6 @@ components:
                 - $ref: "#/components/schemas/UUID"
                 - readOnly: true
 
-            isGroup:
-              description: "Describes if the conversation is a Group or not"
-              type: boolean
-              example: false
-
             latestMessage:
               description: "Details of the lastest message"
               type: object
@@ -826,11 +821,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/UUID"
             - readOnly: true
-
-        isGroup:
-          description: "Describes if the conversation is a Group or not"
-          type: boolean
-          example: true
 
         groupName:
           description: Name of the group

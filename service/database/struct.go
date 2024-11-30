@@ -1,16 +1,18 @@
 package database
 
+import "github.com/gofrs/uuid"
+
 type PrivateConversation struct {
-	ConversationID uint64
-	UserID string
+	ConversationID uuid.UUID
+	UserID uuid.UUID
 	Name string
 	Image string
-	LatestMessage LatestMessage
+	LatestMessage *LatestMessage
 
 }
 
 type GroupConversation struct {
-	ConversationID uint64
+	ConversationID uuid.UUID
 	GroupName string
 	GroupImage string
 	LatestMessage *LatestMessage
@@ -18,7 +20,7 @@ type GroupConversation struct {
 
 
 type LatestMessage struct {
-	MessageType bool
+	MessageType string
 	Message string
 	Timestamp string
 }
@@ -26,5 +28,5 @@ type LatestMessage struct {
 type Conversation struct {
 	Type string
 	Private *PrivateConversation
-	GroupConversation *GroupConversation
+	Group *GroupConversation
 }

@@ -33,19 +33,26 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+
+	"github.com/gofrs/uuid"
 )
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	Ping() error
-	ListConversation(id string) ([]Conversation, error)
-	ListPrivateConversation(id string) ([]PrivateConversation, error)
+	Close() error
+	
+	ListConversation(id uuid.UUID) ([]Conversation, error)
+	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
+	ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error)
+	
 }
+
 
 type appdbimpl struct {
 	c *sql.DB
 }
+
 
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
@@ -53,12 +60,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-
+	
 	// CREATE THE DATABASE STRUCTURE
 	_, err := db.Exec(database_structure)
 	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
+		return nil, err
 	}
+
 	
 	return &appdbimpl{
 		c: db,
@@ -66,5 +74,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 }
 
 func (db *appdbimpl) Ping() error {
-	return db.c.Ping()
+	return db.c.Ping()	
+}
+
+func (db *appdbimpl) Close() error {
+	return db.c.Close()	
 }

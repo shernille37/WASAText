@@ -16,8 +16,11 @@ func (rt *_router) getHelloWorld(w http.ResponseWriter, r *http.Request, ps http
 func (rt *_router) Handler() http.Handler {
 	// Register routes
 	rt.router.GET("/", rt.getHelloWorld)
-	
+	rt.router.GET("/conversations/", rt.listConversation)
+	rt.router.GET("/conversations/private", rt.listPrivateConversation)
+	rt.router.GET("/conversations/group", rt.listGroupConversation)
 
+	
 	// Special routes
 	// ...
 

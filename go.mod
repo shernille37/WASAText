@@ -3,9 +3,9 @@ module github.com/shernille37/WASAText
 go 1.17
 
 require (
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/sirupsen/logrus v1.9.3
-
 )
 
 require (

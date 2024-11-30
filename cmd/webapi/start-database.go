@@ -14,21 +14,15 @@ func startDatabase(logger logrus.FieldLogger, filename string) (database.AppData
 
 	logger.Infof("Initializing database")
 
-	dbconn, err := sql.Open("sqlite3", filename)
+	dbconn, err := sql.Open("sqlite3", filename + "?_foreign_keys=1")
 	if err != nil {
 		logger.WithError(err).Error("error Opening SQLite DB")
 		return nil, fmt.Errorf("epening SQLite: %w", err)
 	}
-	defer func() {
-		logger.Debug("Database Stopping")
-		_ = dbconn.Close()
-	}()
-
 
 	db, err := database.New(dbconn)
-	if err != nil {
-		logger.WithError(err).Error("error Creating AppDatabase")
-		return nil, fmt.Errorf("creating AppDatabase: %w", err)
+	if err != nil {	
+		return nil, err
 	}
 
 	return db, nil

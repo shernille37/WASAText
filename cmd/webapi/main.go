@@ -50,9 +50,14 @@ func run() error {
 
 	db, err := startDatabase(logger, cfg.DB.Filename)
 	if err != nil {
-		logger.WithError(err).Error("error Creating AppDatabase")
-		return fmt.Errorf("creating AppDatabase: %w", err)
+		logger.WithError(err).Error("error creating AppDatabase")
+		return fmt.Errorf("%w", err)
 	}
+
+	defer func() {
+		logger.Debug("database stopping")
+		_ = db.Close()
+	}()
 
 	// Start the API Server
 	logger.Info("Init API Server")
@@ -75,6 +80,7 @@ func run() error {
 	}
 	
 	router := apirouter.Handler()
+	
 
 	// APPLY CORS HANDLER
 	router = applyCORSHandler(router)

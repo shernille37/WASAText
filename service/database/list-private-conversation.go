@@ -10,9 +10,15 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 	var res []PrivateConversation
 
 	const queryPrivateConversation = `
-		SELECT c.conversationID, u.userID, u.username, u.image
-		FROM Conversation c, Members m, User u
-		WHERE c.conversationType = 'personal' AND u.userID = ? AND c.conversationID = m.conversationID AND m.userID = ?;
+		SELECT c.conversationID
+		FROM Conversation c, Members m
+		WHERE c.conversationType = 'personal' AND c.conversationID = m.conversationID AND m.userID = ?;
+	`
+
+	const queryChatmate = `
+		SELECT u.userID, u.username, u.image
+		FROM User u, Members m 
+		WHERE m.conversationID = ? AND m.userID = u.userID AND m.userID <> ?;
 	`
 	
 	const queryLatestMessage = `
@@ -32,12 +38,20 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 	defer rows.Close()
 
 	for rows.Next() {
+		var u User
 		var pc PrivateConversation
 		var lm LatestMessage
 
-		err = rows.Scan(&pc.ConversationID, &pc.UserID, &pc.Name, &pc.Image)
+		err = rows.Scan(&pc.ConversationID)
 		if err != nil {
 			return nil, err
+		}
+
+		// Fetch chatmate
+		err = db.c.QueryRow(queryChatmate, pc.ConversationID, id).Scan(&u.UserID, &u.Name, &u.Image)
+
+		if err != nil {
+			return nil ,err
 		}
 
 		// Fetch the latest message
@@ -47,6 +61,7 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 			return nil, err
 		}
 
+		pc.User = &u
 		pc.LatestMessage = &lm 
 		res = append(res, pc)  
 	}

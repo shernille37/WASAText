@@ -42,9 +42,11 @@ type AppDatabase interface {
 	Ping() error
 	Close() error
 	
+	Login(user User) (User, error)
 	ListConversation(id uuid.UUID) ([]Conversation, error)
 	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
 	ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error)
+	GetConversation(id uuid.UUID, conversationID uuid.UUID) (Conversation, error)
 	
 }
 

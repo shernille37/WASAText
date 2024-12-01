@@ -38,7 +38,7 @@ paths:
                 name:
                   description: "Name of the user"
                   type: string
-                  example: Maria
+                  example: John Doe
                   pattern: "^.*?$"
                   minLength: 3
                   maxLength: 16
@@ -51,10 +51,7 @@ paths:
             application/json:
               schema:
                 description: "User ID that has been authenticated"
-                type: object
-                properties:
-                  userId:
-                    $ref: "#/components/schemas/UUID"
+                $ref: "#/components/schemas/User"
 
         "500":
           description: Internal Server Error
@@ -124,6 +121,12 @@ paths:
 
                 type: object
                 properties:
+                  type:
+                    description: Type of the conversation
+                    type: string
+                    enum:
+                      - personal
+                      - group
                   members:
                     description: Members of the conversation
                     type: array
@@ -138,7 +141,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /conversations/privates:
+  /private-conversations:
     get:
       summary: Get the list of all private conversations
 
@@ -196,7 +199,7 @@ paths:
         "401":
           description: Unauthorized
 
-  /conversations/groups:
+  /group-conversations:
     get:
       summary: Get the list of all group conversations
 
@@ -254,7 +257,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /conversations/groups/{chatId}/name:
+  /group-conversations/{chatId}/name:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
 
@@ -291,7 +294,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /conversations/groups/{chatId}/photo:
+  /group-conversations/{chatId}/photo:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
 
@@ -329,7 +332,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /conversations/groups/{chatId}/members:
+  /group-conversations/{chatId}/members:
     parameters:
       - $ref: "#/components/parameters/ConversationID"
 

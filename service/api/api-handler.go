@@ -4,21 +4,25 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/reqcontext"
 )
 
 // getHelloWorld is an example of HTTP endpoint that returns "Hello world!" as a plain text
-func (rt *_router) getHelloWorld(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getHelloWorld(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "text/plain")
-	_, _ = w.Write([]byte("Hello World!"))
+	_, _ = w.Write([]byte("API is RUNNING!"))
 }
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
 	// Register routes
-	rt.router.GET("/", rt.getHelloWorld)
-	rt.router.GET("/conversations/", rt.listConversation)
-	rt.router.GET("/conversations/private", rt.listPrivateConversation)
-	rt.router.GET("/conversations/group", rt.listGroupConversation)
+
+	rt.router.POST("/login", rt.wrap(rt.login, false))
+	rt.router.GET("/", rt.wrap(rt.getHelloWorld, true))
+	rt.router.GET("/conversations/", rt.wrap(rt.listConversation, true))
+	rt.router.GET("/conversations/:id", rt.wrap(rt.getConversation, true))
+	rt.router.GET("/private-conversations/", rt.wrap(rt.listPrivateConversation, true))
+	rt.router.GET("/group-conversations/", rt.wrap(rt.listGroupConversation, true))
 
 	
 	// Special routes

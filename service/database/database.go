@@ -43,6 +43,7 @@ type AppDatabase interface {
 	Close() error
 	
 	Login(user User) (User, error)
+	GetUserByID(id string) (User, error)
 	ListConversation(id uuid.UUID) ([]Conversation, error)
 	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
 	ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error)

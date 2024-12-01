@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 	"github.com/shernille37/WASAText/service/database"
@@ -13,7 +12,7 @@ import (
 func (rt *_router) listPrivateConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var pc []database.PrivateConversation
-	id, _ := uuid.FromString("760410a9-8290-4fbc-895c-15fc51d6d4dc")
+	id := ctx.UserID
 
 	pc, err := rt.db.ListPrivateConversation(id)
 	

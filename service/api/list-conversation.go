@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 	"github.com/shernille37/WASAText/service/database"
@@ -14,10 +13,9 @@ func (rt *_router) listConversation(w http.ResponseWriter, r *http.Request, ps h
 
 	var c []database.Conversation
 	
-	userID, _ := uuid.FromString("760410a9-8290-4fbc-895c-15fc51d6d4dc")
+	id := ctx.UserID
 	
-
-	c, err := rt.db.ListConversation(userID)
+	c, err := rt.db.ListConversation(id)
 
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't List Conversations")

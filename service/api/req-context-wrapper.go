@@ -15,7 +15,7 @@ import (
 type httpRouterHandler func(http.ResponseWriter, *http.Request, httprouter.Params, reqcontext.RequestContext)
 
 // wrap parses the request and adds a reqcontext.RequestContext instance related to the request.
-func (rt *_router) wrap(fn httpRouterHandler, protected bool) func(http.ResponseWriter, *http.Request, httprouter.Params) {
+func (rt *_router) wrap(pathHandler httpRouterHandler, protected bool) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		reqUUID, err := uuid.NewV4()
 		if err != nil {
@@ -34,11 +34,11 @@ func (rt *_router) wrap(fn httpRouterHandler, protected bool) func(http.Response
 
 		if protected {
 			// Call the auth middlware in chain
-			authmiddlware := middleware.AuthMiddleware(fn)
-			authmiddlware(w,r,ps,ctx)
+			authmiddleware := middleware.AuthMiddleware(rt.db, pathHandler)
+			authmiddleware(w,r,ps,ctx)
 		} else {
 			// Call the next handler in chain (usually, the handler function for the path)
-			fn(w, r, ps, ctx)
+			pathHandler(w, r, ps, ctx)
 		}
 	}
 }

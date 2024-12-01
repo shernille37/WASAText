@@ -15,12 +15,7 @@ func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps ht
 	var pc database.Conversation
 	conversationID := ps.ByName("id")
 	
-	userID, err := uuid.FromString("760410a9-8290-4fbc-895c-15fc51d6d4dc")
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	userID := ctx.UserID
 
 	convID, err := uuid.FromString(conversationID)
 

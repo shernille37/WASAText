@@ -34,8 +34,7 @@ func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps ht
 	var res Conversation
 	res.FromDatabase(pc)
 
-		// Send the list to the user.
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(res)
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(res)
 
 }

@@ -32,18 +32,15 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, e
 		var gc GroupConversation
 		var lm LatestMessage
 
-		err = rows.Scan(&gc.ConversationID, &gc.GroupName, &gc.GroupImage)
-		if err != nil {
+		if err = rows.Scan(&gc.ConversationID, &gc.GroupName, &gc.GroupImage); err != nil {
 			return nil, err
 		}
 
 		// Fetch the latest message
-		err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message)
-		
-		if err != nil && err != sql.ErrNoRows {
-			
+		if err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil && err != sql.ErrNoRows {
 			return nil, err
 		}
+		
 		gc.LatestMessage = &lm
 
 		res = append(res, gc)

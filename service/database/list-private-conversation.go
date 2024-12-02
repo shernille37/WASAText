@@ -29,7 +29,7 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 		LIMIT 1;
 	`
 
-	rows, err := db.c.Query(queryPrivateConversation, id, id)
+	rows, err := db.c.Query(queryPrivateConversation, id)
 
 	if err != nil {
 		return nil, err
@@ -42,22 +42,18 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 		var pc PrivateConversation
 		var lm LatestMessage
 
-		err = rows.Scan(&pc.ConversationID)
-		if err != nil {
+		if err = rows.Scan(&pc.ConversationID); err != nil {
 			return nil, err
 		}
 
-		// Fetch chatmate
-		err = db.c.QueryRow(queryChatmate, pc.ConversationID, id).Scan(&u.UserID, &u.Name, &u.Image)
 
-		if err != nil {
-			return nil ,err
+		// Fetch chatmate
+		if err = db.c.QueryRow(queryChatmate, pc.ConversationID, id).Scan(&u.UserID, &u.Name, &u.Image); err != nil {
+			return nil, err
 		}
 
 		// Fetch the latest message
-		err = db.c.QueryRow(queryLatestMessage, pc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message)
-		if err != nil && err != sql.ErrNoRows {
-			
+		if err = db.c.QueryRow(queryLatestMessage, pc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil && err != sql.ErrNoRows {
 			return nil, err
 		}
 

@@ -16,11 +16,11 @@ func (rt *_router) listPrivateConversation(w http.ResponseWriter, r *http.Reques
 
 	pc, err := rt.db.ListPrivateConversation(id)
 	
-		if err != nil {
-			ctx.Logger.WithError(err).Error("Can't List Private Conversations")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Can't List Private Conversations")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 
 	var res = make([]PrivateConversation, len(pc))
@@ -29,8 +29,8 @@ func (rt *_router) listPrivateConversation(w http.ResponseWriter, r *http.Reques
 		res[idx].FromDatabase(pc[idx])
 	}
 
-		// Send the list to the user.
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(res)
+	// Send the list to the user.
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(res)
 
 }

@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS Members (
 	conversationID TEXT NOT NULL,
 
 	PRIMARY KEY (userID, conversationID),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (conversationID) REFERENCES Conversation(conversationID)
+	FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
+	FOREIGN KEY (conversationID) REFERENCES Conversation(conversationID) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Message (
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS Message (
 
 	PRIMARY KEY (pk),
 	UNIQUE (messageID),
-	FOREIGN KEY (senderID) REFERENCES User(userID),
-	FOREIGN KEY (conversationID) REFERENCES Conversation(conversationID)
+	FOREIGN KEY (senderID) REFERENCES User(userID) ON DELETE CASCADE,
+	FOREIGN KEY (conversationID) REFERENCES Conversation(conversationID) ON DELETE CASCADE
 
 );
 
@@ -76,9 +76,9 @@ CREATE TABLE IF NOT EXISTS Reaction (
 	PRIMARY KEY (pk),
 	UNIQUE(reactionID),
 	UNIQUE(userID, messageID, emoji),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (messageID) REFERENCES Message(messageID),
-	FOREIGN KEY (emoji) REFERENCES Emoji(unicode)
+	FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
+	FOREIGN KEY (messageID) REFERENCES Message(messageID) ON DELETE CASCADE,
+	FOREIGN KEY (emoji) REFERENCES Emoji(unicode) ON DELETE CASCADE
 	
 );
 

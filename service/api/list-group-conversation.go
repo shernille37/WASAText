@@ -27,8 +27,8 @@ func (rt *_router) listGroupConversation(w http.ResponseWriter, r *http.Request,
 		res[idx].FromDatabase(gc[idx])
 	}
 
-		// Send the list to the user.
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(res)
+	// Send the list to the user.
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(res)
 
 }

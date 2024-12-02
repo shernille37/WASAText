@@ -1,6 +1,8 @@
 package database
 
-import "github.com/gofrs/uuid"
+import (
+	"github.com/gofrs/uuid"
+)
 
 func (db *appdbimpl) ListConversation(id uuid.UUID) ([]Conversation, error) {
 
@@ -17,15 +19,17 @@ func (db *appdbimpl) ListConversation(id uuid.UUID) ([]Conversation, error) {
 
 	for _, pc := range personalConversations {
 		var c Conversation
+		tmp := pc
 		c.Type = "personal"
-		c.Private = &pc
+		c.Private = &tmp
 		res = append(res, c)
 	}
-
+	
 	for _, gc := range groupConversations {
 		var c Conversation
+		tmp := gc
 		c.Type = "group"
-		c.Group = &gc
+		c.Group = &tmp
 		res = append(res, c)
 	}
 

@@ -53,12 +53,10 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 	`	
 
 	var u_id uuid.UUID
-
+	mgb.Members = append(mgb.Members, senderID)
 	// Check for user existence in the system
 	for _, userID := range mgb.Members {
-		if senderID == userID {
-			return res, fmt.Errorf("cannot add yourself")
-		}
+
 		if err := db.c.QueryRow(queryCheckUser, userID).Scan(&u_id); errors.Is(err, sql.ErrNoRows) {
 			return res, fmt.Errorf("user doesn't exists")
 		}

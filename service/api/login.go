@@ -12,11 +12,11 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	
 	var u User
 
-	err := json.NewDecoder(r.Body).Decode(&u)
-	if err != nil {
-		http.Error(w, "Parse Error", http.StatusInternalServerError)
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		http.Error(w, "Invalid Input", http.StatusInternalServerError)
 		return
 	}
+
 
 	dbUser, err := rt.db.Login(u.ToDatabase())
 

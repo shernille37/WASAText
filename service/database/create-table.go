@@ -38,9 +38,9 @@ CREATE TABLE IF NOT EXISTS Message (
 	messageID TEXT NOT NULL,
 	senderID TEXT NOT NULL,
 	conversationID TEXT NOT NULL,
-	timestamp TEXT NOT NULL,
+	timestamp TEXT NOT NULL DEFAULT current_timestamp,
 	messageType TEXT NOT NULL CHECK(messageType IN ('text', 'image')),
-	messageStatus TEXT NOT NULL CHECK(messageStatus IN ('delivered', 'read')),
+	messageStatus TEXT NOT NULL CHECK(messageStatus IN ('delivered', 'read', 'sent')),
 	timeDelivered TEXT,
 	message TEXT,
 	image TEXT,
@@ -83,5 +83,3 @@ CREATE TABLE IF NOT EXISTS Reaction (
 );
 
 `
-
-const database_structure = create_table

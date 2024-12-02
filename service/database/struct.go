@@ -34,3 +34,15 @@ type Conversation struct {
 	Group *GroupConversation
 	Members []User
 }
+
+type Message struct {
+	MessageID uuid.UUID 
+	SenderID uuid.UUID 
+	ConversationID uuid.UUID
+	Timestamp string 
+	MessageType string
+	MessageStatus string
+	TimeDelivered string
+	Message string 
+	Image string 
+}

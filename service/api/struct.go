@@ -39,6 +39,46 @@ type Conversation struct {
 	Members []User `json:"members"`
 }
 
+type Message struct {
+	MessageID uuid.UUID `json:"messageID"`
+	SenderID uuid.UUID `json:"senderID"`
+	ConversationID uuid.UUID `json:"conversationID"`
+	Timestamp string `json:"timestamp"`
+	MessageType string `json:"messageType"`
+	MessageStatus string `json:"messageStatus"`
+	TimeDelivered string `json:"timeDelivered"`
+	Message string `json:"message"`
+	Image string `json:"image"`
+}
+
+func (m *Message) ToDatabase() database.Message {
+	return database.Message{
+		MessageID: m.MessageID,
+		SenderID: m.SenderID,
+		ConversationID: m.ConversationID,
+		Timestamp: m.Timestamp,
+		MessageType: m.MessageType,
+		MessageStatus: m.MessageStatus,
+		TimeDelivered: m.TimeDelivered,
+		Message: m.Message,
+		Image: m.Image,	
+	}
+}
+
+func (m *Message) FromDatabase(mess database.Message) {
+	m.MessageID = mess.MessageID
+	m.SenderID = mess.SenderID
+	m.ConversationID = mess.ConversationID
+	m.Timestamp = mess.Timestamp
+	m.MessageType = mess.MessageType
+	m.MessageStatus = mess.MessageStatus
+	m.TimeDelivered = mess.TimeDelivered
+	m.Message = mess.Message
+	m.Image = mess.Image
+}
+
+
+
 func (u *User) FromDatabase(user database.User) {
 	u.UserID = user.UserID
 	u.Name = user.Name
@@ -156,3 +196,5 @@ func (gc *GroupConversation) ToDatabase() database.GroupConversation {
 		LatestMessage: (*database.LatestMessage)(gc.LatestMessage),
 	}
 }
+
+

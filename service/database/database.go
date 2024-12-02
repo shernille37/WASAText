@@ -48,6 +48,9 @@ type AppDatabase interface {
 	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
 	ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error)
 	GetConversation(id uuid.UUID, conversationID uuid.UUID) (Conversation, error)
+
+	AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error)
+	AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error)
 	
 }
 
@@ -65,7 +68,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}
 	
 	// CREATE THE DATABASE STRUCTURE
-	_, err := db.Exec(database_structure)
+	_, err := db.Exec(create_table)
 	if err != nil {
 		return nil, err
 	}

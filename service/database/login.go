@@ -19,7 +19,7 @@ func (db *appdbimpl) Login(user User) (User, error) {
 
 	const queryRegisterUser = `
 		INSERT INTO User(userID, username, image) VALUES 
-		(?,?,?);
+		(?,?,"");
 	`
 
 	err := db.c.QueryRow(queryUser, user.Name).Scan(&res.UserID, &res.Name, &res.Image)
@@ -28,13 +28,11 @@ func (db *appdbimpl) Login(user User) (User, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		userID, err := uuid.NewV4()
 		if err != nil {
-			return user, err
+			return res, err
 		}
 
-		_ , err = db.c.Exec(queryRegisterUser, userID.String(), user.Name, "")
-
-		if err != nil {
-			return user ,err
+		if _ , err = db.c.Exec(queryRegisterUser, userID.String(), user.Name); err != nil {
+			return res, err
 		}
 
 		res.UserID = userID

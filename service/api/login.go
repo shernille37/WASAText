@@ -9,14 +9,13 @@ import (
 )
 
 func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	
+
 	var u User
 
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 		http.Error(w, "Invalid Input", http.StatusInternalServerError)
 		return
 	}
-
 
 	dbUser, err := rt.db.Login(u.ToDatabase())
 
@@ -26,7 +25,7 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	u.FromDatabase(dbUser)
-		
+
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(u)
 

@@ -40,7 +40,7 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, e
 		if err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil && err != sql.ErrNoRows {
 			return nil, err
 		}
-		
+
 		gc.LatestMessage = &lm
 
 		res = append(res, gc)

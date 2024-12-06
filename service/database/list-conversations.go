@@ -24,7 +24,7 @@ func (db *appdbimpl) ListConversation(id uuid.UUID) ([]Conversation, error) {
 		c.Private = &tmp
 		res = append(res, c)
 	}
-	
+
 	for _, gc := range groupConversations {
 		var c Conversation
 		tmp := gc
@@ -32,7 +32,6 @@ func (db *appdbimpl) ListConversation(id uuid.UUID) ([]Conversation, error) {
 		c.Group = &tmp
 		res = append(res, c)
 	}
-
 
 	return res, nil
 

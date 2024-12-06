@@ -13,8 +13,8 @@ import (
 func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var pc database.Conversation
-	conversationID := ps.ByName("id")
-	
+	conversationID := ps.ByName("chatId")
+
 	userID := ctx.UserID
 
 	convID, err := uuid.FromString(conversationID)
@@ -25,7 +25,7 @@ func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	pc, err = rt.db.GetConversation(userID, convID)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -15,13 +15,12 @@ func (rt *_router) listPrivateConversation(w http.ResponseWriter, r *http.Reques
 	id := ctx.UserID
 
 	pc, err := rt.db.ListPrivateConversation(id)
-	
+
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't List Private Conversations")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 
 	var res = make([]PrivateConversation, len(pc))
 

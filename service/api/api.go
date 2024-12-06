@@ -22,12 +22,11 @@ type Config struct {
 type Router interface {
 	Handler() http.Handler
 	Close() error
-	
 }
 
 type _router struct {
-	router *httprouter.Router
-	db database.AppDatabase
+	router     *httprouter.Router
+	db         database.AppDatabase
 	baseLogger logrus.FieldLogger
 }
 
@@ -46,8 +45,8 @@ func New(cfg Config) (Router, error) {
 	router.RedirectFixedPath = false
 
 	return &_router{
-		router: router,
+		router:     router,
 		baseLogger: cfg.Logger,
-		db: cfg.Database,
+		db:         cfg.Database,
 	}, nil
 }

@@ -41,7 +41,7 @@ import (
 type AppDatabase interface {
 	Ping() error
 	Close() error
-	
+
 	Login(user User) (User, error)
 	GetUserByID(id string) (User, error)
 	ListConversation(id uuid.UUID) ([]Conversation, error)
@@ -51,14 +51,15 @@ type AppDatabase interface {
 
 	AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error)
 	AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error)
-	
-}
+	UpdateGroupName(conversationID uuid.UUID, newGroupName string) error
+	UpdateGroupImage(conversationID uuid.UUID, newGroupPhoto string) error
 
+	ListMessages(conversationID uuid.UUID) ([]Message, error)
+}
 
 type appdbimpl struct {
 	c *sql.DB
 }
-
 
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
@@ -66,23 +67,22 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-	
+
 	// CREATE THE DATABASE STRUCTURE
 	_, err := db.Exec(create_table)
 	if err != nil {
 		return nil, err
 	}
 
-	
 	return &appdbimpl{
 		c: db,
 	}, nil
 }
 
 func (db *appdbimpl) Ping() error {
-	return db.c.Ping()	
+	return db.c.Ping()
 }
 
 func (db *appdbimpl) Close() error {
-	return db.c.Close()	
+	return db.c.Close()
 }

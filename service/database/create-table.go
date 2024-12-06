@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS Message (
 	timestamp TEXT NOT NULL DEFAULT current_timestamp,
 	messageType TEXT NOT NULL CHECK(messageType IN ('text', 'image')),
 	messageStatus TEXT NOT NULL CHECK(messageStatus IN ('delivered', 'read', 'sent')),
+	timeRead TEXT,
 	timeDelivered TEXT,
 	message TEXT,
 	image TEXT,

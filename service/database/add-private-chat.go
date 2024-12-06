@@ -9,11 +9,10 @@ import (
 )
 
 type MessagePrivateBody struct {
-	ReceiverID uuid.UUID 
-	Message string 
-	MessageType string 
+	ReceiverID  uuid.UUID
+	Message     string
+	MessageType string
 }
-
 
 func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error) {
 
@@ -54,7 +53,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	WHERE m.conversationID = ?
 	ORDER BY m.timestamp DESC
 	LIMIT 1;
-`	
+	`
 
 	if senderID == mpb.ReceiverID {
 		return res, fmt.Errorf("cannot have conversation to yourself")
@@ -66,7 +65,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	if errors.Is(err, sql.ErrNoRows) {
 		return res, fmt.Errorf("user doesn't exists")
 	}
-	
+
 	var existingConvID bool
 	err = db.c.QueryRow(queryCheckConversation, senderID, mpb.ReceiverID).Scan(&existingConvID)
 
@@ -88,7 +87,6 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 		return res, err
 	}
 
-	
 	// Add Conversation
 	var mess string
 	var image string
@@ -96,7 +94,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	if mpb.MessageType == "image" {
 		image = mpb.Message
 	} else {
-		
+
 		mess = mpb.Message
 	}
 
@@ -107,36 +105,33 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	}
 
 	// Add Members
-	mems := [2]uuid.UUID{ senderID, mpb.ReceiverID }
+	mems := [2]uuid.UUID{senderID, mpb.ReceiverID}
 	for _, id := range mems {
 
 		_, err = db.c.Exec(queryAddMembers, id, convID)
-	
+
 		if err != nil {
 			return res, err
 		}
 	}
 
-
 	// Add Message
-	_, err = db.c.Exec(queryMessage,messageID, senderID, convID, mpb.MessageType, mess, image)
+	_, err = db.c.Exec(queryMessage, messageID, senderID, convID, mpb.MessageType, mess, image)
 
 	if err != nil {
 		return res, err
 	}
 
-	
 	var lm LatestMessage
 	err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message)
-	
+
 	if err != nil {
 		return res, err
 	}
-	
+
 	res.ConversationID = convID
 	res.User = &u
 	res.LatestMessage = &lm
-
 
 	return res, nil
 

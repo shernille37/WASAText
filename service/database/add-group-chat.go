@@ -9,14 +9,12 @@ import (
 )
 
 type MessageGroupBody struct {
-	GroupName string 
-	GroupImage string 
+	GroupName   string
+	GroupImage  string
 	MessageType string
-	Message string 
-	Members []uuid.UUID
+	Message     string
+	Members     []uuid.UUID
 }
-
-
 
 func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error) {
 
@@ -43,14 +41,13 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 		WHERE u.userID = ?;
 	`
 
-
 	const queryLatestMessage = `
 	SELECT m.messageType, m.timestamp, COALESCE(m.message, '') 
 	FROM Message m 
 	WHERE m.conversationID = ?
 	ORDER BY m.timestamp DESC
 	LIMIT 1;
-	`	
+	`
 
 	var u_id uuid.UUID
 	mgb.Members = append(mgb.Members, senderID)
@@ -60,8 +57,8 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 		if err := db.c.QueryRow(queryCheckUser, userID).Scan(&u_id); errors.Is(err, sql.ErrNoRows) {
 			return res, fmt.Errorf("user doesn't exists")
 		}
-	
-	} 
+
+	}
 
 	convID, err := uuid.NewV4()
 	if err != nil {
@@ -95,7 +92,7 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 		mess = mgb.Message
 	}
 
-	_, err = db.c.Exec(queryMessage,messageID, senderID, convID, mgb.MessageType, mess, image)
+	_, err = db.c.Exec(queryMessage, messageID, senderID, convID, mgb.MessageType, mess, image)
 
 	if err != nil {
 		return res, err
@@ -103,16 +100,15 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 
 	var lm LatestMessage
 	err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message)
-	
+
 	if err != nil {
 		return res, err
 	}
-	
+
 	res.ConversationID = convID
 	res.GroupName = mgb.GroupName
 	res.GroupImage = mgb.GroupImage
 	res.LatestMessage = &lm
-
 
 	return res, nil
 

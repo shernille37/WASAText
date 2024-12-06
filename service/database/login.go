@@ -7,7 +7,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-
 func (db *appdbimpl) Login(user User) (User, error) {
 
 	var res User
@@ -31,7 +30,7 @@ func (db *appdbimpl) Login(user User) (User, error) {
 			return res, err
 		}
 
-		if _ , err = db.c.Exec(queryRegisterUser, userID.String(), user.Name); err != nil {
+		if _, err = db.c.Exec(queryRegisterUser, userID.String(), user.Name); err != nil {
 			return res, err
 		}
 
@@ -40,7 +39,7 @@ func (db *appdbimpl) Login(user User) (User, error) {
 		res.Image = ""
 
 		return res, nil
-	} 
+	}
 
 	return res, nil
 

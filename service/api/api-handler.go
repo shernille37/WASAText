@@ -20,14 +20,18 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/", rt.wrap(rt.getHelloWorld, false))
 	rt.router.POST("/login", rt.wrap(rt.login, false))
 	rt.router.GET("/conversations", rt.wrap(rt.listConversation, true))
-	rt.router.GET("/conversations/:id", rt.wrap(rt.getConversation, true))
+
+	rt.router.GET("/conversations/:chatId/details", rt.wrap(rt.getConversation, true))
+	rt.router.GET("/conversations/:chatId/messages", rt.wrap(rt.listMessages, true))
+
 	rt.router.GET("/private-conversations", rt.wrap(rt.listPrivateConversation, true))
 	rt.router.POST("/private-conversations", rt.wrap(rt.addPrivateChat, true))
 
 	rt.router.GET("/group-conversations", rt.wrap(rt.listGroupConversation, true))
 	rt.router.POST("/group-conversations", rt.wrap(rt.addGroupChat, true))
+	rt.router.PUT("/group-conversations/:chatId/name", rt.wrap(rt.updateGroupName, true))
+	rt.router.PUT("/group-conversations/:chatId/photo", rt.wrap(rt.updateGroupImage, true))
 
-	
 	// Special routes
 	// ...
 

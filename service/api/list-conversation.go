@@ -12,9 +12,9 @@ import (
 func (rt *_router) listConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var c []database.Conversation
-	
+
 	id := ctx.UserID
-	
+
 	c, err := rt.db.ListConversation(id)
 
 	if err != nil {

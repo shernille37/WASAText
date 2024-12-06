@@ -12,15 +12,14 @@ import (
 )
 
 type MessagePrivateBody struct {
-	ReceiverID uuid.UUID `json:"receiverID"`
-	Message string `json:"message"`
-	MessageType string `json:"messageType"`
+	ReceiverID  uuid.UUID `json:"receiverID"`
+	Message     string    `json:"message"`
+	MessageType string    `json:"messageType"`
 }
 
 func (rt *_router) addPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	
+
 	var mess MessagePrivateBody
-	
 
 	if err := json.NewDecoder(r.Body).Decode(&mess); err != nil {
 		http.Error(w, "Parse Error", http.StatusInternalServerError)
@@ -36,18 +35,19 @@ func (rt *_router) addPrivateChat(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	// TODO: CHECK if conversations exists
 	var res PrivateConversation
 	res.FromDatabase(dbUser)
-		
+
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(res)
 
 }
 
 func (mpb *MessagePrivateBody) ToDatabase() database.MessagePrivateBody {
-	return database.MessagePrivateBody {
-		ReceiverID: mpb.ReceiverID,
-		Message: mpb.Message,
+	return database.MessagePrivateBody{
+		ReceiverID:  mpb.ReceiverID,
+		Message:     mpb.Message,
 		MessageType: mpb.MessageType,
 	}
 }

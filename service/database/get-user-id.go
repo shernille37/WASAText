@@ -5,7 +5,6 @@ import (
 	"errors"
 )
 
-
 func (db *appdbimpl) GetUserByID(id string) (User, error) {
 
 	var res User
@@ -20,7 +19,7 @@ func (db *appdbimpl) GetUserByID(id string) (User, error) {
 	// No user found
 	if errors.Is(err, sql.ErrNoRows) {
 		return res, err
-	} 
+	}
 
 	return res, nil
 

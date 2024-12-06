@@ -8,13 +8,12 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 	var res Conversation
 	var members []User
 
-	
 	const queryConversation = `
 		SELECT c.conversationID, c.conversationType, COALESCE(c.groupName, ''), COALESCE(c.groupImage, '')
 		FROM Conversation c
 		WHERE c.conversationID = ?;
 	`
-	
+
 	const queryPrivateConversation = `
 	SELECT c.conversationID, u.userID, u.username, u.image
 	FROM Conversation c, Members m, User u
@@ -46,7 +45,6 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 		return res, err
 	}
 
-
 	res.Type = convType
 
 	if convType == "personal" {
@@ -55,7 +53,6 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 		if err := db.c.QueryRow(queryPrivateConversation, conversationID, id).Scan(&pc.ConversationID, &u.UserID, &u.Name, &u.Image); err != nil {
 			return res, err
 		}
-
 
 		var lm LatestMessage
 		if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
@@ -70,7 +67,6 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 		gc.ConversationID = convID
 		gc.GroupName = groupName
 		gc.GroupImage = groupImage
-
 
 		var lm LatestMessage
 		if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {

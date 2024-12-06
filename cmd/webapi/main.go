@@ -21,7 +21,7 @@ func main() {
 		_, _ = fmt.Fprintln(os.Stderr, "error: ", err)
 		os.Exit(1)
 	}
-	
+
 }
 
 func run() error {
@@ -43,7 +43,7 @@ func run() error {
 	} else {
 		logger.SetLevel(logrus.InfoLevel)
 	}
-	
+
 	logger.Infof("Application Initializing")
 
 	// Start the database
@@ -70,7 +70,7 @@ func run() error {
 	serverErrors := make(chan error, 1)
 
 	apirouter, err := api.New(api.Config{
-		Logger: logger,
+		Logger:   logger,
 		Database: db,
 	})
 
@@ -78,16 +78,15 @@ func run() error {
 		logger.WithError(err).Error("error creating the API server instance")
 		return fmt.Errorf("error starting api: %w", err)
 	}
-	
+
 	router := apirouter.Handler()
-	
 
 	// APPLY CORS HANDLER
 	router = applyCORSHandler(router)
 
-	apiServer := http.Server {
-		Addr: cfg.Web.APIHost,
-		Handler: router,
+	apiServer := http.Server{
+		Addr:              cfg.Web.APIHost,
+		Handler:           router,
 		ReadTimeout:       cfg.Web.ReadTimeout,
 		ReadHeaderTimeout: cfg.Web.ReadTimeout,
 		WriteTimeout:      cfg.Web.WriteTimeout,
@@ -133,7 +132,7 @@ func run() error {
 			return fmt.Errorf("could not stop server gracefully: %w", err)
 		}
 	}
-	
+
 	return nil
 
 }

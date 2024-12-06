@@ -50,7 +50,6 @@ paths:
           content:
             application/json:
               schema:
-                description: "User ID that has been authenticated"
                 $ref: "#/components/schemas/User"
 
         "500":

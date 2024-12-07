@@ -38,10 +38,13 @@ type Message struct {
 	MessageID      uuid.UUID
 	SenderID       uuid.UUID
 	ConversationID uuid.UUID
+	ReplyMessageID *uuid.UUID
+	ReplyMessage   *string
 	Timestamp      string
+	HasImage       bool
 	MessageType    string
 	MessageStatus  string
 	TimeDelivered  string
 	Message        string
-	Image          string
+	Image          *string
 }

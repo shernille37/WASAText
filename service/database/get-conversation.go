@@ -19,7 +19,6 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 	FROM Conversation c, Members m, User u
 	WHERE c.conversationType = 'personal' AND c.conversationID = ? AND c.conversationID = m.conversationID AND m.userID <> ?
 	AND m.userID = u.userID;
-
 	`
 
 	const queryLatestMessage = `
@@ -54,13 +53,7 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 			return res, err
 		}
 
-		var lm LatestMessage
-		if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
-			return res, err
-		}
-
 		pc.User = &u
-		pc.LatestMessage = &lm
 		res.Private = &pc
 	} else {
 		var gc GroupConversation
@@ -68,16 +61,22 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 		gc.GroupName = groupName
 		gc.GroupImage = groupImage
 
-		var lm LatestMessage
-		if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
-			return res, err
-		}
-
-		gc.LatestMessage = &lm
 		res.Group = &gc
 	}
 
+	var lm LatestMessage
+	if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
+		return res, err
+	}
+
+	if res.Private != nil {
+		res.Private.LatestMessage = &lm
+	} else {
+		res.Group.LatestMessage = &lm
+	}
+
 	rows, err := db.c.Query(queryMembers, conversationID, id)
+
 	if err != nil {
 		return res, err
 	}
@@ -94,6 +93,11 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 		members = append(members, u)
 	}
 
+	if err = rows.Err(); err != nil {
+		return res, err
+	}
+
 	res.Members = members
+
 	return res, nil
 }

@@ -21,8 +21,8 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 	var res GroupConversation
 
 	const queryMessage = `
-		INSERT INTO Message(messageID, senderID, conversationID, messageType, messageStatus, timeDelivered, message, image)
-		VALUES (?,?,?,?,'sent', "", ?, ?);
+		INSERT INTO Message(messageID, senderID, conversationID, messageType, message, image)
+		VALUES (?,?,?,?, ?, ?);
 	`
 
 	const queryAddConversation = `
@@ -83,13 +83,13 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 	}
 
 	// Add Message
-	var mess string
-	var image string
+	var mess *string
+	var image *string
 
 	if mgb.MessageType == "image" {
-		image = mgb.Message
+		image = &mgb.Message
 	} else {
-		mess = mgb.Message
+		mess = &mgb.Message
 	}
 
 	_, err = db.c.Exec(queryMessage, messageID, senderID, convID, mgb.MessageType, mess, image)

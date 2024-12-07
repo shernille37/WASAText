@@ -38,15 +38,18 @@ type Conversation struct {
 }
 
 type Message struct {
-	MessageID      uuid.UUID `json:"messageID"`
-	SenderID       uuid.UUID `json:"senderID"`
-	ConversationID uuid.UUID `json:"conversationID"`
-	Timestamp      string    `json:"timestamp"`
-	MessageType    string    `json:"messageType"`
-	MessageStatus  string    `json:"messageStatus"`
-	TimeDelivered  string    `json:"timeDelivered"`
-	Message        string    `json:"message"`
-	Image          string    `json:"image"`
+	MessageID      uuid.UUID  `json:"messageID"`
+	SenderID       uuid.UUID  `json:"senderID"`
+	ConversationID uuid.UUID  `json:"conversationID"`
+	ReplyMessageID *uuid.UUID `json:"replyMessageID"`
+	ReplyMessage   *string    `json:"replyMessage"`
+	Timestamp      string     `json:"timestamp"`
+	HasImage       bool       `json:"hasImage"`
+	MessageType    string     `json:"messageType"`
+	MessageStatus  string     `json:"messageStatus"`
+	TimeDelivered  string     `json:"timeDelivered"`
+	Message        string     `json:"message"`
+	Image          *string    `json:"image"`
 }
 
 func (m *Message) ToDatabase() database.Message {
@@ -54,7 +57,10 @@ func (m *Message) ToDatabase() database.Message {
 		MessageID:      m.MessageID,
 		SenderID:       m.SenderID,
 		ConversationID: m.ConversationID,
+		ReplyMessageID: m.ReplyMessageID,
+		ReplyMessage:   m.ReplyMessage,
 		Timestamp:      m.Timestamp,
+		HasImage:       m.HasImage,
 		MessageType:    m.MessageType,
 		MessageStatus:  m.MessageStatus,
 		TimeDelivered:  m.TimeDelivered,
@@ -67,7 +73,10 @@ func (m *Message) FromDatabase(mess database.Message) {
 	m.MessageID = mess.MessageID
 	m.SenderID = mess.SenderID
 	m.ConversationID = mess.ConversationID
+	m.ReplyMessageID = mess.ReplyMessageID
+	m.ReplyMessage = mess.ReplyMessage
 	m.Timestamp = mess.Timestamp
+	m.HasImage = mess.HasImage
 	m.MessageType = mess.MessageType
 	m.MessageStatus = mess.MessageStatus
 	m.TimeDelivered = mess.TimeDelivered

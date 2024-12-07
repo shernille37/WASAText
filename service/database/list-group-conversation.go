@@ -1,8 +1,6 @@
 package database
 
 import (
-	"database/sql"
-
 	"github.com/gofrs/uuid"
 )
 
@@ -37,13 +35,17 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, e
 		}
 
 		// Fetch the latest message
-		if err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil && err != sql.ErrNoRows {
+		if err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
 			return nil, err
 		}
 
 		gc.LatestMessage = &lm
 
 		res = append(res, gc)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return res, nil

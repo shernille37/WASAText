@@ -55,6 +55,7 @@ type AppDatabase interface {
 	UpdateGroupImage(conversationID uuid.UUID, newGroupPhoto string) error
 
 	ListMessages(conversationID uuid.UUID) ([]Message, error)
+	AddMessage(senderID uuid.UUID, mb MessageBody) (Message, error)
 }
 
 type appdbimpl struct {

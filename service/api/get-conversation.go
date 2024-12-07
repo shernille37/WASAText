@@ -23,7 +23,7 @@ func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps ht
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
+	// TODO: CHECK THAT userID is part of the conversation
 	pc, err = rt.db.GetConversation(userID, convID)
 
 	if err != nil {

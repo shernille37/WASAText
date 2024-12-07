@@ -38,16 +38,19 @@ CREATE TABLE IF NOT EXISTS Message (
 	messageID TEXT NOT NULL,
 	senderID TEXT NOT NULL,
 	conversationID TEXT NOT NULL,
+	replyMessageID TEXT,
 	timestamp TEXT NOT NULL DEFAULT current_timestamp,
-	messageType TEXT NOT NULL CHECK(messageType IN ('text', 'image')),
-	messageStatus TEXT NOT NULL CHECK(messageStatus IN ('delivered', 'read', 'sent')),
+	messageType TEXT NOT NULL CHECK(messageType IN ('default', 'reply', 'forward')) DEFAULT 'default',
+	hasImage INTEGER DEFAULT 0,
+	messageStatus TEXT NOT NULL CHECK(messageStatus IN ('delivered', 'read', 'sent')) DEFAULT 'sent',
 	timeRead TEXT,
 	timeDelivered TEXT,
-	message TEXT,
+	message TEXT NOT NULL,
 	image TEXT,
 
 	PRIMARY KEY (pk),
 	UNIQUE (messageID),
+	FOREIGN KEY (replyMessageID) REFERENCES Message(messageID) ON DELETE CASCADE,
 	FOREIGN KEY (senderID) REFERENCES User(userID) ON DELETE CASCADE,
 	FOREIGN KEY (conversationID) REFERENCES Conversation(conversationID) ON DELETE CASCADE
 

@@ -59,17 +59,15 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 		return res, fmt.Errorf("cannot have conversation to yourself")
 	}
 
-	var u User
-	err := db.c.QueryRow(queryCheckUser, mpb.ReceiverID).Scan(&u.UserID, &u.Name, &u.Image)
 	// No user found -- Register the User to the system
-	if errors.Is(err, sql.ErrNoRows) {
+	var u User
+	if err := db.c.QueryRow(queryCheckUser, mpb.ReceiverID).Scan(&u.UserID, &u.Name, &u.Image); errors.Is(err, sql.ErrNoRows) {
 		return res, fmt.Errorf("user doesn't exists")
+
 	}
 
 	var existingConvID bool
-	err = db.c.QueryRow(queryCheckConversation, senderID, mpb.ReceiverID).Scan(&existingConvID)
-
-	if err != nil {
+	if err := db.c.QueryRow(queryCheckConversation, senderID, mpb.ReceiverID).Scan(&existingConvID); err != nil {
 		return res, err
 	}
 
@@ -123,9 +121,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	}
 
 	var lm LatestMessage
-	err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message)
-
-	if err != nil {
+	if err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
 		return res, err
 	}
 

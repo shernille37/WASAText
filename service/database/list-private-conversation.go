@@ -20,7 +20,7 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 	`
 
 	const queryLatestMessage = `
-		SELECT m.messageType, m.timestamp, COALESCE(m.message, '') 
+		SELECT m.hasImage, m.timestamp, COALESCE(m.message, '') 
 		FROM Message m 
 		WHERE m.conversationID = ?
 		ORDER BY m.timestamp DESC
@@ -50,7 +50,7 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 		}
 
 		// Fetch the latest message
-		if err = db.c.QueryRow(queryLatestMessage, pc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
+		if err = db.c.QueryRow(queryLatestMessage, pc.ConversationID).Scan(&lm.HasImage, &lm.Timestamp, &lm.Message); err != nil {
 			return nil, err
 		}
 

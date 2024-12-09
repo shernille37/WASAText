@@ -22,7 +22,7 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 	`
 
 	const queryLatestMessage = `
-		SELECT m.messageType, m.timestamp, COALESCE(m.message, '') 
+		SELECT m.hasImage, m.timestamp, COALESCE(m.message, '') 
 		FROM Message m 
 		WHERE m.conversationID = ?
 		ORDER BY m.timestamp DESC
@@ -32,7 +32,7 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 	const queryMembers = `
 		SELECT u.userID, u.username, u.image FROM 
 		Members m, User u
-		WHERE m.conversationID = ? AND m.userID = u.userID AND m.userID <> ?;
+		WHERE m.conversationID = ? AND m.userID = u.userID;
 	`
 
 	var convID uuid.UUID
@@ -65,7 +65,7 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 	}
 
 	var lm LatestMessage
-	if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
+	if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.HasImage, &lm.Timestamp, &lm.Message); err != nil {
 		return res, err
 	}
 

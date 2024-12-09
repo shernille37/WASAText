@@ -42,7 +42,7 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 	`
 
 	const queryLatestMessage = `
-	SELECT m.messageType, m.timestamp, COALESCE(m.message, '') 
+	SELECT m.hasImage, m.timestamp, COALESCE(m.message, '') 
 	FROM Message m 
 	WHERE m.conversationID = ?
 	ORDER BY m.timestamp DESC
@@ -99,7 +99,7 @@ func (db *appdbimpl) AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (Gro
 	}
 
 	var lm LatestMessage
-	err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message)
+	err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.HasImage, &lm.Timestamp, &lm.Message)
 
 	if err != nil {
 		return res, err

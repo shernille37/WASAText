@@ -25,9 +25,9 @@ type GroupConversation struct {
 }
 
 type LatestMessage struct {
-	MessageType string `json:"messageType"`
-	Message     string `json:"message"`
-	Timestamp   string `json:"timestamp"`
+	HasImage  bool   `json:"hasImage"`
+	Message   string `json:"message"`
+	Timestamp string `json:"timestamp"`
 }
 
 type Conversation struct {

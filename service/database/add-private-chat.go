@@ -48,7 +48,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	`
 
 	const queryLatestMessage = `
-	SELECT m.messageType, m.timestamp, COALESCE(m.message, '') 
+	SELECT m.hasImage, m.timestamp, COALESCE(m.message, '') 
 	FROM Message m 
 	WHERE m.conversationID = ?
 	ORDER BY m.timestamp DESC
@@ -121,7 +121,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	}
 
 	var lm LatestMessage
-	if err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
+	if err = db.c.QueryRow(queryLatestMessage, convID).Scan(&lm.HasImage, &lm.Timestamp, &lm.Message); err != nil {
 		return res, err
 	}
 

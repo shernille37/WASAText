@@ -12,7 +12,6 @@ import (
 )
 
 type MessageBody struct {
-	ConversationID uuid.UUID  `json:"conversationID"`
 	ReplyMessageID *uuid.UUID `json:"replyMessageID"`
 	Message        string     `json:"message"`
 	Image          *string    `json:"image"`
@@ -33,9 +32,9 @@ func (rt *_router) addMessage(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	mess.ConversationID = conversationID
-
-	dbUser, err := rt.db.AddMessage(ctx.UserID, mess.ToDatabase())
+	// Check if userID is part of the conversation
+	// Check if the replyMessageID is part of the conversation
+	dbUser, err := rt.db.AddMessage(ctx.UserID, conversationID, mess.ToDatabase())
 
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't Add Message")
@@ -55,7 +54,6 @@ func (rt *_router) addMessage(w http.ResponseWriter, r *http.Request, ps httprou
 
 func (mb *MessageBody) ToDatabase() database.MessageBody {
 	return database.MessageBody{
-		ConversationID: mb.ConversationID,
 		ReplyMessageID: mb.ReplyMessageID,
 		Message:        mb.Message,
 		Image:          mb.Image,

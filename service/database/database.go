@@ -45,17 +45,23 @@ type AppDatabase interface {
 	Login(user User) (User, error)
 	GetUserByID(id string) (User, error)
 	ListConversation(id uuid.UUID) ([]Conversation, error)
-	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
-	ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error)
 	GetConversation(id uuid.UUID, conversationID uuid.UUID) (Conversation, error)
 
+	ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error)
 	AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error)
+
+	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
 	AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error)
 	UpdateGroupName(conversationID uuid.UUID, newGroupName string) error
 	UpdateGroupImage(conversationID uuid.UUID, newGroupPhoto string) error
+	ListGroupMembers(conversationID uuid.UUID) ([]User, error)
+	AddGroupMembers(conversationID uuid.UUID, gmb GroupMemberBody) ([]User, error)
+	LeaveGroupConversation(userID uuid.UUID, conversationID uuid.UUID) error
 
 	ListMessages(conversationID uuid.UUID) ([]Message, error)
-	AddMessage(senderID uuid.UUID, mb MessageBody) (Message, error)
+	AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb MessageBody) (Message, error)
+
+	ListUsers(id uuid.UUID) ([]User, error)
 }
 
 type appdbimpl struct {

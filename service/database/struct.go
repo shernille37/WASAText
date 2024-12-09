@@ -22,9 +22,9 @@ type GroupConversation struct {
 }
 
 type LatestMessage struct {
-	MessageType string
-	Message     string
-	Timestamp   string
+	HasImage  bool
+	Message   string
+	Timestamp string
 }
 
 type Conversation struct {

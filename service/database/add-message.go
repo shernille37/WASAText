@@ -5,13 +5,12 @@ import (
 )
 
 type MessageBody struct {
-	ConversationID uuid.UUID
 	ReplyMessageID *uuid.UUID
 	Message        string
 	Image          *string
 }
 
-func (db *appdbimpl) AddMessage(senderID uuid.UUID, mb MessageBody) (Message, error) {
+func (db *appdbimpl) AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb MessageBody) (Message, error) {
 
 	var res Message
 
@@ -49,13 +48,13 @@ func (db *appdbimpl) AddMessage(senderID uuid.UUID, mb MessageBody) (Message, er
 		hasImage = false
 	}
 
-	_, err = db.c.Exec(queryAddMessage, messageID, senderID, mb.ConversationID, mb.ReplyMessageID, messageType, hasImage, mb.Message, mb.Image)
+	_, err = db.c.Exec(queryAddMessage, messageID, senderID, conversationID, mb.ReplyMessageID, messageType, hasImage, mb.Message, mb.Image)
 
 	if err != nil {
 		return res, nil
 	}
 
-	if err := db.c.QueryRow(queryResponse, mb.ConversationID, messageID).Scan(&res.MessageID, &res.SenderID, &res.ConversationID, &res.Timestamp, &res.MessageType, &res.MessageStatus, &res.Message, &res.HasImage, &res.Image, &res.ReplyMessageID, &res.ReplyMessage); err != nil {
+	if err := db.c.QueryRow(queryResponse, conversationID, messageID).Scan(&res.MessageID, &res.SenderID, &res.ConversationID, &res.Timestamp, &res.MessageType, &res.MessageStatus, &res.Message, &res.HasImage, &res.Image, &res.ReplyMessageID, &res.ReplyMessage); err != nil {
 		return res, nil
 	}
 

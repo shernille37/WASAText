@@ -32,6 +32,11 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/group-conversations", rt.wrap(rt.addGroupChat, true))
 	rt.router.PUT("/group-conversations/:chatId/name", rt.wrap(rt.updateGroupName, true))
 	rt.router.PUT("/group-conversations/:chatId/photo", rt.wrap(rt.updateGroupImage, true))
+	rt.router.GET("/group-conversations/:chatId/members", rt.wrap(rt.listGroupMembers, true))
+	rt.router.POST("/group-conversations/:chatId/members", rt.wrap(rt.addGroupMembers, true))
+	rt.router.DELETE("/group-conversations/:chatId/members", rt.wrap(rt.leaveGroupConversation, true))
+
+	rt.router.GET("/users", rt.wrap(rt.listUsers, true))
 
 	// Special routes
 	// ...

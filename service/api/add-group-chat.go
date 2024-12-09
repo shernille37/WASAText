@@ -26,7 +26,12 @@ func (rt *_router) addGroupChat(w http.ResponseWriter, r *http.Request, ps httpr
 	if err := json.NewDecoder(r.Body).Decode(&mess); err != nil {
 		http.Error(w, "Invalid Input", http.StatusInternalServerError)
 		return
+	}
 
+	// Check that members are atleast 2
+	if len(mess.Members) < 2 {
+		http.Error(w, "Members should atleast be 2", http.StatusBadRequest)
+		return
 	}
 
 	dbUser, err := rt.db.AddGroupChat(ctx.UserID, mess.ToDatabase())

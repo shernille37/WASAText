@@ -13,7 +13,7 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, e
 	WHERE c.conversationType = 'group' AND u.userID = ? AND c.conversationID = m.conversationID AND m.userID = ?;
 	`
 	const queryLatestMessage = `
-		SELECT	m.messageType, m.timestamp, COALESCE(m.message, '') FROM Message m 
+		SELECT	m.hasImage, m.timestamp, COALESCE(m.message, '') FROM Message m 
 		WHERE m.conversationID = ?
 		ORDER BY m.timestamp
 		LIMIT 1;
@@ -35,7 +35,7 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, e
 		}
 
 		// Fetch the latest message
-		if err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.MessageType, &lm.Timestamp, &lm.Message); err != nil {
+		if err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.HasImage, &lm.Timestamp, &lm.Message); err != nil {
 			return nil, err
 		}
 

@@ -50,3 +50,7 @@ func New(cfg Config) (Router, error) {
 		db:         cfg.Database,
 	}, nil
 }
+
+func (rt *_router) Close() error {
+	return nil
+}

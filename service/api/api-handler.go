@@ -37,6 +37,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/group-conversations/:chatId/members", rt.wrap(rt.leaveGroupConversation, true))
 
 	rt.router.GET("/users", rt.wrap(rt.listUsers, true))
+	rt.router.PUT("/users/:userId/username", rt.wrap(rt.updateUsername, true))
+	rt.router.PUT("/users/:userId/image", rt.wrap(rt.updateUserImage, true))
 
 	// Special routes
 	// ...

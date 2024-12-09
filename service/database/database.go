@@ -62,6 +62,8 @@ type AppDatabase interface {
 	AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb MessageBody) (Message, error)
 
 	ListUsers(id uuid.UUID) ([]User, error)
+	UpdateUsername(userID uuid.UUID, newUsername string) error
+	UpdateUserImage(userID uuid.UUID, newUserImage string) error
 }
 
 type appdbimpl struct {

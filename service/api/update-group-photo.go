@@ -26,7 +26,6 @@ func (rt *_router) updateGroupImage(w http.ResponseWriter, r *http.Request, ps h
 
 	if err != nil {
 		http.Error(w, "Parse Errror", http.StatusInternalServerError)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	// TODO: Check if it's a group

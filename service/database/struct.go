@@ -48,3 +48,8 @@ type Message struct {
 	Message        string
 	Image          *string
 }
+
+type Reader struct {
+	User		*User
+	Timestamp	string
+}

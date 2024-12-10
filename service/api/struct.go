@@ -52,6 +52,11 @@ type Message struct {
 	Image          *string    `json:"image"`
 }
 
+type Reader struct {
+	User		*User	`json:"user"`
+	Timestamp	string	`json:"timestamp"`
+}
+
 func (m *Message) ToDatabase() database.Message {
 	return database.Message{
 		MessageID:      m.MessageID,
@@ -198,4 +203,21 @@ func (gc *GroupConversation) ToDatabase() database.GroupConversation {
 		GroupImage:     gc.GroupImage,
 		LatestMessage:  (*database.LatestMessage)(gc.LatestMessage),
 	}
+}
+
+func (r *Reader) ToDatabase() database.Reader {
+	
+	return database.Reader{
+		User: &database.User{
+			UserID: r.User.UserID,
+			Name: r.User.Name,
+			Image: r.User.Image,
+		},
+		Timestamp: r.Timestamp,
+	}
+}
+
+func (r *Reader) FromDatabase(rdb database.Reader) {
+	r.User = (*User)(rdb.User)
+	r.Timestamp = rdb.Timestamp
 }

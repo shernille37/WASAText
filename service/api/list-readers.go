@@ -22,7 +22,7 @@ func (rt *_router) listReaders(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		http.Error(w, "Parse Errror", http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
-		return		
+		return
 	}
 
 	// TODO: Check if conversation exists

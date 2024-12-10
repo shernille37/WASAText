@@ -50,6 +50,6 @@ type Message struct {
 }
 
 type Reader struct {
-	User		*User
-	Timestamp	string
+	User      *User
+	Timestamp string
 }

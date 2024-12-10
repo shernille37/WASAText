@@ -53,8 +53,8 @@ type Message struct {
 }
 
 type Reader struct {
-	User		*User	`json:"user"`
-	Timestamp	string	`json:"timestamp"`
+	User      *User  `json:"user"`
+	Timestamp string `json:"timestamp"`
 }
 
 func (m *Message) ToDatabase() database.Message {
@@ -206,12 +206,12 @@ func (gc *GroupConversation) ToDatabase() database.GroupConversation {
 }
 
 func (r *Reader) ToDatabase() database.Reader {
-	
+
 	return database.Reader{
 		User: &database.User{
 			UserID: r.User.UserID,
-			Name: r.User.Name,
-			Image: r.User.Image,
+			Name:   r.User.Name,
+			Image:  r.User.Image,
 		},
 		Timestamp: r.Timestamp,
 	}

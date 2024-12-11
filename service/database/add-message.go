@@ -58,6 +58,14 @@ func (db *appdbimpl) AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb
 		return res, nil
 	}
 
+	if !res.HasImage {
+		res.Image = nil
+	}
+
+	if res.ReplyMessageID == nil {
+		res.ReplyMessage = nil
+	}
+
 	return res, nil
 
 }

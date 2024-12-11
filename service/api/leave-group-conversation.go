@@ -14,7 +14,6 @@ func (rt *_router) leaveGroupConversation(w http.ResponseWriter, r *http.Request
 
 	if err != nil {
 		http.Error(w, "Parse Errror", http.StatusInternalServerError)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

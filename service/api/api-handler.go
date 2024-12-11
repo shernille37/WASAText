@@ -20,10 +20,11 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/", rt.wrap(rt.getHelloWorld, false))
 	rt.router.POST("/login", rt.wrap(rt.login, false))
 	rt.router.GET("/conversations", rt.wrap(rt.listConversation, true))
+	rt.router.GET("/conversations/:chatId", rt.wrap(rt.getConversation, true))
 
-	rt.router.GET("/conversations/:chatId/details", rt.wrap(rt.getConversation, true))
 	rt.router.GET("/conversations/:chatId/messages", rt.wrap(rt.listMessages, true))
 	rt.router.POST("/conversations/:chatId/messages", rt.wrap(rt.addMessage, true))
+	rt.router.DELETE("/conversations/:chatId/messages/:messageId", rt.wrap(rt.deleteMessage, true))
 	rt.router.GET("/conversations/:chatId/messages/:messageId/readers", rt.wrap(rt.listReaders, true))
 
 	rt.router.POST("/messages/:messageId/forward", rt.wrap(rt.forwardMessage, true))

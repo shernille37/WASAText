@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 	"github.com/shernille37/WASAText/service/database"
 )
@@ -21,14 +22,14 @@ func AuthMiddleware(db database.AppDatabase, next func(http.ResponseWriter, *htt
 		userID := strings.Split(bearer, "Bearer ")
 
 		if len(userID) < 2 {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Error(w, constants.UNAUTHORIZED, http.StatusUnauthorized)
 			return
 		}
 
 		user, err := db.GetUserByID(userID[1])
 		// No user found
 		if errors.Is(err, sql.ErrNoRows) {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Error(w, constants.UNAUTHORIZED, http.StatusUnauthorized)
 			return
 		}
 		// Simulate extracting user information from token

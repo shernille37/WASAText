@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 )
 
@@ -18,20 +19,20 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 	var ub UsernameBody
 
 	if err := json.NewDecoder(r.Body).Decode(&ub); err != nil {
-		http.Error(w, "Invalid Input", http.StatusInternalServerError)
+		http.Error(w, constants.INVALID_INPUT, http.StatusInternalServerError)
 		return
 	}
 
 	userID, err := uuid.FromString(ps.ByName("userId"))
 
 	if err != nil {
-		http.Error(w, "Parse Errror", http.StatusInternalServerError)
+		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
 		return
 	}
 
 	// If the UserID is not equal to the user currently logged in
 	if userID.String() != ctx.UserID.String() {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		http.Error(w, constants.UNAUTHORIZED, http.StatusUnauthorized)
 		return
 	}
 

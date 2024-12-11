@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 	"github.com/shernille37/WASAText/service/database"
 )
@@ -19,14 +20,14 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 
 	var fmess ForwardMessageBody
 	if err := json.NewDecoder(r.Body).Decode(&fmess); err != nil {
-		http.Error(w, "Parse Error", http.StatusInternalServerError)
+		http.Error(w, constants.INVALID_INPUT, http.StatusInternalServerError)
 		return
 	}
 
 	messageID, err := uuid.FromString(ps.ByName("messageId"))
 
 	if err != nil {
-		http.Error(w, "Parse Error", http.StatusInternalServerError)
+		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
 		return
 	}
 

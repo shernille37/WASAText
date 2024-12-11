@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 )
 
@@ -13,7 +14,7 @@ func (rt *_router) listGroupMembers(w http.ResponseWriter, r *http.Request, ps h
 
 	conversationID, err := uuid.FromString(ps.ByName("chatId"))
 	if err != nil {
-		http.Error(w, "Parse Errror", http.StatusInternalServerError)
+		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -22,7 +23,7 @@ func (rt *_router) listGroupMembers(w http.ResponseWriter, r *http.Request, ps h
 	m, err := rt.db.ListGroupMembers(conversationID)
 
 	if err != nil {
-		ctx.Logger.WithError(err).Error("Can't List Private Conversations")
+		ctx.Logger.WithError(err).Error("Can't List Group Members")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

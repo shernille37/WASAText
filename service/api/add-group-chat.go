@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 	"github.com/shernille37/WASAText/service/database"
 )
@@ -24,7 +25,7 @@ func (rt *_router) addGroupChat(w http.ResponseWriter, r *http.Request, ps httpr
 	var mess MessageGroupBody
 
 	if err := json.NewDecoder(r.Body).Decode(&mess); err != nil {
-		http.Error(w, "Invalid Input", http.StatusInternalServerError)
+		http.Error(w, constants.INVALID_INPUT, http.StatusInternalServerError)
 		return
 	}
 

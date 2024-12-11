@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 )
 
@@ -12,14 +13,14 @@ func (rt *_router) deleteMessage(w http.ResponseWriter, r *http.Request, ps http
 
 	conversationID, err := uuid.FromString(ps.ByName("chatId"))
 	if err != nil {
-		http.Error(w, "Parse Errror", http.StatusInternalServerError)
+		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	messageID, err := uuid.FromString(ps.ByName("messageId"))
 	if err != nil {
-		http.Error(w, "Parse Errror", http.StatusInternalServerError)
+		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
 		return
 	}
 

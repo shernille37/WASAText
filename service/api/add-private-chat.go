@@ -2,11 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
 	"github.com/shernille37/WASAText/service/database"
 )
@@ -22,7 +22,7 @@ func (rt *_router) addPrivateChat(w http.ResponseWriter, r *http.Request, ps htt
 	var mess MessagePrivateBody
 
 	if err := json.NewDecoder(r.Body).Decode(&mess); err != nil {
-		http.Error(w, "Parse Error", http.StatusInternalServerError)
+		http.Error(w, constants.INVALID_INPUT, http.StatusInternalServerError)
 		return
 	}
 
@@ -30,7 +30,6 @@ func (rt *_router) addPrivateChat(w http.ResponseWriter, r *http.Request, ps htt
 
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't Add conversation")
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

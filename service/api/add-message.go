@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gofrs/uuid"
@@ -32,18 +31,17 @@ func (rt *_router) addMessage(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
+	// TODO: CHECK if conversations exists
 	// Check if userID is part of the conversation
 	// Check if the replyMessageID is part of the conversation
 	dbUser, err := rt.db.AddMessage(ctx.UserID, conversationID, mess.ToDatabase())
 
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't Add Message")
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// TODO: CHECK if conversations exists
 	var res Message
 	res.FromDatabase(dbUser)
 

@@ -27,11 +27,11 @@ func (rt *_router) listReaders(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// TODO: Check if conversation exists
 	// 	If message exists in that conversationID
-	// If User is part of the conversation
+	// If User is part of the conversation and If it is his message
 	dbReaders, err := rt.db.ListReaders(conversationID, messageID)
 
 	if err != nil {
-		ctx.Logger.WithError(err).Error("Can't List Private Conversations")
+		ctx.Logger.WithError(err).Error("Can't List Readers Conversations")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

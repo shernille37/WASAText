@@ -61,6 +61,7 @@ type AppDatabase interface {
 	ListMessages(conversationID uuid.UUID) ([]Message, error)
 	AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb MessageBody) (Message, error)
 	ListReaders(conversationID uuid.UUID, messageID uuid.UUID) ([]Reader, error)
+	ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb ForwardMessageBody) error
 
 	ListUsers(id uuid.UUID) ([]User, error)
 	UpdateUsername(userID uuid.UUID, newUsername string) error

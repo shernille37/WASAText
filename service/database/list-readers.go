@@ -7,7 +7,7 @@ func (db *appdbimpl) ListReaders(conversationID uuid.UUID, messageID uuid.UUID) 
 	var res []Reader
 
 	const queryReaders = `
-		SELECT u.userID, u.username, u.image, timestamp
+		SELECT u.userID, u.username, u.image, m.timestamp
 		FROM User u, Reader r, Conversation c, Message m
 		WHERE c.conversationID = ? AND m.conversationID = c.conversationID AND
 		m.messageID = ? AND m.messageID = r.messageID AND r.userID = u.userID;

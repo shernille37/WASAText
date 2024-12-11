@@ -28,6 +28,14 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 			return nil, err
 		}
 
+		if !m.HasImage {
+			m.Image = nil
+		}
+
+		if m.ReplyMessageID == nil {
+			m.ReplyMessage = nil
+		}
+
 		res = append(res, m)
 	}
 

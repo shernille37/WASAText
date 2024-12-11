@@ -26,6 +26,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/conversations/:chatId/messages", rt.wrap(rt.addMessage, true))
 	rt.router.GET("/conversations/:chatId/messages/:messageId/readers", rt.wrap(rt.listReaders, true))
 
+	rt.router.POST("/messages/:messageId/forward", rt.wrap(rt.forwardMessage, true))
+
 	rt.router.GET("/private-conversations", rt.wrap(rt.listPrivateConversation, true))
 	rt.router.POST("/private-conversations", rt.wrap(rt.addPrivateChat, true))
 

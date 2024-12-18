@@ -48,6 +48,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:userId/username", rt.wrap(rt.updateUsername, true))
 	rt.router.PUT("/users/:userId/image", rt.wrap(rt.updateUserImage, true))
 
+	rt.router.POST("/upload", rt.wrap(uploadImage, true))
+
 	// Special routes
 	// ...
 

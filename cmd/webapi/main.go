@@ -84,6 +84,10 @@ func run() error {
 	// APPLY CORS HANDLER
 	router = applyCORSHandler(router)
 
+	// Serve Images File
+	fs := http.FileServer(http.Dir("/tmp/images"))
+	http.Handle("/images/", http.StripPrefix("/images/", fs))
+
 	apiServer := http.Server{
 		Addr:              cfg.Web.APIHost,
 		Handler:           router,

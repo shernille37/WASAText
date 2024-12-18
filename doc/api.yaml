@@ -784,7 +784,7 @@ paths:
                   format: binary
 
       responses:
-        "200":
+        "201":
           description: File Image uploaded succesfully
           content:
             application/json:

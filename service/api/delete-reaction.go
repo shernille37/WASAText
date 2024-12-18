@@ -30,6 +30,8 @@ func (rt *_router) deleteReaction(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	// TODO:
+	// CHECK if user is the owner of the reaction
 	if err = rt.db.DeleteReaction(reactionID, conversationID, messageID); err != nil {
 		ctx.Logger.WithError(err).Error("Can't delete reaction")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -385,6 +385,7 @@ paths:
           content:
             application/json:
               schema:
+                description: "List of all members to add"
                 type: array
                 minItems: 2
                 maxItems: 100

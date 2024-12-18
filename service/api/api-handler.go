@@ -29,6 +29,10 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.POST("/messages/:messageId/forward", rt.wrap(rt.forwardMessage, true))
 
+	rt.router.GET("/conversations/:chatId/messages/:messageId/reactions", rt.wrap(rt.listReactions, true))
+	rt.router.POST("/conversations/:chatId/messages/:messageId/reactions", rt.wrap(rt.addReaction, true))
+	rt.router.DELETE("/conversations/:chatId/messages/:messageId/reactions/:reactionId", rt.wrap(rt.deleteReaction, true))
+
 	rt.router.GET("/private-conversations", rt.wrap(rt.listPrivateConversation, true))
 	rt.router.POST("/private-conversations", rt.wrap(rt.addPrivateChat, true))
 

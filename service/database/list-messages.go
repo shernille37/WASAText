@@ -14,6 +14,14 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 		WHERE m.conversationID = ?
 	`
 
+	const queryReactions = `
+		SELECT r.emoji, COUNT(r.emoji) as count
+		FROM Reaction r, User u, Message m
+		WHERE r.messageID = ? AND r.messageID = m.messageID AND 
+		r.userID = u.userID AND m.conversationID = ?
+		GROUP BY r.emoji;
+	`
+
 	rows, err := db.c.Query(queryMessages, conversationID)
 
 	if err != nil {
@@ -34,6 +42,28 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 
 		if m.ReplyMessageID == nil {
 			m.ReplyMessage = nil
+		}
+
+		rowReactions, err := db.c.Query(queryReactions, m.MessageID, m.ConversationID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		defer rowReactions.Close()
+
+		for rowReactions.Next() {
+			var r Reaction
+			r.ReactionID = nil
+			if err = rowReactions.Scan(&r.Unicode, &r.Count); err != nil {
+				return nil, err
+			}
+
+			m.Reactions = append(m.Reactions, r)
+		}
+
+		if err = rowReactions.Err(); err != nil {
+			return nil, err
 		}
 
 		res = append(res, m)

@@ -50,6 +50,7 @@ type Message struct {
 	TimeDelivered  string     `json:"timeDelivered"`
 	Message        string     `json:"message"`
 	Image          *string    `json:"image"`
+	Reactions      []Reaction `json:"reactions"`
 }
 
 type Reader struct {
@@ -57,7 +58,28 @@ type Reader struct {
 	Timestamp string `json:"timestamp"`
 }
 
+type Reaction struct {
+	ReactionID *uuid.UUID `json:"reactionID"`
+	Unicode    string     `json:"unicode"`
+	Reactor    *User      `json:"reactor"`
+	Count      *int       `json:"count"`
+}
+
+// -------- Mapping Functions --------
+
 func (m *Message) ToDatabase() database.Message {
+
+	var reactions []database.Reaction
+
+	for _, reaction := range m.Reactions {
+		reactions = append(reactions, database.Reaction{
+			ReactionID: reaction.ReactionID,
+			Unicode:    reaction.Unicode,
+			Reactor:    (*database.User)(reaction.Reactor),
+			Count:      reaction.Count,
+		})
+	}
+
 	return database.Message{
 		MessageID:      m.MessageID,
 		SenderID:       m.SenderID,
@@ -71,10 +93,23 @@ func (m *Message) ToDatabase() database.Message {
 		TimeDelivered:  m.TimeDelivered,
 		Message:        m.Message,
 		Image:          m.Image,
+		Reactions:      reactions,
 	}
 }
 
 func (m *Message) FromDatabase(mess database.Message) {
+
+	var reactions = make([]Reaction, len(mess.Reactions))
+
+	for idx := range reactions {
+		reactions[idx] = Reaction{
+			ReactionID: mess.Reactions[idx].ReactionID,
+			Unicode:    mess.Reactions[idx].Unicode,
+			Reactor:    (*User)(mess.Reactions[idx].Reactor),
+			Count:      mess.Reactions[idx].Count,
+		}
+	}
+
 	m.MessageID = mess.MessageID
 	m.SenderID = mess.SenderID
 	m.ConversationID = mess.ConversationID
@@ -87,6 +122,8 @@ func (m *Message) FromDatabase(mess database.Message) {
 	m.TimeDelivered = mess.TimeDelivered
 	m.Message = mess.Message
 	m.Image = mess.Image
+	m.Reactions = reactions
+
 }
 
 func (u *User) FromDatabase(user database.User) {
@@ -220,4 +257,19 @@ func (r *Reader) ToDatabase() database.Reader {
 func (r *Reader) FromDatabase(rdb database.Reader) {
 	r.User = (*User)(rdb.User)
 	r.Timestamp = rdb.Timestamp
+}
+
+func (r *Reaction) ToDatabase() database.Reaction {
+
+	return database.Reaction{
+		ReactionID: r.ReactionID,
+		Unicode:    r.Unicode,
+		Reactor:    (*database.User)(r.Reactor),
+	}
+}
+
+func (r *Reaction) FromDatabase(dr database.Reaction) {
+	r.ReactionID = dr.ReactionID
+	r.Unicode = dr.Unicode
+	r.Reactor = (*User)(dr.Reactor)
 }

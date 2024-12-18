@@ -12,9 +12,9 @@ import (
 )
 
 type MessagePrivateBody struct {
-	ReceiverID  uuid.UUID `json:"receiverID"`
-	Message     string    `json:"message"`
-	MessageType string    `json:"messageType"`
+	ReceiverID uuid.UUID `json:"receiverID"`
+	Message    string    `json:"message"`
+	Image      *string   `json:"image"`
 }
 
 func (rt *_router) addPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -45,8 +45,8 @@ func (rt *_router) addPrivateChat(w http.ResponseWriter, r *http.Request, ps htt
 
 func (mpb *MessagePrivateBody) ToDatabase() database.MessagePrivateBody {
 	return database.MessagePrivateBody{
-		ReceiverID:  mpb.ReceiverID,
-		Message:     mpb.Message,
-		MessageType: mpb.MessageType,
+		ReceiverID: mpb.ReceiverID,
+		Message:    mpb.Message,
+		Image:      mpb.Image,
 	}
 }

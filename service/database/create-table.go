@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS Message (
 
 	PRIMARY KEY (pk),
 	UNIQUE (messageID),
-	FOREIGN KEY (replyMessageID) REFERENCES Message(messageID) ON DELETE CASCADE,
+	FOREIGN KEY (replyMessageID) REFERENCES Message(messageID) ON DELETE SET NULL,
 	FOREIGN KEY (senderID) REFERENCES User(userID) ON DELETE CASCADE,
 	FOREIGN KEY (conversationID) REFERENCES Conversation(conversationID) ON DELETE CASCADE
 

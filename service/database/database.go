@@ -64,6 +64,10 @@ type AppDatabase interface {
 	ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb ForwardMessageBody) error
 	DeleteMessage(conversationID uuid.UUID, messageID uuid.UUID, typeFlag bool, userID uuid.UUID) error
 
+	ListReactions(conversationID uuid.UUID, messageID uuid.UUID) ([]Reaction, error)
+	AddReaction(userID uuid.UUID, messageID uuid.UUID, rb ReactionBody) (Reaction, error)
+	DeleteReaction(reactionID uuid.UUID, conversationID uuid.UUID, messageID uuid.UUID) error
+
 	ListUsers(id uuid.UUID) ([]User, error)
 	UpdateUsername(userID uuid.UUID, newUsername string) error
 	UpdateUserImage(userID uuid.UUID, newUserImage string) error

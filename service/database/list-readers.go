@@ -34,7 +34,7 @@ func (db *appdbimpl) ListReaders(conversationID uuid.UUID, messageID uuid.UUID) 
 		res = append(res, reader)
 	}
 
-	if err = rows.Close(); err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 

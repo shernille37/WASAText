@@ -9,9 +9,9 @@ import (
 )
 
 type MessagePrivateBody struct {
-	ReceiverID  uuid.UUID
-	Message     string
-	MessageType string
+	ReceiverID uuid.UUID
+	Message    string
+	Image      *string
 }
 
 func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error) {
@@ -19,8 +19,8 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	var res PrivateConversation
 
 	const queryMessage = `
-		INSERT INTO Message(messageID, senderID, conversationID, messageType, messageStatus, timeDelivered, message, image)
-		VALUES (?,?,?,?,'sent', "", ?, ?);
+		INSERT INTO Message(messageID, senderID, conversationID, message, image)
+		VALUES (?,?,?,?,?);
 	`
 
 	const queryAddConversation = `
@@ -41,10 +41,12 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	`
 
 	const queryCheckConversation = `
-		SELECT EXISTS( SELECT c.conversationID 
-		FROM Conversation c, Members m, Message mess
-		WHERE mess.senderID = ? AND mess.conversationID = c.conversationID 
-		AND m.conversationID = c.conversationID AND m.userID = ?);
+		SELECT EXISTS (SELECT c.conversationID 
+		FROM Conversation c, Conversation c1, Members m1, Members m2
+		WHERE m1.userID = ? AND m2.userID = ? AND 
+		m1.conversationID = c.conversationID AND 
+		m2.conversationID = c1.conversationID AND
+		c.conversationID = c1.conversationID AND c.conversationType = 'personal' AND c1.conversationType = 'personal');
 	`
 
 	const queryLatestMessage = `
@@ -86,15 +88,6 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	}
 
 	// Add Conversation
-	var mess string
-	var image string
-
-	if mpb.MessageType == "image" {
-		image = mpb.Message
-	} else {
-
-		mess = mpb.Message
-	}
 
 	_, err = db.c.Exec(queryAddConversation, convID, "personal")
 
@@ -114,7 +107,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	}
 
 	// Add Message
-	_, err = db.c.Exec(queryMessage, messageID, senderID, convID, mpb.MessageType, mess, image)
+	_, err = db.c.Exec(queryMessage, messageID, senderID, convID, mpb.Message, mpb.Image)
 
 	if err != nil {
 		return res, err

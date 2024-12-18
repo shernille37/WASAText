@@ -47,9 +47,17 @@ type Message struct {
 	TimeDelivered  string
 	Message        string
 	Image          *string
+	Reactions      []Reaction
 }
 
 type Reader struct {
 	User      *User
 	Timestamp string
+}
+
+type Reaction struct {
+	ReactionID *uuid.UUID
+	Unicode    string
+	Reactor    *User
+	Count      *int
 }

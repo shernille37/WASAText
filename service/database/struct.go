@@ -5,7 +5,7 @@ import "github.com/gofrs/uuid"
 type User struct {
 	UserID uuid.UUID
 	Name   string
-	Image  string
+	Image  *string
 }
 
 type PrivateConversation struct {
@@ -17,13 +17,13 @@ type PrivateConversation struct {
 type GroupConversation struct {
 	ConversationID uuid.UUID
 	GroupName      string
-	GroupImage     string
+	GroupImage     *string
 	LatestMessage  *LatestMessage
 }
 
 type LatestMessage struct {
-	HasImage  bool
 	Message   string
+	Image     *string
 	Timestamp string
 }
 

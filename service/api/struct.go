@@ -8,7 +8,7 @@ import (
 type User struct {
 	UserID uuid.UUID `json:"userID"`
 	Name   string    `json:"name"`
-	Image  string    `json:"image"`
+	Image  *string   `json:"image"`
 }
 
 type PrivateConversation struct {
@@ -20,14 +20,14 @@ type PrivateConversation struct {
 type GroupConversation struct {
 	ConversationID uuid.UUID      `json:"conversationID"`
 	GroupName      string         `json:"groupName"`
-	GroupImage     string         `json:"groupImage"`
+	GroupImage     *string        `json:"groupImage"`
 	LatestMessage  *LatestMessage `json:"latestMessage"`
 }
 
 type LatestMessage struct {
-	HasImage  bool   `json:"hasImage"`
-	Message   string `json:"message"`
-	Timestamp string `json:"timestamp"`
+	Message   string  `json:"message"`
+	Image     *string `json:"image"`
+	Timestamp string  `json:"timestamp"`
 }
 
 type Conversation struct {

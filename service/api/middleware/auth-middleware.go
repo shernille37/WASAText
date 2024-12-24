@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"database/sql"
-	"errors"
 	"net/http"
 	"strings"
 
@@ -28,7 +26,7 @@ func AuthMiddleware(db database.AppDatabase, next func(http.ResponseWriter, *htt
 
 		user, err := db.GetUserByID(userID[1])
 		// No user found
-		if errors.Is(err, sql.ErrNoRows) {
+		if err != nil {
 			http.Error(w, constants.UNAUTHORIZED, http.StatusUnauthorized)
 			return
 		}

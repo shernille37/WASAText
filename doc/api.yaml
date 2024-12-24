@@ -313,13 +313,7 @@ paths:
               type: object
               properties:
                 image:
-                  description: "URI of new photo"
-                  type: string
-                  format: file
-                  pattern: '^(.+)\/([^\/]+)$'
-                  example: "assets/images/img1.jpg"
-                  minLength: 1
-                  maxLength: 1000
+                  $ref: "#/components/schemas/Image"
 
       responses:
         "204":
@@ -746,13 +740,7 @@ paths:
               type: object
               properties:
                 image:
-                  description: "URI of new photo"
-                  type: string
-                  format: file
-                  pattern: '^(.+)\/([^\/]+)$'
-                  example: "assets/images/img1.jpg"
-                  minLength: 1
-                  maxLength: 1000
+                  $ref: "#/components/schemas/Image"
 
       responses:
         "204":
@@ -779,9 +767,7 @@ paths:
               type: object
               properties:
                 image:
-                  description: "File Image"
-                  type: string
-                  format: binary
+                  $ref: "#/components/schemas/Image"
 
       responses:
         "201":
@@ -793,13 +779,7 @@ paths:
                 type: object
                 properties:
                   image:
-                    description: Image URI
-                    type: string
-                    format: file
-                    pattern: '^(.+)\/([^\/]+)$'
-                    example: "assets/images/img1.jpg"
-                    minLength: 1
-                    maxLength: 1000
+                    $ref: "#/components/schemas/Image"
 
         "400":
           description: Bad Request
@@ -934,13 +914,7 @@ components:
           maxLength: 2000
 
         image:
-          description: "URI of the image sent"
-          type: string
-          format: file
-          pattern: '^(.+)\/([^\/]+)$'
-          example: "assets/images/img1.jpg"
-          minLength: 1
-          maxLength: 1000
+          $ref: "#/components/schemas/Image"
 
         replyMessage:
           description: "Reply to a message"
@@ -998,13 +972,7 @@ components:
           maxLength: 16
 
         image:
-          description: "URI of the image sent"
-          type: string
-          format: file
-          pattern: '^(.+)\/([^\/]+)$'
-          example: "assets/images/img1.jpg"
-          minLength: 1
-          maxLength: 1000
+          $ref: "#/components/schemas/Image"
 
     UUID:
       description: "Universally Unique Identifier"
@@ -1038,8 +1006,8 @@ components:
         timestamp:
           $ref: "#/components/schemas/Timestamp"
 
-        isImage:
-          description: "Describes if the image is an Image or not"
+        hasImage:
+          description: "Describes if the image has an Image or not"
           type: boolean
           example: false
 
@@ -1050,6 +1018,15 @@ components:
           pattern: "^.*?$"
           minLength: 1
           maxLength: 2000
+
+    Image:
+      description: "Image URI"
+      type: string
+      format: file
+      pattern: '^(.+)\/([^\/]+)$'
+      example: "/tmp/images/img1.png"
+      minLength: 1
+      maxLength: 1000
 
   securitySchemes:
     bearerAuth:

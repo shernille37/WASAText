@@ -34,10 +34,10 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/conversations/:chatId/messages/:messageId/reactions/:reactionId", rt.wrap(rt.deleteReaction, true))
 
 	rt.router.GET("/private-conversations", rt.wrap(rt.listPrivateConversation, true))
-	rt.router.POST("/private-conversations", rt.wrap(rt.addPrivateChat, true))
+	rt.router.POST("/private-conversations", rt.wrap(rt.addPrivateConversation, true))
 
 	rt.router.GET("/group-conversations", rt.wrap(rt.listGroupConversation, true))
-	rt.router.POST("/group-conversations", rt.wrap(rt.addGroupChat, true))
+	rt.router.POST("/group-conversations", rt.wrap(rt.addGroupConversation, true))
 	rt.router.PUT("/group-conversations/:chatId/name", rt.wrap(rt.updateGroupName, true))
 	rt.router.PUT("/group-conversations/:chatId/photo", rt.wrap(rt.updateGroupImage, true))
 	rt.router.GET("/group-conversations/:chatId/members", rt.wrap(rt.listGroupMembers, true))

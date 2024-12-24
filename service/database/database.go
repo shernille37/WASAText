@@ -43,7 +43,6 @@ type AppDatabase interface {
 	Close() error
 
 	Login(user User) (User, error)
-	GetUserByID(id string) (User, error)
 	ListConversation(id uuid.UUID) ([]Conversation, error)
 	GetConversation(id uuid.UUID, conversationID uuid.UUID) (Conversation, error)
 
@@ -51,7 +50,7 @@ type AppDatabase interface {
 	AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error)
 
 	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
-	AddGroupChat(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error)
+	AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error)
 	UpdateGroupName(conversationID uuid.UUID, newGroupName string) error
 	UpdateGroupImage(conversationID uuid.UUID, newGroupPhoto string) error
 	ListGroupMembers(conversationID uuid.UUID) ([]User, error)
@@ -62,7 +61,7 @@ type AppDatabase interface {
 	AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb MessageBody) (Message, error)
 	ListReaders(conversationID uuid.UUID, messageID uuid.UUID) ([]Reader, error)
 	ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb ForwardMessageBody) error
-	DeleteMessage(conversationID uuid.UUID, messageID uuid.UUID, typeFlag bool, userID uuid.UUID) error
+	DeleteMessage(conversationID uuid.UUID, messageID uuid.UUID) error
 
 	ListReactions(conversationID uuid.UUID, messageID uuid.UUID) ([]Reaction, error)
 	AddReaction(userID uuid.UUID, messageID uuid.UUID, rb ReactionBody) (Reaction, error)
@@ -71,6 +70,14 @@ type AppDatabase interface {
 	ListUsers(id uuid.UUID) ([]User, error)
 	UpdateUsername(userID uuid.UUID, newUsername string) error
 	UpdateUserImage(userID uuid.UUID, newUserImage string) error
+
+	// Utils
+	GetUserByID(id string) (User, error)
+	CheckConversationMembership(id uuid.UUID, members []uuid.UUID) error
+	CheckMessageMembership(conversationID uuid.UUID, messageID uuid.UUID) error
+	CheckExistingConversation(senderID uuid.UUID, receiverID uuid.UUID) error
+	CheckMessageOwnership(userID uuid.UUID, conversationID uuid.UUID, messageID uuid.UUID) error
+	CheckReactionOwnership(userID uuid.UUID, reactionID uuid.UUID) error
 }
 
 type appdbimpl struct {

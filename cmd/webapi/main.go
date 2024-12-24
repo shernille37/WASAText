@@ -81,6 +81,12 @@ func run() error {
 
 	router := apirouter.Handler()
 
+	router, err = registerWebUI(router)
+	if err != nil {
+		logger.WithError(err).Error("error registering web UI handler")
+		return fmt.Errorf("registering web UI handler: %w", err)
+	}
+
 	// APPLY CORS HANDLER
 	router = applyCORSHandler(router)
 

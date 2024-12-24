@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS User(
 	image TEXT,
 
 	PRIMARY KEY(pk),
-	UNIQUE(userID)
+	UNIQUE(userID),
+	UNIQUE(username)
 );
 
 

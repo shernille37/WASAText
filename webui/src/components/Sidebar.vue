@@ -2,15 +2,19 @@
 import { conversationStore } from "../stores/conversationStore";
 import Conversation from "./Conversation.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import NewConversation from "./NewConversation.vue";
+
 export default {
   name: "Sidebar",
   components: {
     Conversation,
     LoadingSpinner,
+    NewConversation,
   },
   data() {
     return {
       conversationStore,
+      addConversation: false,
     };
   },
   computed: {
@@ -24,6 +28,16 @@ export default {
   },
   mounted() {
     this.conversationStore.getConversations();
+  },
+  methods: {
+    toggleAddConversation() {
+      this.addConversation = !this.addConversation;
+      this.$emit("toggle-add-conversation", this.addConversation);
+    },
+    handleSelectConversation(conversationID) {
+      this.addConversation = false;
+      this.$emit("select-conversation", conversationID);
+    },
   },
 };
 </script>
@@ -39,8 +53,11 @@ export default {
       <i
         role="button"
         class="bi bi-plus-circle fs-5 hover-bg-light rounded-circle"
+        @click="toggleAddConversation"
       ></i>
     </div>
+
+    <NewConversation v-if="addConversation" />
 
     <div v-if="conversations.data.length == 0">
       <p class="fs-4 text-center text-uppercase">No conversations</p>
@@ -53,7 +70,7 @@ export default {
         v-for="conversation in conversations.data"
         :key="conversation.conversationID"
         :conversation="conversation"
-        @click="$emit('select-conversation', conversation.conversationID)"
+        @click="handleSelectConversation(conversation.conversationID)"
       />
     </div>
   </div>

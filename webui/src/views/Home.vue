@@ -2,6 +2,8 @@
 import Navbar from "../components/Navbar.vue";
 import Sidebar from "../components/Sidebar.vue";
 import ChatMessages from "../components/ChatMessages.vue";
+import NewChatMessages from "../components/NewChatMessages.vue";
+import { conversationStore } from "../stores/conversationStore";
 
 export default {
   name: "Home",
@@ -9,15 +11,23 @@ export default {
     Navbar,
     Sidebar,
     ChatMessages,
+    NewChatMessages,
   },
   data() {
     return {
+      conversationStore,
       selectedConversation: null,
+      addConversation: false,
     };
   },
   methods: {
     selectConveration(conversationID) {
-      this.selectedConversation = conversationID;
+      this.addConversation = false;
+      // To avoid race conditions
+      this.$nextTick(() => (this.selectedConversation = conversationID));
+    },
+    toggleAddConversation(addConversation) {
+      this.addConversation = addConversation;
     },
   },
 };
@@ -26,8 +36,12 @@ export default {
 <template>
   <Navbar />
   <main class="d-flex">
-    <Sidebar @select-conversation="selectConveration" />
-    <ChatMessages :conversationID="selectedConversation" />
+    <Sidebar
+      @toggle-add-conversation="toggleAddConversation"
+      @select-conversation="selectConveration"
+    />
+    <NewChatMessages v-if="addConversation" />
+    <ChatMessages v-else :conversationID="selectedConversation" />
   </main>
 </template>
 

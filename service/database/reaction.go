@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/gofrs/uuid"
 )
@@ -75,7 +76,9 @@ func (db *appdbimpl) AddReaction(userID uuid.UUID, messageID uuid.UUID, rb React
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				fmt.Printf("Rollback failed %v\n", rbErr)
+			}
 		}
 	}()
 

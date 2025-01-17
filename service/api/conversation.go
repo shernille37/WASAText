@@ -15,9 +15,7 @@ func (rt *_router) listConversation(w http.ResponseWriter, r *http.Request, ps h
 
 	var c []database.Conversation
 
-	id := ctx.UserID
-
-	c, err := rt.db.ListConversation(id)
+	c, err := rt.db.ListConversation(ctx.UserID)
 
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't List Conversations")
@@ -36,7 +34,6 @@ func (rt *_router) listConversation(w http.ResponseWriter, r *http.Request, ps h
 	_ = json.NewEncoder(w).Encode(res)
 
 }
-
 
 func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
@@ -69,4 +66,3 @@ func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps ht
 	_ = json.NewEncoder(w).Encode(res)
 
 }
-

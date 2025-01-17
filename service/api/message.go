@@ -11,7 +11,6 @@ import (
 	"github.com/shernille37/WASAText/service/database"
 )
 
-
 type MessageBody struct {
 	ReplyMessageID *uuid.UUID `json:"replyMessageID"`
 	Message        string     `json:"message"`
@@ -82,7 +81,7 @@ func (rt *_router) addMessage(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// Add Message
-	dbUser, err := rt.db.AddMessage(ctx.UserID, conversationID, mess.ToDatabase())
+	dbMessage, err := rt.db.AddMessage(ctx.UserID, conversationID, mess.ToDatabase())
 
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't Add Message")
@@ -91,7 +90,7 @@ func (rt *_router) addMessage(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	var res Message
-	res.FromDatabase(dbUser)
+	res.FromDatabase(dbMessage)
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(res)

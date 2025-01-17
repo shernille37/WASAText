@@ -25,10 +25,9 @@ func (mpb *MessagePrivateBody) ToDatabase() database.MessagePrivateBody {
 	}
 }
 
-
 func (rt *_router) listPrivateConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var pc []database.PrivateConversation
+	var pc []database.Conversation
 	id := ctx.UserID
 
 	pc, err := rt.db.ListPrivateConversation(id)
@@ -39,7 +38,7 @@ func (rt *_router) listPrivateConversation(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var res = make([]PrivateConversation, len(pc))
+	var res = make([]Conversation, len(pc))
 
 	for idx := range res {
 		res[idx].FromDatabase(pc[idx])
@@ -80,7 +79,7 @@ func (rt *_router) addPrivateConversation(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var res PrivateConversation
+	var res Conversation
 	res.FromDatabase(dbUser)
 
 	w.Header().Set("Content-Type", "application/json")

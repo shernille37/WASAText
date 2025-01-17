@@ -1,14 +1,39 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHashHistory } from "vue-router";
+import Home from "../views/Home.vue";
+import Login from "../views/Login.vue";
+
+import { authStore } from "../stores/authStore";
+
+const routes = [
+  {
+    path: "/",
+    name: "Home",
+    component: Home,
+    meta: { private: true },
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+  },
+];
 
 const router = createRouter({
-	history: createWebHashHistory(import.meta.env.BASE_URL),
-	routes: [
-		{path: '/', component: HomeView},
-		{path: '/link1', component: HomeView},
-		{path: '/link2', component: HomeView},
-		{path: '/some/:id/link', component: HomeView},
-	]
-})
+  history: createWebHashHistory(import.meta.env.BASE_URL),
+  routes,
+});
 
-export default router
+router.beforeEach((to, from, next) => {
+  // Check if the user is authenticated
+  const isAuthenticated = !!authStore.user.data;
+
+  if (to.meta.private && !isAuthenticated) {
+    next({ path: "/login" });
+  } else if (to.path === "/login" && isAuthenticated) {
+    next({ path: from.path });
+  } else {
+    next();
+  }
+});
+
+export default router;

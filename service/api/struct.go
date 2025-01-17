@@ -6,22 +6,18 @@ import (
 )
 
 type User struct {
-	UserID uuid.UUID `json:"userID"`
-	Name   string    `json:"name"`
-	Image  *string   `json:"image"`
+	UserID   uuid.UUID `json:"userID"`
+	Username string    `json:"username"`
+	Image    *string   `json:"image"`
 }
 
 type PrivateConversation struct {
-	ConversationID uuid.UUID      `json:"conversationID"`
-	User           *User          `json:"user"`
-	LatestMessage  *LatestMessage `json:"latestMessage"`
+	User *User `json:"user"`
 }
 
 type GroupConversation struct {
-	ConversationID uuid.UUID      `json:"conversationID"`
-	GroupName      string         `json:"groupName"`
-	GroupImage     *string        `json:"groupImage"`
-	LatestMessage  *LatestMessage `json:"latestMessage"`
+	GroupName  string  `json:"groupName"`
+	GroupImage *string `json:"groupImage"`
 }
 
 type LatestMessage struct {
@@ -31,26 +27,31 @@ type LatestMessage struct {
 }
 
 type Conversation struct {
-	Type    string               `json:"type"`
-	Private *PrivateConversation `json:"private"`
-	Group   *GroupConversation   `json:"group"`
-	Members []User               `json:"members"`
+	ConversationID uuid.UUID            `json:"conversationID"`
+	Type           string               `json:"type"`
+	Private        *PrivateConversation `json:"private"`
+	Group          *GroupConversation   `json:"group"`
+	LatestMessage  *LatestMessage       `json:"latestMessage"`
+	Members        []User               `json:"members"`
 }
 
 type Message struct {
-	MessageID      uuid.UUID  `json:"messageID"`
-	SenderID       uuid.UUID  `json:"senderID"`
-	ConversationID uuid.UUID  `json:"conversationID"`
-	ReplyMessageID *uuid.UUID `json:"replyMessageID"`
-	ReplyMessage   *string    `json:"replyMessage"`
-	Timestamp      string     `json:"timestamp"`
-	HasImage       bool       `json:"hasImage"`
-	MessageType    string     `json:"messageType"`
-	MessageStatus  string     `json:"messageStatus"`
-	TimeDelivered  string     `json:"timeDelivered"`
-	Message        string     `json:"message"`
-	Image          *string    `json:"image"`
-	Reactions      []Reaction `json:"reactions"`
+	MessageID          uuid.UUID  `json:"messageID"`
+	SenderID           uuid.UUID  `json:"senderID"`
+	SenderName         string     `json:"senderName"`
+	ConversationID     uuid.UUID  `json:"conversationID"`
+	ReplyMessageID     *uuid.UUID `json:"replyMessageID"`
+	ReplyMessage       *string    `json:"replyMessage"`
+	ReplyRecipientName *string    `json:"replyRecipientName"`
+	Timestamp          string     `json:"timestamp"`
+	HasImage           bool       `json:"hasImage"`
+	MessageType        string     `json:"messageType"`
+	MessageStatus      string     `json:"messageStatus"`
+	TimeDelivered      *string    `json:"timeDelivered"`
+	TimeRead           *string    `json:"timeRead"`
+	Message            string     `json:"message"`
+	Image              *string    `json:"image"`
+	Reactions          []Reaction `json:"reactions"`
 }
 
 type Reader struct {
@@ -81,19 +82,21 @@ func (m *Message) ToDatabase() database.Message {
 	}
 
 	return database.Message{
-		MessageID:      m.MessageID,
-		SenderID:       m.SenderID,
-		ConversationID: m.ConversationID,
-		ReplyMessageID: m.ReplyMessageID,
-		ReplyMessage:   m.ReplyMessage,
-		Timestamp:      m.Timestamp,
-		HasImage:       m.HasImage,
-		MessageType:    m.MessageType,
-		MessageStatus:  m.MessageStatus,
-		TimeDelivered:  m.TimeDelivered,
-		Message:        m.Message,
-		Image:          m.Image,
-		Reactions:      reactions,
+		MessageID:          m.MessageID,
+		SenderID:           m.SenderID,
+		SenderName:         m.SenderName,
+		ConversationID:     m.ConversationID,
+		ReplyMessageID:     m.ReplyMessageID,
+		ReplyMessage:       m.ReplyMessage,
+		ReplyRecipientName: m.ReplyRecipientName,
+		Timestamp:          m.Timestamp,
+		HasImage:           m.HasImage,
+		MessageType:        m.MessageType,
+		MessageStatus:      m.MessageStatus,
+		TimeDelivered:      m.TimeDelivered,
+		Message:            m.Message,
+		Image:              m.Image,
+		Reactions:          reactions,
 	}
 }
 
@@ -112,9 +115,11 @@ func (m *Message) FromDatabase(mess database.Message) {
 
 	m.MessageID = mess.MessageID
 	m.SenderID = mess.SenderID
+	m.SenderName = mess.SenderName
 	m.ConversationID = mess.ConversationID
 	m.ReplyMessageID = mess.ReplyMessageID
 	m.ReplyMessage = mess.ReplyMessage
+	m.ReplyRecipientName = mess.ReplyRecipientName
 	m.Timestamp = mess.Timestamp
 	m.HasImage = mess.HasImage
 	m.MessageType = mess.MessageType
@@ -128,35 +133,36 @@ func (m *Message) FromDatabase(mess database.Message) {
 
 func (u *User) FromDatabase(user database.User) {
 	u.UserID = user.UserID
-	u.Name = user.Name
+	u.Username = user.Username
 	u.Image = user.Image
 }
 
 func (u *User) ToDatabase() database.User {
 	return database.User{
-		UserID: u.UserID,
-		Name:   u.Name,
-		Image:  u.Image,
+		UserID:   u.UserID,
+		Username: u.Username,
+		Image:    u.Image,
 	}
 }
 
 func (c *Conversation) ToDatabase() database.Conversation {
 	var private *database.PrivateConversation
+	var group *database.GroupConversation
+
 	if c.Private != nil {
+
 		private = &database.PrivateConversation{
-			ConversationID: c.Private.ConversationID,
-			User:           (*database.User)(c.Private.User),
-			LatestMessage:  (*database.LatestMessage)(c.Private.LatestMessage),
+
+			User: (*database.User)(c.Private.User),
 		}
 	}
 
-	var group *database.GroupConversation
 	if c.Group != nil {
+
 		group = &database.GroupConversation{
-			ConversationID: c.Group.ConversationID,
-			GroupName:      c.Group.GroupName,
-			GroupImage:     c.Group.GroupImage,
-			LatestMessage:  (*database.LatestMessage)(c.Group.LatestMessage),
+
+			GroupName:  c.Group.GroupName,
+			GroupImage: c.Group.GroupImage,
 		}
 	}
 
@@ -164,37 +170,36 @@ func (c *Conversation) ToDatabase() database.Conversation {
 
 	for _, member := range c.Members {
 		members = append(members, database.User{
-			UserID: member.UserID,
-			Name:   member.Name,
-			Image:  member.Image,
+			UserID:   member.UserID,
+			Username: member.Username,
+			Image:    member.Image,
 		})
 	}
 
 	return database.Conversation{
-		Type:    c.Type,
-		Private: private,
-		Group:   group,
-		Members: members,
+		ConversationID: c.ConversationID,
+		Type:           c.Type,
+		Private:        private,
+		Group:          group,
+		LatestMessage:  (*database.LatestMessage)(c.LatestMessage),
+		Members:        members,
 	}
 }
 
 func (c *Conversation) FromDatabase(conv database.Conversation) {
+	c.ConversationID = conv.ConversationID
 	c.Type = conv.Type
-
+	c.LatestMessage = (*LatestMessage)(conv.LatestMessage)
 	if conv.Private != nil {
 		c.Private = &PrivateConversation{
-			ConversationID: conv.Private.ConversationID,
-			User:           (*User)(conv.Private.User),
-			LatestMessage:  (*LatestMessage)(conv.Private.LatestMessage),
+			User: (*User)(conv.Private.User),
 		}
 	}
 
 	if conv.Group != nil {
 		c.Group = &GroupConversation{
-			ConversationID: conv.Group.ConversationID,
-			GroupName:      conv.Group.GroupName,
-			GroupImage:     conv.Group.GroupImage,
-			LatestMessage:  (*LatestMessage)(conv.Group.LatestMessage),
+			GroupName:  conv.Group.GroupName,
+			GroupImage: conv.Group.GroupImage,
 		}
 
 	}
@@ -202,9 +207,9 @@ func (c *Conversation) FromDatabase(conv database.Conversation) {
 	var members = make([]User, len(conv.Members))
 	for idx := range members {
 		members[idx] = User{
-			UserID: conv.Members[idx].UserID,
-			Name:   conv.Members[idx].Name,
-			Image:  conv.Members[idx].Image,
+			UserID:   conv.Members[idx].UserID,
+			Username: conv.Members[idx].Username,
+			Image:    conv.Members[idx].Image,
 		}
 	}
 
@@ -213,32 +218,30 @@ func (c *Conversation) FromDatabase(conv database.Conversation) {
 }
 
 func (pc *PrivateConversation) FromDatabase(priv database.PrivateConversation) {
-	pc.ConversationID = priv.ConversationID
+
 	pc.User = (*User)(priv.User)
-	pc.LatestMessage = (*LatestMessage)(priv.LatestMessage)
+
 }
 
 func (pc *PrivateConversation) ToDatabase() database.PrivateConversation {
 	return database.PrivateConversation{
-		ConversationID: pc.ConversationID,
-		User:           (*database.User)(pc.User),
-		LatestMessage:  (*database.LatestMessage)(pc.LatestMessage),
+
+		User: (*database.User)(pc.User),
 	}
 }
 
 func (gc *GroupConversation) FromDatabase(group database.GroupConversation) {
-	gc.ConversationID = group.ConversationID
+
 	gc.GroupName = group.GroupName
 	gc.GroupImage = group.GroupImage
-	gc.LatestMessage = (*LatestMessage)(group.LatestMessage)
+
 }
 
 func (gc *GroupConversation) ToDatabase() database.GroupConversation {
 	return database.GroupConversation{
-		ConversationID: gc.ConversationID,
-		GroupName:      gc.GroupName,
-		GroupImage:     gc.GroupImage,
-		LatestMessage:  (*database.LatestMessage)(gc.LatestMessage),
+
+		GroupName:  gc.GroupName,
+		GroupImage: gc.GroupImage,
 	}
 }
 
@@ -246,9 +249,9 @@ func (r *Reader) ToDatabase() database.Reader {
 
 	return database.Reader{
 		User: &database.User{
-			UserID: r.User.UserID,
-			Name:   r.User.Name,
-			Image:  r.User.Image,
+			UserID:   r.User.UserID,
+			Username: r.User.Username,
+			Image:    r.User.Image,
 		},
 		Timestamp: r.Timestamp,
 	}

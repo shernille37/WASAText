@@ -1,14 +1,16 @@
 <script>
 export default {
-	props: ['msg']
-}
+  name: "ErrorMsg",
+  props: {
+    msg: String,
+  },
+};
 </script>
 
 <template>
-	<div class="alert alert-danger" role="alert">
-		{{ msg }}
-	</div>
+  <div class="alert alert-danger p-1" role="alert">
+    {{ msg }}
+  </div>
 </template>
 
-<style>
-</style>
+<style></style>

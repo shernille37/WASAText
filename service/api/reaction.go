@@ -101,7 +101,6 @@ func (rt *_router) addReaction(w http.ResponseWriter, r *http.Request, ps httpro
 
 }
 
-
 func (rt *_router) deleteReaction(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationID, err := uuid.FromString(ps.ByName("chatId"))
@@ -144,8 +143,6 @@ func (rt *_router) deleteReaction(w http.ResponseWriter, r *http.Request, ps htt
 	w.WriteHeader(http.StatusNoContent)
 
 }
-
-
 
 func (rb *ReactionBody) ToDatabase() database.ReactionBody {
 	return database.ReactionBody{

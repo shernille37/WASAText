@@ -34,7 +34,7 @@ func (db *appdbimpl) ListReactions(conversationID uuid.UUID, messageID uuid.UUID
 		var r Reaction
 		var u User
 
-		if err = rows.Scan(&r.ReactionID, &r.Unicode, &u.UserID, &u.Name, &u.Image); err != nil {
+		if err = rows.Scan(&r.ReactionID, &r.Unicode, &u.UserID, &u.Username, &u.Image); err != nil {
 			return nil, err
 		}
 
@@ -79,7 +79,6 @@ func (db *appdbimpl) AddReaction(userID uuid.UUID, messageID uuid.UUID, rb React
 		}
 	}()
 
-
 	// Add reaction
 	reactionID, err := uuid.NewV4()
 	if err != nil {
@@ -91,7 +90,7 @@ func (db *appdbimpl) AddReaction(userID uuid.UUID, messageID uuid.UUID, rb React
 	}
 
 	var u User
-	if err = tx.QueryRow(queryResponse, messageID, reactionID).Scan(&res.ReactionID, &res.Unicode, &u.UserID, &u.Name, &u.Image); err != nil {
+	if err = tx.QueryRow(queryResponse, messageID, reactionID).Scan(&res.ReactionID, &res.Unicode, &u.UserID, &u.Username, &u.Image); err != nil {
 		return res, err
 	}
 

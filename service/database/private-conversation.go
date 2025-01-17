@@ -1,9 +1,10 @@
 package database
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
 )
-
 
 type MessagePrivateBody struct {
 	ReceiverID uuid.UUID
@@ -11,27 +12,19 @@ type MessagePrivateBody struct {
 	Image      *string
 }
 
-func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error) {
-	var res []PrivateConversation
+func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]Conversation, error) {
+	var res []Conversation
 
 	const queryPrivateConversation = `
-		SELECT c.conversationID
+		SELECT c.conversationID, c.conversationType
 		FROM Conversation c, Members m
-		WHERE c.conversationType = 'personal' AND c.conversationID = m.conversationID AND m.userID = ?;
+		WHERE c.conversationType = 'private' AND c.conversationID = m.conversationID AND m.userID = ?;
 	`
 
 	const queryChatmate = `
 		SELECT u.userID, u.username, u.image
 		FROM User u, Members m 
 		WHERE m.conversationID = ? AND m.userID = u.userID AND m.userID <> ?;
-	`
-
-	const queryLatestMessage = `
-		SELECT m.timestamp, m.message, m.image
-		FROM Message m 
-		WHERE m.conversationID = ?
-		ORDER BY m.timestamp DESC
-		LIMIT 1;
 	`
 
 	rows, err := db.c.Query(queryPrivateConversation, id)
@@ -43,27 +36,22 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 	defer rows.Close()
 
 	for rows.Next() {
-		var u User
+		var c Conversation
 		var pc PrivateConversation
-		var lm LatestMessage
+		var u User
 
-		if err = rows.Scan(&pc.ConversationID); err != nil {
+		if err = rows.Scan(&c.ConversationID, &c.Type); err != nil {
 			return nil, err
 		}
 
 		// Fetch chatmate
-		if err = db.c.QueryRow(queryChatmate, pc.ConversationID, id).Scan(&u.UserID, &u.Name, &u.Image); err != nil {
-			return nil, err
-		}
-
-		// Fetch the latest message
-		if err = db.c.QueryRow(queryLatestMessage, pc.ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image); err != nil {
+		if err = db.c.QueryRow(queryChatmate, c.ConversationID, id).Scan(&u.UserID, &u.Username, &u.Image); err != nil {
 			return nil, err
 		}
 
 		pc.User = &u
-		pc.LatestMessage = &lm
-		res = append(res, pc)
+		c.Private = &pc
+		res = append(res, c)
 	}
 
 	if err = rows.Err(); err != nil {
@@ -73,9 +61,9 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]PrivateConversatio
 	return res, nil
 }
 
-func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error) {
+func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (Conversation, error) {
 
-	var res PrivateConversation
+	var res Conversation
 
 	const queryMessage = `
 		INSERT INTO Message(messageID, senderID, conversationID, message, image)
@@ -84,7 +72,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 
 	const queryAddConversation = `
 		INSERT INTO Conversation(conversationID, conversationType) VALUES
-		(?,'personal');
+		(?,'private');
 	`
 
 	const queryAddMembers = `
@@ -115,7 +103,9 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				fmt.Printf("Rollback failed %v\n", rbErr)
+			}
 		}
 	}()
 
@@ -150,11 +140,13 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 		return res, err
 	}
 
+	// Query Receiver
 	var u User
-	if err = tx.QueryRow(queryReceiver, mpb.ReceiverID).Scan(&u.UserID, &u.Name, &u.Image); err != nil {
+	if err = tx.QueryRow(queryReceiver, mpb.ReceiverID).Scan(&u.UserID, &u.Username, &u.Image); err != nil {
 		return res, err
 	}
 
+	// Query Latest Message
 	var lm LatestMessage
 	if err = tx.QueryRow(queryLatestMessage, convID).Scan(&lm.Timestamp, &lm.Message, &lm.Image); err != nil {
 		return res, err
@@ -164,8 +156,13 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 		return res, err
 	}
 
+	pc := &PrivateConversation{
+		User: &u,
+	}
+
 	res.ConversationID = convID
-	res.User = &u
+	res.Type = "private"
+	res.Private = pc
 	res.LatestMessage = &lm
 
 	return res, nil

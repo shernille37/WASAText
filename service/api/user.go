@@ -19,7 +19,6 @@ type UserImageBody struct {
 	Image string `json:"image"`
 }
 
-
 func (rt *_router) listUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var u []database.User

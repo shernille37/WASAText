@@ -46,11 +46,11 @@ type AppDatabase interface {
 	ListConversation(id uuid.UUID) ([]Conversation, error)
 	GetConversation(id uuid.UUID, conversationID uuid.UUID) (Conversation, error)
 
-	ListPrivateConversation(id uuid.UUID) ([]PrivateConversation, error)
-	AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (PrivateConversation, error)
+	ListPrivateConversation(id uuid.UUID) ([]Conversation, error)
+	AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) (Conversation, error)
 
-	ListGroupConversation(id uuid.UUID) ([]GroupConversation, error)
-	AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error)
+	ListGroupConversation(id uuid.UUID) ([]Conversation, error)
+	AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBody) (Conversation, error)
 	UpdateGroupName(conversationID uuid.UUID, newGroupName string) error
 	UpdateGroupImage(conversationID uuid.UUID, newGroupPhoto string) error
 	ListGroupMembers(conversationID uuid.UUID) ([]User, error)

@@ -30,7 +30,7 @@ func (db *appdbimpl) ListUsers(id uuid.UUID) ([]User, error) {
 	for rows.Next() {
 		var u User
 
-		if err = rows.Scan(&u.UserID, &u.Name, &u.Image); err != nil {
+		if err = rows.Scan(&u.UserID, &u.Username, &u.Image); err != nil {
 			return nil, err
 		}
 
@@ -77,7 +77,6 @@ func (db *appdbimpl) UpdateUsername(userID uuid.UUID, newUsername string) error 
 	return nil
 
 }
-
 
 func (db *appdbimpl) UpdateUserImage(userID uuid.UUID, newUserImage string) error {
 

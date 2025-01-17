@@ -21,7 +21,7 @@ func (db *appdbimpl) Login(user User) (User, error) {
 		(?,?,"");
 	`
 
-	err := db.c.QueryRow(queryUser, user.Name).Scan(&res.UserID, &res.Name, &res.Image)
+	err := db.c.QueryRow(queryUser, user.Username).Scan(&res.UserID, &res.Username, &res.Image)
 
 	// No user found -- Register the User to the system
 	if errors.Is(err, sql.ErrNoRows) {
@@ -30,12 +30,12 @@ func (db *appdbimpl) Login(user User) (User, error) {
 			return res, err
 		}
 
-		if _, err = db.c.Exec(queryRegisterUser, userID.String(), user.Name); err != nil {
+		if _, err = db.c.Exec(queryRegisterUser, userID.String(), user.Username); err != nil {
 			return res, err
 		}
 
 		res.UserID = userID
-		res.Name = user.Name
+		res.Username = user.Username
 		res.Image = nil
 
 		return res, nil

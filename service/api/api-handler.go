@@ -51,7 +51,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/upload", rt.wrap(uploadImage, true))
 
 	// Special routes
-	// ...
+	// Serve File Images
+	rt.router.Handler("GET", "/images/*filepath", http.StripPrefix("/images/", http.FileServer(http.Dir("/tmp/images"))))
 
 	return rt.router
 }

@@ -18,7 +18,7 @@ func (db *appdbimpl) GetUserByID(id string) (User, error) {
 	`
 
 	// No User found
-	if err := db.c.QueryRow(queryUser, id).Scan(&res.UserID, &res.Name, &res.Image); errors.Is(err, sql.ErrNoRows) {
+	if err := db.c.QueryRow(queryUser, id).Scan(&res.UserID, &res.Username, &res.Image); errors.Is(err, sql.ErrNoRows) {
 		return res, err
 	}
 

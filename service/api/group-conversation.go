@@ -19,7 +19,6 @@ type MessageGroupBody struct {
 	Image      *string     `json:"image"`
 }
 
-
 type GroupNameBody struct {
 	GroupName string `json:"groupName"`
 }
@@ -32,10 +31,9 @@ type GroupMemberBody struct {
 	Members []uuid.UUID `json:"members"`
 }
 
-
 func (rt *_router) listGroupConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var gc []database.GroupConversation
+	var gc []database.Conversation
 	id := ctx.UserID
 
 	gc, err := rt.db.ListGroupConversation(id)
@@ -46,7 +44,7 @@ func (rt *_router) listGroupConversation(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	var res = make([]GroupConversation, len(gc))
+	var res = make([]Conversation, len(gc))
 	for idx := range res {
 		res[idx].FromDatabase(gc[idx])
 	}
@@ -81,14 +79,13 @@ func (rt *_router) addGroupConversation(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	var res GroupConversation
+	var res Conversation
 	res.FromDatabase(dbUser)
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(res)
 
 }
-
 
 func (rt *_router) updateGroupName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var gb GroupNameBody
@@ -115,7 +112,6 @@ func (rt *_router) updateGroupName(w http.ResponseWriter, r *http.Request, ps ht
 	w.WriteHeader(http.StatusNoContent)
 
 }
-
 
 func (rt *_router) updateGroupImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
@@ -242,7 +238,6 @@ func (rt *_router) leaveGroupConversation(w http.ResponseWriter, r *http.Request
 
 }
 
-
 func (mgb *MessageGroupBody) ToDatabase() database.MessageGroupBody {
 	return database.MessageGroupBody{
 		GroupName:  mgb.GroupName,
@@ -258,4 +253,3 @@ func (gmb *GroupMemberBody) ToDatabase() database.GroupMemberBody {
 		Members: gmb.Members,
 	}
 }
-

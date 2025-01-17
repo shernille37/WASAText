@@ -2,11 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/shernille37/WASAText/service/api/constants"
 	"github.com/shernille37/WASAText/service/api/reqcontext"
@@ -36,7 +38,8 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 	// Retrieve the file
 	file, handler, err := r.FormFile("image")
 	if err != nil {
-		http.Error(w, constants.INVALID_IMAGE, http.StatusBadRequest)
+		// http.Error(w, constants.INVALID_IMAGE, http.StatusBadRequest)
+		http.Error(w, "Cannot retrieve file", http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
@@ -47,8 +50,16 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 		return
 	}
 
+	// Create a unique filename
+	fileID, err := uuid.NewV4()
+	if err != nil {
+		http.Error(w, constants.INTERNAL_SERVER_ERROR, http.StatusInternalServerError)
+		return
+	}
+
+	uniqueFilename := fmt.Sprintf("%s-%s", fileID.String(), handler.Filename)
 	// Create and Save file to /tmp/images
-	dstPath := filepath.Join("/tmp/images", handler.Filename)
+	dstPath := filepath.Join("/tmp/images", uniqueFilename)
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		http.Error(w, "Unable to create file", http.StatusInternalServerError)
@@ -62,7 +73,7 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 		return
 	}
 
-	res.Image = dstPath
+	res.Image = fmt.Sprintf("/images/%s", uniqueFilename)
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(res)

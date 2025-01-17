@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gofrs/uuid"
 )
@@ -18,24 +19,16 @@ type GroupMemberBody struct {
 	Members []uuid.UUID
 }
 
+func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]Conversation, error) {
 
-func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, error) {
+	var res []Conversation
 
-	var res []GroupConversation
-
-	const queryGroupConversation = `SELECT c.conversationID, c.groupName, c.groupImage 
+	const queryGroupConversation = `SELECT c.conversationID, c.conversationType, c.groupName, c.groupImage 
 	FROM Conversation c, Members m, User u
-	WHERE c.conversationType = 'group' AND u.userID = ? AND c.conversationID = m.conversationID AND m.userID = ?;
-	`
-	const queryLatestMessage = `
-		SELECT	m.timestamp, m.message, m.image
-		FROM Message m 
-		WHERE m.conversationID = ?
-		ORDER BY m.timestamp
-		LIMIT 1;
+	WHERE c.conversationType = 'group' AND u.userID = ? AND c.conversationID = m.conversationID AND m.userID = u.userID;
 	`
 
-	rows, err := db.c.Query(queryGroupConversation, id, id)
+	rows, err := db.c.Query(queryGroupConversation, id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,21 +36,14 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, e
 	defer rows.Close()
 
 	for rows.Next() {
+		var c Conversation
 		var gc GroupConversation
-		var lm LatestMessage
 
-		if err = rows.Scan(&gc.ConversationID, &gc.GroupName, &gc.GroupImage); err != nil {
+		if err = rows.Scan(&c.ConversationID, &c.Type, &gc.GroupName, &gc.GroupImage); err != nil {
 			return nil, err
 		}
-
-		// Fetch the latest message
-		if err = db.c.QueryRow(queryLatestMessage, gc.ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image); err != nil {
-			return nil, err
-		}
-
-		gc.LatestMessage = &lm
-
-		res = append(res, gc)
+		c.Group = &gc
+		res = append(res, c)
 	}
 
 	if err = rows.Err(); err != nil {
@@ -68,10 +54,9 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]GroupConversation, e
 
 }
 
+func (db *appdbimpl) AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBody) (Conversation, error) {
 
-func (db *appdbimpl) AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBody) (GroupConversation, error) {
-
-	var res GroupConversation
+	var res Conversation
 
 	const queryAddMessage = `
 		INSERT INTO Message(messageID, senderID, conversationID, hasImage, message, image)
@@ -104,7 +89,9 @@ func (db *appdbimpl) AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBo
 	// In case of error --> Rollback
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				fmt.Printf("Rollback failed %v\n", rbErr)
+			}
 		}
 	}()
 
@@ -142,6 +129,7 @@ func (db *appdbimpl) AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBo
 		return res, err
 	}
 
+	// Query Latest Message
 	var lm LatestMessage
 	if err = tx.QueryRow(queryLatestMessage, convID).Scan(&lm.Timestamp, &lm.Message, &lm.Image); err != nil {
 		return res, err
@@ -151,14 +139,18 @@ func (db *appdbimpl) AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBo
 		return res, err
 	}
 
+	gc := &GroupConversation{
+		GroupName:  mgb.GroupName,
+		GroupImage: mgb.GroupImage,
+	}
+
 	res.ConversationID = convID
-	res.GroupName = mgb.GroupName
-	res.GroupImage = mgb.GroupImage
+	res.Type = "group"
+	res.Group = gc
 	res.LatestMessage = &lm
 
 	return res, nil
 }
-
 
 func (db *appdbimpl) UpdateGroupName(conversationID uuid.UUID, newGroupName string) error {
 
@@ -210,7 +202,6 @@ func (db *appdbimpl) UpdateGroupImage(conversationID uuid.UUID, newGroupPhoto st
 	return nil
 }
 
-
 func (db *appdbimpl) ListGroupMembers(conversationID uuid.UUID) ([]User, error) {
 	var res []User
 
@@ -230,7 +221,7 @@ func (db *appdbimpl) ListGroupMembers(conversationID uuid.UUID) ([]User, error) 
 
 	for rows.Next() {
 		var u User
-		if err = rows.Scan(&u.UserID, &u.Name, &u.Image); err != nil {
+		if err = rows.Scan(&u.UserID, &u.Username, &u.Image); err != nil {
 			return nil, err
 		}
 
@@ -267,7 +258,9 @@ func (db *appdbimpl) AddGroupMembers(conversationID uuid.UUID, gmb GroupMemberBo
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				fmt.Printf("Rollback failed %v\n", rbErr)
+			}
 		}
 	}()
 
@@ -282,10 +275,14 @@ func (db *appdbimpl) AddGroupMembers(conversationID uuid.UUID, gmb GroupMemberBo
 
 	for _, member := range gmb.Members {
 		var u User
-		if err := tx.QueryRow(queryResponse, member).Scan(&u.UserID, &u.Name, &u.Image); err != nil {
+		if err := tx.QueryRow(queryResponse, member).Scan(&u.UserID, &u.Username, &u.Image); err != nil {
 			return nil, err
 		}
 		res = append(res, u)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return res, err
 	}
 
 	return res, nil

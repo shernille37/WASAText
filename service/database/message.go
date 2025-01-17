@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gofrs/uuid"
 )
@@ -21,9 +22,13 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 	var res []Message
 
 	const queryMessages = `
-		SELECT m.messageID, m.senderID, m.conversationID, m.timestamp, m.messageType,m.messageStatus, m.message, m.hasImage ,COALESCE(m.image, ''),
-		m.replyMessageID ,COALESCE(m1.message, '')
-		FROM Message m LEFT JOIN Message m1 ON m.replyMessageID = m1.messageID
+		SELECT m.messageID, m.senderID, u.username ,m.conversationID, m.timestamp, m.messageType,m.messageStatus, m.message, m.hasImage ,m.image,
+		m.replyMessageID,u1.username, m1.message
+		FROM (
+		(Message m LEFT JOIN Message m1 ON m.replyMessageID = m1.messageID) 
+		LEFT JOIN User u ON m.senderID = u.userID
+		)
+		LEFT JOIN User u1 ON m1.senderID = u1.userID
 		WHERE m.conversationID = ?
 	`
 
@@ -45,12 +50,8 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 
 	for rows.Next() {
 		var m Message
-		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.ConversationID, &m.Timestamp, &m.MessageType, &m.MessageStatus, &m.Message, &m.HasImage, &m.Image, &m.ReplyMessageID, &m.ReplyMessage); err != nil {
+		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.SenderName, &m.ConversationID, &m.Timestamp, &m.MessageType, &m.MessageStatus, &m.Message, &m.HasImage, &m.Image, &m.ReplyMessageID, &m.ReplyRecipientName, &m.ReplyMessage); err != nil {
 			return nil, err
-		}
-
-		if !m.HasImage {
-			m.Image = nil
 		}
 
 		if m.ReplyMessageID == nil {
@@ -99,9 +100,12 @@ func (db *appdbimpl) AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb
 	`
 
 	const queryResponse = `
-		SELECT m.messageID, m.senderID, m.conversationID, m.timestamp, m.messageType,m.messageStatus, m.message, m.hasImage, m.image,
-		m.replyMessageID, m1.message
-		FROM Message m LEFT JOIN Message m1 ON m.replyMessageID = m1.messageID 
+		SELECT m.messageID, m.senderID, u.username ,m.conversationID, m.timestamp, m.messageType,m.messageStatus, m.message, m.hasImage, m.image,
+		m.replyMessageID, u1.username,m1.message
+		FROM (
+		(Message m LEFT JOIN Message m1 ON m.replyMessageID = m1.messageID) 
+		LEFT JOIN User u ON m.senderID = u.userID)
+		LEFT JOIN User u1 ON m1.senderID = u1.userID
 		WHERE m.conversationID = ? AND m.messageID = ?
 	`
 
@@ -113,7 +117,9 @@ func (db *appdbimpl) AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				fmt.Printf("Rollback failed %v\n", rbErr)
+			}
 		}
 	}()
 
@@ -141,10 +147,9 @@ func (db *appdbimpl) AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb
 		return res, err
 	}
 
-	if err = tx.QueryRow(queryResponse, conversationID, messageID).Scan(&res.MessageID, &res.SenderID, &res.ConversationID, &res.Timestamp, &res.MessageType, &res.MessageStatus, &res.Message, &res.HasImage, &res.Image, &res.ReplyMessageID, &res.ReplyMessage); err != nil {
+	if err = tx.QueryRow(queryResponse, conversationID, messageID).Scan(&res.MessageID, &res.SenderID, &res.SenderName, &res.ConversationID, &res.Timestamp, &res.MessageType, &res.MessageStatus, &res.Message, &res.HasImage, &res.Image, &res.ReplyMessageID, &res.ReplyRecipientName, &res.ReplyMessage); err != nil {
 		return res, err
 	}
-
 
 	if err = tx.Commit(); err != nil {
 		return res, err
@@ -201,7 +206,7 @@ func (db *appdbimpl) ListReaders(conversationID uuid.UUID, messageID uuid.UUID) 
 		var reader Reader
 		var u User
 
-		if err = rows.Scan(&u.UserID, &u.Name, &u.Image, &reader.Timestamp); err != nil {
+		if err = rows.Scan(&u.UserID, &u.Username, &u.Image, &reader.Timestamp); err != nil {
 			return nil, err
 		}
 
@@ -240,11 +245,11 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				fmt.Printf("Rollback failed %v\n", rbErr)
+			}
 		}
 	}()
-
-
 
 	if err = tx.QueryRow(queryMessage, messageID, fmb.Source).Scan(&sourceMessage.Message, &sourceMessage.HasImage, &sourceMessage.Image); err != nil {
 		return err
@@ -273,5 +278,3 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 	return nil
 
 }
-
-

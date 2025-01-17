@@ -3,22 +3,18 @@ package database
 import "github.com/gofrs/uuid"
 
 type User struct {
-	UserID uuid.UUID
-	Name   string
-	Image  *string
+	UserID   uuid.UUID
+	Username string
+	Image    *string
 }
 
 type PrivateConversation struct {
-	ConversationID uuid.UUID
-	User           *User
-	LatestMessage  *LatestMessage
+	User *User
 }
 
 type GroupConversation struct {
-	ConversationID uuid.UUID
-	GroupName      string
-	GroupImage     *string
-	LatestMessage  *LatestMessage
+	GroupName  string
+	GroupImage *string
 }
 
 type LatestMessage struct {
@@ -28,26 +24,31 @@ type LatestMessage struct {
 }
 
 type Conversation struct {
-	Type    string
-	Private *PrivateConversation
-	Group   *GroupConversation
-	Members []User
+	ConversationID uuid.UUID
+	Type           string
+	Private        *PrivateConversation
+	Group          *GroupConversation
+	LatestMessage  *LatestMessage
+	Members        []User
 }
 
 type Message struct {
-	MessageID      uuid.UUID
-	SenderID       uuid.UUID
-	ConversationID uuid.UUID
-	ReplyMessageID *uuid.UUID
-	ReplyMessage   *string
-	Timestamp      string
-	HasImage       bool
-	MessageType    string
-	MessageStatus  string
-	TimeDelivered  string
-	Message        string
-	Image          *string
-	Reactions      []Reaction
+	MessageID          uuid.UUID
+	SenderID           uuid.UUID
+	SenderName         string
+	ConversationID     uuid.UUID
+	ReplyMessageID     *uuid.UUID
+	ReplyMessage       *string
+	ReplyRecipientName *string
+	Timestamp          string
+	HasImage           bool
+	MessageType        string
+	MessageStatus      string
+	TimeDelivered      *string
+	TimeRead           *string
+	Message            string
+	Image              *string
+	Reactions          []Reaction
 }
 
 type Reader struct {

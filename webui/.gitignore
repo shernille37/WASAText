@@ -27,6 +27,7 @@ coverage
 *.sw?
 
 node_modules/
+.env
 
 .yarn/*
 !.yarn/cache

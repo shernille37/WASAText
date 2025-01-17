@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS User(
 CREATE TABLE IF NOT EXISTS Conversation (
 	pk INTEGER,
 	conversationID TEXT NOT NULL,
-	conversationType TEXT NOT NULL CHECK(conversationType IN ('personal', 'group')),
+	conversationType TEXT NOT NULL CHECK(conversationType IN ('private', 'group')),
 	groupName TEXT,
 	groupImage TEXT,
 
@@ -54,17 +54,6 @@ CREATE TABLE IF NOT EXISTS Message (
 	FOREIGN KEY (replyMessageID) REFERENCES Message(messageID) ON DELETE SET NULL,
 	FOREIGN KEY (senderID) REFERENCES User(userID) ON DELETE CASCADE,
 	FOREIGN KEY (conversationID) REFERENCES Conversation(conversationID) ON DELETE CASCADE
-
-);
-
-CREATE TABLE IF NOT EXISTS UserMessageStatus (
-	userID TEXT NOT NULL,
-	messageID TEXT NOT NULL,
-	visibility INTEGER NOT NULL DEFAULT 1,
-
-	UNIQUE(userID, messageID),
-	FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
-	FOREIGN KEY (messageID) REFERENCES Message(messageID) ON DELETE CASCADE
 
 );
 

@@ -57,10 +57,9 @@ export const authStore = reactive({
 
       this.userList.loading = false;
       this.userList.data = res.data;
-      console.log(res.data);
     } catch (error) {
       this.userList.loading = false;
-      this.userList.error = error.toString();
+      this.userList.error = error.response.data;
     }
   },
 });

@@ -4,6 +4,7 @@ export default {
   name: "MessageForm",
   props: {
     conversationID: String,
+    newConversation: Boolean,
   },
   data() {
     return {
@@ -27,11 +28,15 @@ export default {
         return;
       }
 
-      messageStore.sendMessage({
+      const data = {
         conversationID: this.conversationID,
         message: this.message,
         image: this.fileToUpload,
-      });
+      };
+
+      if (this.newConversation) {
+        this.$emit("add-conversation", data);
+      } else messageStore.sendMessage(data);
 
       this.message = "";
       this.image = null;

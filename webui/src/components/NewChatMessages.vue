@@ -1,19 +1,24 @@
 <script>
 import MessageForm from "./MessageForm.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import ErrorMsg from "./ErrorMsg.vue";
 import { authStore } from "../stores/authStore";
+import { conversationStore } from "../stores/conversationStore";
 
 export default {
   name: "NewChatMessages",
   components: {
     MessageForm,
     LoadingSpinner,
+    ErrorMsg,
   },
   data() {
     return {
       authStore,
+      conversationStore,
       apiUrl: import.meta.env.VITE_API_URL,
       conversationType: null,
+      groupName: null,
       groupImage: null,
       groupImageToUpload: null,
       searchMembers: "",
@@ -27,6 +32,13 @@ export default {
         data: this.authStore.userList.data,
         loading: this.authStore.userList.loading,
         error: this.authStore.userList.error,
+      };
+    },
+    conversations() {
+      return {
+        data: this.conversationStore.conversations.data,
+        loading: this.conversationStore.conversations.loading,
+        error: this.conversationStore.conversations.error,
       };
     },
   },
@@ -56,7 +68,7 @@ export default {
         (user) => !this.selectedMembers.some((u) => u.userID === user.userID)
       );
     },
-    addMember(user) {
+    handleAddMember(user) {
       if (this.conversationType === "group") {
         this.selectedMembers.push(user);
 
@@ -70,7 +82,44 @@ export default {
         this.suggestedMembers = [];
       }
     },
+    handleAddConversation(data) {
+      if (!this.conversationType) {
+        alert("Please select a conversation type");
+        return;
+      }
+
+      if (this.conversationType === "private") {
+        if (!this.selectedMembers.length) {
+          alert("Please pick a user");
+          return;
+        }
+      } else {
+        if (!this.groupName || data.message == "") {
+          alert("Please insert a Groupname and a message");
+          return;
+        }
+
+        if (this.selectedMembers.length + 1 <= 2) {
+          alert("Members should be more than 2");
+          return;
+        }
+      }
+
+      data = {
+        ...data,
+        conversationType: this.conversationType,
+        groupName: this.groupName,
+        groupImage: this.groupImage,
+        members: this.selectedMembers.map((member) => member.userID),
+      };
+      conversationStore.addConversation(data);
+      this.resetFields();
+    },
     resetFields() {
+      this.groupName = null;
+      this.groupImage = null;
+      this.groupImageToUpload = null;
+      this.searchMembers = "";
       this.suggestedMembers = [];
       this.selectedMembers = [];
     },
@@ -134,7 +183,7 @@ export default {
           class="d-flex gap-3 p-2 hover-bg-light rounded-2"
           v-for="user in suggestedMembers"
           :key="user.userID"
-          @click="addMember(user)"
+          @click="handleAddMember(user)"
         >
           <img v-if="user.image" :src="`${apiUrl}${user.image}`" alt="" />
           <i v-else class="bi bi-person-circle fs-3"></i>
@@ -174,6 +223,7 @@ export default {
       <input
         type="text"
         class="form-control p-1 mb-2"
+        v-model="groupName"
         id="groupname"
         placeholder="Groupname"
       />
@@ -197,7 +247,7 @@ export default {
             class="d-flex gap-3 p-2 hover-bg-light rounded-2"
             v-for="user in suggestedMembers"
             :key="user.userID"
-            @click="addMember(user)"
+            @click="handleAddMember(user)"
           >
             <img v-if="user.image" :src="`${apiUrl}${user.image}`" alt="" />
             <i v-else class="bi bi-person-circle fs-3"></i>
@@ -221,6 +271,13 @@ export default {
       </div>
     </div>
 
-    <!-- <MessageForm /> -->
+    <div v-if="conversations.error">
+      <ErrorMsg :msg="conversations.error" />
+    </div>
+
+    <MessageForm
+      @add-conversation="handleAddConversation"
+      :newConversation="true"
+    />
   </div>
 </template>

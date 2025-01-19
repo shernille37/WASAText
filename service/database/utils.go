@@ -65,7 +65,7 @@ func (db *appdbimpl) CheckExistingConversation(senderID uuid.UUID, receiverID uu
 	WHERE m1.userID = ? AND m2.userID = ? AND 
 	m1.conversationID = c.conversationID AND 
 	m2.conversationID = c1.conversationID AND
-	c.conversationID = c1.conversationID AND c.conversationType = 'personal' AND c1.conversationType = 'personal');
+	c.conversationID = c1.conversationID AND c.conversationType = 'private' AND c1.conversationType = 'private');
 `
 
 	var existingConvID bool

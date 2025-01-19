@@ -2,6 +2,7 @@ import { reactive } from "vue";
 import axios from "../services/axios";
 
 import { authStore } from "../stores/authStore";
+import { uploadImage } from "../utils/upload";
 
 export const messageStore = reactive({
   messages: {
@@ -25,63 +26,39 @@ export const messageStore = reactive({
       this.messages.data = res.data;
     } catch (error) {
       this.messages.loading = false;
-      this.messages.error = error.toString();
+      this.messages.error = error.response.data;
     }
   },
 
   async sendMessage(data) {
     this.messages.sendMessageLoading = true;
+    let resUploadImage = null;
     try {
       // Check if there's an image
       if (data.image) {
-        const formData = new FormData();
-        formData.append("image", data.image);
-        // Upload the image
-        const resUpload = await axios.post("/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${authStore.user.data.userID}`,
-          },
-        });
-
-        // Send the message
-        const resSendMessage = await axios.post(
-          `/conversations/${data.conversationID}/messages`,
-          {
-            message: data.message,
-            image: resUpload.data.image,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authStore.user.data.userID}`,
-            },
-          }
-        );
-
-        this.messages.data.push(resSendMessage.data);
-      } else {
-        const resSendMessage = await axios.post(
-          `/conversations/${data.conversationID}/messages`,
-          {
-            message: data.message,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authStore.user.data.userID}`,
-            },
-          }
-        );
-
-        this.messages.data.push(resSendMessage.data);
+        resUploadImage = await uploadImage(data.image);
       }
 
+      const resSendMessage = await axios.post(
+        `/conversations/${data.conversationID}/messages`,
+        {
+          message: data.message,
+          image: resUploadImage,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      this.messages.data.push(resSendMessage.data);
       this.messages.sendMessageLoading = false;
     } catch (error) {
-      console.error(error.message);
+      console.error(error.response.data);
       this.messages.sendMessageLoading = false;
-      this.messages.error = error.toString();
+      this.messages.error = error.response.data;
     }
   },
 });

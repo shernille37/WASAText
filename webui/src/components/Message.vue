@@ -109,7 +109,8 @@ export default {
         <div class="position-absolute end-0 d-flex gap-1">
           <div
             class="d-flex justify-content-center align-items-center gap-1 bg-light rounded-2 p-1"
-            v-for="reaction in message.reactions"
+            v-for="(reaction, index) in message.reactions"
+            :key="index"
           >
             <p>{{ reaction.unicode }}</p>
             <p>{{ reaction.count }}</p>

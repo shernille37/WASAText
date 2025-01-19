@@ -27,7 +27,6 @@ func (rt *_router) listMessages(w http.ResponseWriter, r *http.Request, ps httpr
 	conversationID, err := uuid.FromString(ps.ByName("chatId"))
 	if err != nil {
 		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

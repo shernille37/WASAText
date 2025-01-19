@@ -1,7 +1,7 @@
 <script>
 import { authStore } from "../stores/authStore";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
-import Footer from "../components/Footer.vue";
+import Copyright from "../components/Copyright.vue";
 export default {
   name: "Login",
   data() {
@@ -11,7 +11,7 @@ export default {
     };
   },
   components: {
-    Footer,
+    Copyright,
     LoadingSpinner,
   },
   methods: {
@@ -61,5 +61,5 @@ export default {
       </form>
     </div>
   </div>
-  <Footer />
+  <Copyright />
 </template>

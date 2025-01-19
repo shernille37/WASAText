@@ -118,7 +118,7 @@ func (db *appdbimpl) AddMessage(senderID uuid.UUID, conversationID uuid.UUID, mb
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				fmt.Printf("Rollback failed %v\n", rbErr)
+				err = fmt.Errorf("%v -- Rollback Failed: %v", err, rbErr)
 			}
 		}
 	}()
@@ -246,7 +246,7 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				fmt.Printf("Rollback failed %v\n", rbErr)
+				err = fmt.Errorf("%v -- Rollback Failed: %v", err, rbErr)
 			}
 		}
 	}()

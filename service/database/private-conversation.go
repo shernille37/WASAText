@@ -104,7 +104,7 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				fmt.Printf("Rollback failed %v\n", rbErr)
+				err = fmt.Errorf("%v -- Rollback Failed: %v", err, rbErr)
 			}
 		}
 	}()

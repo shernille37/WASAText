@@ -23,8 +23,6 @@ export const messageStore = reactive({
 
       this.messages.loading = false;
       this.messages.data = res.data;
-
-      console.log(res.data);
     } catch (error) {
       this.messages.loading = false;
       this.messages.error = error.toString();

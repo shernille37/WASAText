@@ -8,6 +8,12 @@ export const authStore = reactive({
     error: null,
   },
 
+  userList: {
+    data: null,
+    loading: false,
+    error: null,
+  },
+
   async login(username) {
     try {
       this.user.loading = true;
@@ -33,5 +39,28 @@ export const authStore = reactive({
     this.user.data = null;
     this.user.loading = false;
     this.user.error = null;
+
+    this.userList.data = null;
+    this.userList.loading = false;
+    this.userList.error = null;
+  },
+
+  async getUsers() {
+    try {
+      this.userList.loading = true;
+
+      const res = await axios.get("/users", {
+        headers: {
+          Authorization: `Bearer ${this.user.data.userID}`,
+        },
+      });
+
+      this.userList.loading = false;
+      this.userList.data = res.data;
+      console.log(res.data);
+    } catch (error) {
+      this.userList.loading = false;
+      this.userList.error = error.toString();
+    }
   },
 });

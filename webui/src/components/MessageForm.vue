@@ -52,7 +52,7 @@ export default {
 </script>
 
 <template>
-  <div class="d-flex align-items-end p-3">
+  <div class="d-flex align-items-end p-3 w-100">
     <i
       role="button"
       class="bi bi-plus-circle fs-5 hover-bg-light rounded-circle"

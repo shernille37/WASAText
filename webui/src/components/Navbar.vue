@@ -1,5 +1,4 @@
 <script>
-import ErrorMsg from "../components/ErrorMsg.vue";
 import { authStore } from "../stores/authStore";
 
 export default {
@@ -9,9 +8,6 @@ export default {
       apiUrl: import.meta.env.VITE_API_URL,
       authStore,
     };
-  },
-  components: {
-    ErrorMsg,
   },
   computed: {
     user() {

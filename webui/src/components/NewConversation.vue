@@ -5,7 +5,7 @@ export default {
 </script>
 
 <template>
-  <div class="d-flex p-2 flex-column">
+  <div class="d-none d-md-flex p-2 flex-column">
     <div
       class="d-flex p-2 justify-content-center justify-content-md-between align-items-center rounded-3 my-2 hover-bg-light"
     >

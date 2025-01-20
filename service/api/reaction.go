@@ -15,6 +15,30 @@ type ReactionBody struct {
 	Unicode string `json:"unicode"`
 }
 
+type Emojis struct {
+	Unicodes []string `json:"emojis"`
+}
+
+func (rt *_router) listEmojis(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	emojis, err := rt.db.ListEmojis()
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Can't List Emojis")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var res Emojis
+
+	res.Unicodes = append(res.Unicodes, emojis...)
+
+	// Send the list to the user.
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(res)
+
+}
+
 func (rt *_router) listReactions(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationID, err := uuid.FromString(ps.ByName("chatId"))

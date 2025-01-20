@@ -20,14 +20,16 @@ export default {
       addConversation: false,
     };
   },
+  computed: {
+    addConversationFlag() {
+      return this.conversationStore.addConversationFlag;
+    },
+  },
   methods: {
     selectConveration(conversationID) {
-      this.addConversation = false;
+      this.conversationStore.addConversationFlag = false;
       // To avoid race conditions
       this.$nextTick(() => (this.selectedConversation = conversationID));
-    },
-    toggleAddConversation(addConversation) {
-      this.addConversation = addConversation;
     },
   },
 };
@@ -36,12 +38,9 @@ export default {
 <template>
   <Navbar />
   <main class="d-flex">
-    <Sidebar
-      @toggle-add-conversation="toggleAddConversation"
-      @select-conversation="selectConveration"
-    />
+    <Sidebar @select-conversation="selectConveration" />
     <NewChatMessages
-      v-if="addConversation"
+      v-if="addConversationFlag"
       @add-conversation="selectConveration"
     />
     <ChatMessages v-else :conversationID="selectedConversation" />

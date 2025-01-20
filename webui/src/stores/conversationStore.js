@@ -15,6 +15,9 @@ export const conversationStore = reactive({
     loading: true,
     error: null,
   },
+
+  addConversationFlag: false,
+
   async getConversations() {
     try {
       this.conversations.loading = true;

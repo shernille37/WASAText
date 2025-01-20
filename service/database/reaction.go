@@ -12,6 +12,39 @@ type ReactionBody struct {
 	Unicode string `json:"unicode"`
 }
 
+func (db *appdbimpl) ListEmojis() ([]string, error) {
+
+	var res []string
+
+	const queryEmojis = `
+		SELECT unicode 
+		FROM Emoji;
+	`
+
+	rows, err := db.c.Query(queryEmojis)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var emoji string
+
+		if err = rows.Scan(&emoji); err != nil {
+			return nil, err
+		}
+
+		res = append(res, emoji)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (db *appdbimpl) ListReactions(conversationID uuid.UUID, messageID uuid.UUID) ([]Reaction, error) {
 
 	var res []Reaction

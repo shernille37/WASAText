@@ -12,7 +12,6 @@ export default {
   data() {
     return {
       conversationStore,
-      addConversation: false,
     };
   },
   computed: {
@@ -29,11 +28,10 @@ export default {
   },
   methods: {
     toggleAddConversation() {
-      this.addConversation = !this.addConversation;
-      this.$emit("toggle-add-conversation", this.addConversation);
+      this.conversationStore.addConversationFlag =
+        !this.conversationStore.addConversationFlag;
     },
     handleSelectConversation(conversationID) {
-      this.addConversation = false;
       this.$emit("select-conversation", conversationID);
     },
   },

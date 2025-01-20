@@ -100,7 +100,12 @@ export default {
           <i class="bi bi-reply text-black"></i>
 
           <i @click="toggleEmojiPicker" class="bi bi-emoji-smile"></i>
-          <EmojiPicker @mouseleave="toggleEmojiPicker" v-if="emojiClick" />
+          <EmojiPicker
+            @mouseleave="toggleEmojiPicker"
+            v-if="emojiClick"
+            :senderID="authStore.user.data.userID"
+            :conversationID="conversation.conversationID"
+          />
 
           <i class="bi bi-info-circle"></i>
         </div>

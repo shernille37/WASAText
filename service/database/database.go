@@ -78,6 +78,7 @@ type AppDatabase interface {
 	CheckExistingConversation(senderID uuid.UUID, receiverID uuid.UUID) error
 	CheckMessageOwnership(userID uuid.UUID, conversationID uuid.UUID, messageID uuid.UUID) error
 	CheckReactionOwnership(userID uuid.UUID, reactionID uuid.UUID) error
+	ListEmojis() ([]string, error)
 }
 
 type appdbimpl struct {

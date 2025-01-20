@@ -40,7 +40,10 @@ export default {
       @toggle-add-conversation="toggleAddConversation"
       @select-conversation="selectConveration"
     />
-    <NewChatMessages v-if="addConversation" />
+    <NewChatMessages
+      v-if="addConversation"
+      @add-conversation="selectConveration"
+    />
     <ChatMessages v-else :conversationID="selectedConversation" />
   </main>
 </template>

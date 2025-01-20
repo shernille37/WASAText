@@ -2,14 +2,12 @@
 import { conversationStore } from "../stores/conversationStore";
 import Conversation from "./Conversation.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
-import NewConversation from "./NewConversation.vue";
 
 export default {
   name: "Sidebar",
   components: {
     Conversation,
     LoadingSpinner,
-    NewConversation,
   },
   data() {
     return {
@@ -56,8 +54,6 @@ export default {
         @click="toggleAddConversation"
       ></i>
     </div>
-
-    <NewConversation v-if="addConversation" />
 
     <div v-if="conversations.data.length == 0">
       <p class="fs-4 text-center text-uppercase">No conversations</p>

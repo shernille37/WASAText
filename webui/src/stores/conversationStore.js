@@ -63,48 +63,38 @@ export const conversationStore = reactive({
         resImageUpload = await uploadImage(data.image);
       }
 
-      // Add Conversation
-      if (data.conversationType === "group") {
-        const resAddConversation = await axios.post(
-          `/group-conversations`,
-          {
-            groupName: data.groupName,
-            groupImage: resGroupImageUpload,
-            message: data.message,
-            image: resImageUpload,
-            members: data.members,
+      const groupData = {
+        groupName: data.groupName,
+        groupImage: resGroupImageUpload,
+        message: data.message,
+        image: resImageUpload,
+        members: data.members,
+      };
+
+      const privateData = {
+        receiverID: data.members[0],
+        message: data.message,
+        image: resImageUpload,
+      };
+
+      const resAddConversation = await axios.post(
+        `${
+          data.conversationType === "group"
+            ? "/group-conversations"
+            : "/private-conversations"
+        }`,
+        data.conversationType === "group" ? groupData : privateData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authStore.user.data.userID}`,
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authStore.user.data.userID}`,
-            },
-          }
-        );
+        }
+      );
 
-        this.conversations.loading = false;
-
-        this.conversations.data.push(resAddConversation.data);
-      } else {
-        const resAddConversation = await axios.post(
-          `/private-conversations`,
-          {
-            receiverID: data.members[0],
-            message: data.message,
-            image: resImageUpload,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authStore.user.data.userID}`,
-            },
-          }
-        );
-
-        this.conversations.loading = false;
-
-        this.conversations.data.push(resAddConversation.data);
-      }
+      this.conversations.loading = false;
+      this.conversations.data.push(resAddConversation.data);
+      return resAddConversation.data;
     } catch (error) {
       this.conversations.loading = false;
       this.conversations.error = error.response.data;

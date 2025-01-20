@@ -82,7 +82,7 @@ export default {
         this.suggestedMembers = [];
       }
     },
-    handleAddConversation(data) {
+    async handleAddConversation(data) {
       if (!this.conversationType) {
         alert("Please select a conversation type");
         return;
@@ -109,11 +109,14 @@ export default {
         ...data,
         conversationType: this.conversationType,
         groupName: this.groupName,
-        groupImage: this.groupImage,
+        groupImage: this.groupImageToUpload,
         members: this.selectedMembers.map((member) => member.userID),
       };
-      conversationStore.addConversation(data);
+
+      const res = await conversationStore.addConversation(data);
       this.resetFields();
+
+      this.$emit("add-conversation", res.conversationID);
     },
     resetFields() {
       this.groupName = null;

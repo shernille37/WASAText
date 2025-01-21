@@ -110,7 +110,7 @@ func (db *appdbimpl) AddReaction(userID uuid.UUID, messageID uuid.UUID, rb React
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				err = fmt.Errorf("%v -- Rollback Failed: %v", err, rbErr)
+				err = fmt.Errorf("%w -- Rollback Failed: %w", err, rbErr)
 			}
 		}
 	}()

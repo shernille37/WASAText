@@ -90,7 +90,7 @@ func (db *appdbimpl) AddGroupConversation(senderID uuid.UUID, mgb MessageGroupBo
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				err = fmt.Errorf("%v -- Rollback Failed: %v", err, rbErr)
+				err = fmt.Errorf("%w -- Rollback Failed: %w", err, rbErr)
 			}
 		}
 	}()
@@ -259,7 +259,7 @@ func (db *appdbimpl) AddGroupMembers(conversationID uuid.UUID, gmb GroupMemberBo
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				err = fmt.Errorf("%v -- Rollback Failed: %v", err, rbErr)
+				err = fmt.Errorf("%w -- Rollback Failed: %w", err, rbErr)
 			}
 		}
 	}()

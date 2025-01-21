@@ -96,26 +96,34 @@ export default {
   <div v-else class="d-flex flex-column flex-grow-1">
     <!-- Heading -->
     <div
-      class="d-flex justify-content-start align-items-center p-2 mb-2 border-bottom"
+      class="d-flex justify-content-between align-items-center p-2 mb-2 border-bottom"
     >
-      <img
-        v-if="hasImage"
-        class="profile-image"
-        :src="
-          isPrivate
-            ? `${apiUrl}${conversation.data.private.user.image}`
-            : `${apiUrl}${conversation.data.group.groupImage}`
-        "
-        alt="Profile Picture"
-      />
-      <i v-else class="bi bi-person-circle fs-3"></i>
-      <p class="fw-medium fs-3 ms-3">
-        {{
-          isPrivate
-            ? conversation.data.private.user.username
-            : conversation.data.group.groupName
-        }}
-      </p>
+      <div class="d-flex align-items-center">
+        <img
+          v-if="hasImage"
+          class="profile-image"
+          :src="
+            isPrivate
+              ? `${apiUrl}${conversation.data.private.user.image}`
+              : `${apiUrl}${conversation.data.group.groupImage}`
+          "
+          alt="Profile Picture"
+        />
+        <i v-else class="bi bi-person-circle fs-3"></i>
+        <p class="fw-medium fs-3 ms-3">
+          {{
+            isPrivate
+              ? conversation.data.private.user.username
+              : conversation.data.group.groupName
+          }}
+        </p>
+      </div>
+
+      <i
+        v-if="conversation.data.group"
+        role="button"
+        class="bi bi-person-plus-fill rounded-circle hover-bg-light fs-5"
+      ></i>
     </div>
 
     <!-- Messages -->

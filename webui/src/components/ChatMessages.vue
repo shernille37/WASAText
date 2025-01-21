@@ -1,6 +1,7 @@
 <script>
 import { conversationStore } from "../stores/conversationStore";
 import { messageStore } from "../stores/messageStore";
+import AddMemberForm from "./AddMemberForm.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import Message from "./Message.vue";
 import MessageForm from "./MessageForm.vue";
@@ -14,6 +15,7 @@ export default {
     Message,
     MessageForm,
     LoadingSpinner,
+    AddMemberForm,
   },
   data() {
     return {
@@ -58,6 +60,10 @@ export default {
         }
       });
     },
+    toggleAddMemberForm() {
+      this.conversationStore.addMemberFlag =
+        !this.conversationStore.addMemberFlag;
+    },
   },
 
   watch: {
@@ -93,7 +99,7 @@ export default {
     <LoadingSpinner />
   </div>
 
-  <div v-else class="d-flex flex-column flex-grow-1">
+  <div id="heading" v-else class="d-flex flex-column flex-grow-1">
     <!-- Heading -->
     <div
       class="d-flex justify-content-between align-items-center p-2 mb-2 border-bottom"
@@ -122,9 +128,12 @@ export default {
       <i
         v-if="conversation.data.group"
         role="button"
-        class="bi bi-person-plus-fill rounded-circle hover-bg-light fs-5"
+        class="bi bi-person-plus-fill rounded-circle hover-bg-light fs-5 p-1 mb-1"
+        @click="toggleAddMemberForm"
       ></i>
     </div>
+
+    <AddMemberForm />
 
     <!-- Messages -->
 

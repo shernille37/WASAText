@@ -17,6 +17,7 @@ export const conversationStore = reactive({
   },
 
   addConversationFlag: false,
+  addMemberFlag: false,
 
   async getConversations() {
     try {
@@ -101,6 +102,29 @@ export const conversationStore = reactive({
     } catch (error) {
       this.conversations.loading = false;
       this.conversations.error = error.response.data;
+    }
+  },
+
+  async addMembersToGroup(data) {
+    try {
+      this.conversation.loading = true;
+
+      const res = await axios.post(
+        `/group-conversations/${this.conversation.data.conversationID}/members`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      this.conversation.loading = false;
+      this.addMemberFlag = false;
+    } catch (error) {
+      this.conversation.loading = false;
+      this.conversation.error = error.response.data;
     }
   },
 });

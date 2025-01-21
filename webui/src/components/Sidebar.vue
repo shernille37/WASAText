@@ -37,7 +37,6 @@ export default {
   },
 };
 </script>
-
 <template>
   <div
     class="d-flex flex-column p-2 shadow-sm col-3 overflow-auto overflow-x-hidden"

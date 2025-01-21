@@ -62,11 +62,18 @@ export default {
     },
     async getUsers() {
       await this.authStore.getUsers();
-
       // Just display the members that are NOT already selected (NOT in selectedMembers)
       this.suggestedMembers = this.users.data.filter(
         (user) => !this.selectedMembers.some((u) => u.userID === user.userID)
       );
+    },
+    handleRemoveSelected(user) {
+      // Remove the user from the selected Members
+      this.selectedMembers = this.selectedMembers.filter(
+        (u) => u.userID !== user.userID
+      );
+      // Re-add the user to the suggested members
+      this.suggestedMembers.push(user);
     },
     handleAddMember(user) {
       if (this.conversationType === "group") {
@@ -118,6 +125,7 @@ export default {
 
       this.$emit("add-conversation", res.conversationID);
     },
+
     resetFields() {
       this.groupName = null;
       this.groupImage = null;
@@ -173,7 +181,7 @@ export default {
             ? this.selectedMembers[0].username
             : 'Username'
         }`"
-        @focus="() => getUsers()"
+        @focus="getUsers"
       />
 
       <div v-if="users.loading">
@@ -238,7 +246,7 @@ export default {
         id="members"
         v-model="searchMembers"
         placeholder="Pick members"
-        @focus="() => getUsers()"
+        @focus="getUsers"
       />
       <div v-if="users.loading">
         <LoadingSpinner />
@@ -262,9 +270,11 @@ export default {
         <div v-if="selectedMembers.length" class="col">
           <p class="text-center fw-bold">Selected Members</p>
           <div
+            role="button"
             class="d-flex justify-content-center gap-3 p-2 hover-bg-light rounded-2"
             v-for="user in selectedMembers"
             :key="user.userID"
+            @click="handleRemoveSelected(user)"
           >
             <img v-if="user.image" :src="`${apiUrl}${user.image}`" alt="" />
             <i v-else class="bi bi-person-circle fs-3"></i>

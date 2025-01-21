@@ -48,7 +48,7 @@ export default {
           role="button"
           class="bi bi-chevron-down ms-2 p-2 hover-bg-light"
         ></i>
-        <ul class="dropdown-menu dropdown-menu-end mt-3">
+        <ul class="dropdown-menu dropdown-menu-end mt-3 z-3">
           <li>
             <p role="button" class="dropdown-item p-1 rounded-1">Profile</p>
           </li>

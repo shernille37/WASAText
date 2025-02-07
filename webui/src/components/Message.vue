@@ -118,13 +118,14 @@ export default {
             isOwner ? 'end-0' : 'start-0'
           } d-flex gap-1`"
         >
-          <div
-            class="d-flex justify-content-center align-items-center gap-1 bg-light rounded-2 p-1"
-            v-for="(reaction, index) in message.reactions"
-            :key="index"
-          >
-            <p>{{ reaction.unicode }}</p>
-            <p>{{ reaction.count }}</p>
+          <div v-for="(reaction, index) in message.reactions" :key="index">
+            <div
+              role="button"
+              class="d-flex justify-content-center align-items-center gap-1 bg-light rounded-2 p-1"
+            >
+              <p>{{ reaction.unicode }}</p>
+              <p>{{ reaction.count }}</p>
+            </div>
           </div>
         </div>
       </div>

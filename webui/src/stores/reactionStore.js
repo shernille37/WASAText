@@ -60,22 +60,19 @@ export const reactionStore = reactive({
       );
 
       // Update reaction UI
-      let messageStoreMessages = messageStore.messages.data;
+      messageStore.messages.data.map((message) => {
+        if (message.messageID === messageID) {
+          const reaction = message.reactions.find((r) => r.unicode === emoji);
 
-      const message = messageStoreMessages.find(
-        (message) => message.messageID === messageID
-      );
-      const reaction = message.reactions.find((r) => r.unicode === emoji);
-
-      // If the reaction is new
-      if (!reaction) {
-        message.reactions.push(res.data);
-      } else {
-        // Increment count
-        reaction.count += 1;
-      }
-
-      messageStore.messages.data = messageStoreMessages;
+          // If the reaction is new
+          if (!reaction) {
+            message.reactions.push(res.data);
+          } else {
+            // Increment count
+            reaction.count += 1;
+          }
+        }
+      });
     } catch (error) {
       this.reactions.error = error.response.data;
     }
@@ -94,24 +91,21 @@ export const reactionStore = reactive({
       );
 
       // Update reaction UI
-      let messageStoreMessages = messageStore.messages.data;
+      messageStore.messages.data.map((message) => {
+        if (message.messageID === messageID) {
+          const reaction = message.reactions.find((r) => r.unicode === emoji);
 
-      const message = messageStoreMessages.find(
-        (message) => message.messageID === messageID
-      );
-      const reaction = message.reactions.find((r) => r.unicode === emoji);
-
-      // If the count decreases to 0, remove the emoji in the UI
-      if (reaction.count - 1 == 0) {
-        message.reactions = message.reactions.filter(
-          (r) => r.unicode !== emoji
-        );
-      } else {
-        // Decrement the count
-        reaction.count -= 1;
-      }
-
-      messageStore.messages.data = messageStoreMessages;
+          // If the count decreases to 0, remove the emoji in the UI
+          if (reaction.count - 1 == 0) {
+            message.reactions = message.reactions.filter(
+              (r) => r.unicode !== emoji
+            );
+          } else {
+            // Decrement the count
+            reaction.count -= 1;
+          }
+        }
+      });
     } catch (error) {
       this.reactions.error = error.response.data;
     }

@@ -14,6 +14,7 @@ export default {
     senderID: String,
     conversationID: String,
   },
+  emits: ["toggle-emoji-picker"],
   data() {
     return {
       reactionStore,
@@ -47,21 +48,36 @@ export default {
   },
 
   methods: {
-    clickEmoji(emoji) {
-      console.log(emoji, this.senderID, this.conversationID);
-
+    async clickEmoji(emoji) {
+      this.$emit("toggle-emoji-picker");
       // Check if the auth user has already reacted to the message
-      const hasReacted = this.reactions.data.some(
+      const userReaction = this.reactions.data.find(
         (reaction) => reaction.reactor.userID === this.owner
       );
 
       // Add reaction
-      if (!hasReacted) {
+      if (!userReaction) {
         this.reactionStore.addReaction(
           emoji,
           this.messageID,
           this.conversationID
         );
+      } else {
+        // Delete the reaction and replace
+        await this.reactionStore.deleteReaction(
+          userReaction.unicode,
+          userReaction.reactionID,
+          this.messageID,
+          this.conversationID
+        );
+
+        // Add the picked emoji if the picked emoji is different with the existing emoji
+        if (emoji !== userReaction.unicode)
+          await this.reactionStore.addReaction(
+            emoji,
+            this.messageID,
+            this.conversationID
+          );
       }
     },
   },

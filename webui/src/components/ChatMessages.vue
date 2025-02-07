@@ -142,7 +142,7 @@ export default {
 
     <div
       ref="chatContainer"
-      class="chat-container d-flex flex-column flex-grow-1 gap-3 p-2 overflow-scroll"
+      class="chat-container d-flex flex-column flex-grow-1 gap-5 p-2 overflow-scroll"
     >
       <Message
         v-for="message in message.data"

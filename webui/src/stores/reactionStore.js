@@ -39,7 +39,6 @@ export const reactionStore = reactive({
       );
 
       this.reactions.data = res.data;
-      console.log("Reactions: ", res.data);
     } catch (error) {
       this.reactions.error = error.response.data;
     }
@@ -60,7 +59,7 @@ export const reactionStore = reactive({
         }
       );
 
-      // Update reaction count
+      // Update reaction UI
       let messageStoreMessages = messageStore.messages.data;
 
       const message = messageStoreMessages.find(
@@ -68,14 +67,51 @@ export const reactionStore = reactive({
       );
       const reaction = message.reactions.find((r) => r.unicode === emoji);
 
+      // If the reaction is new
       if (!reaction) {
         message.reactions.push(res.data);
       } else {
+        // Increment count
         reaction.count += 1;
       }
 
       messageStore.messages.data = messageStoreMessages;
-      console.log(res.data);
+    } catch (error) {
+      this.reactions.error = error.response.data;
+    }
+  },
+
+  async deleteReaction(emoji, reactionID, messageID, conversationID) {
+    try {
+      await axios.delete(
+        `/conversations/${conversationID}/messages/${messageID}/reactions/${reactionID}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      // Update reaction UI
+      let messageStoreMessages = messageStore.messages.data;
+
+      const message = messageStoreMessages.find(
+        (message) => message.messageID === messageID
+      );
+      const reaction = message.reactions.find((r) => r.unicode === emoji);
+
+      // If the count decreases to 0, remove the emoji in the UI
+      if (reaction.count - 1 == 0) {
+        message.reactions = message.reactions.filter(
+          (r) => r.unicode !== emoji
+        );
+      } else {
+        // Decrement the count
+        reaction.count -= 1;
+      }
+
+      messageStore.messages.data = messageStoreMessages;
     } catch (error) {
       this.reactions.error = error.response.data;
     }

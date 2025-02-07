@@ -89,7 +89,11 @@ func (db *appdbimpl) CheckMessageOwnership(userID uuid.UUID, conversationID uuid
 
 	var res bool
 
-	if _ = db.c.QueryRow(queryMembership, conversationID, messageID, userID).Scan(&res); !res {
+	if err := db.c.QueryRow(queryMembership, conversationID, messageID, userID).Scan(&res); err != nil {
+		return err
+	}
+
+	if !res {
 		return errors.New(constants.UNAUTHORIZED)
 	}
 
@@ -105,7 +109,11 @@ func (db *appdbimpl) CheckReactionOwnership(userID uuid.UUID, reactionID uuid.UU
 
 	var res bool
 
-	if _ = db.c.QueryRow(queryMembership, reactionID, userID).Scan(&res); !res {
+	if err := db.c.QueryRow(queryMembership, reactionID, userID).Scan(&res); err != nil {
+		return err
+	}
+
+	if !res {
 		return errors.New(constants.UNAUTHORIZED)
 	}
 

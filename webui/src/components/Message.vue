@@ -106,13 +106,18 @@ export default {
             :senderID="authStore.user.data.userID"
             :conversationID="conversation.conversationID"
             :messageID="message.messageID"
+            @toggle-emoji-picker="toggleEmojiPicker"
           />
 
           <i class="bi bi-info-circle"></i>
         </div>
 
         <!-- Reactions -->
-        <div class="position-absolute end-0 d-flex gap-1">
+        <div
+          :class="`position-absolute ${
+            isOwner ? 'end-0' : 'start-0'
+          } d-flex gap-1`"
+        >
           <div
             class="d-flex justify-content-center align-items-center gap-1 bg-light rounded-2 p-1"
             v-for="(reaction, index) in message.reactions"

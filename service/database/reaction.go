@@ -147,12 +147,7 @@ func (db *appdbimpl) DeleteReaction(reactionID uuid.UUID, conversationID uuid.UU
 
 	const queryDeleteReaction = `
 		DELETE FROM Reaction WHERE
-		reactionID = ? AND messageID = ? AND 
-		messageID IN (
-			SELECT m.messageID
-			FROM Message m
-			WHERE m.conversationID = ? 
-		);
+		reactionID = ? AND messageID = ?;
 	`
 
 	res, err := db.c.Exec(queryDeleteReaction, reactionID, messageID, conversationID)

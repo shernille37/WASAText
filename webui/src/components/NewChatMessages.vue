@@ -42,6 +42,16 @@ export default {
       };
     },
   },
+  watch: {
+    "conversations.error": {
+      handler() {
+        setTimeout(() => {
+          this.conversationStore.conversations.error = null;
+        }, 3000);
+      },
+      deep: true,
+    },
+  },
   methods: {
     openGroupImageUpload() {
       this.$refs.group_image.click();
@@ -122,8 +132,7 @@ export default {
 
       const res = await conversationStore.addConversation(data);
       this.resetFields();
-
-      this.$emit("add-conversation", res.conversationID);
+      if (res) this.$emit("add-conversation", res.conversationID);
     },
 
     resetFields() {

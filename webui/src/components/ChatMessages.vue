@@ -30,6 +30,7 @@ export default {
         data: this.conversationStore.conversation.data,
         loading: this.conversationStore.conversation.loading,
         error: this.conversationStore.conversation.error,
+        showAddMember: this.conversationStore.addMemberFlag,
       };
     },
     message() {
@@ -133,7 +134,9 @@ export default {
       ></i>
     </div>
 
-    <AddMemberForm />
+    <div v-if="conversation.showAddMember">
+      <AddMemberForm :conversationID="conversationID" />
+    </div>
 
     <!-- Messages -->
 

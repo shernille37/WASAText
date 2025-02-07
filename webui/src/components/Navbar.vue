@@ -31,7 +31,7 @@ export default {
       <p class="fs-2 fw-semibold navbar-brand">WASAText</p>
     </div>
 
-    <div class="d-flex align-items-center gap-2">
+    <div v-if="user" class="d-flex align-items-center gap-2">
       <img
         v-if="user.image"
         :src="`${apiUrl}${user.image}`"

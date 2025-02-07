@@ -33,6 +33,7 @@ export default {
     },
     handleSelectConversation(conversationID) {
       this.$emit("select-conversation", conversationID);
+      this.conversationStore.addMemberFlag = false;
     },
   },
 };

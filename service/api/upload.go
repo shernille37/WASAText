@@ -24,13 +24,21 @@ var validImages = map[string]bool{
 	".png":  true,
 }
 
+var imageDirectory = "/tmp/images"
+
 func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// Create the image directory if it doesn't exist with permission (0755)
+	if err := os.MkdirAll(imageDirectory, 0755); err != nil {
+		http.Error(w, "Failed to create directory", http.StatusBadRequest)
+		return
+	}
 
 	var res ImageURL
 
 	// Parse the multipart form
-	err := r.ParseMultipartForm(10 << 20) // Limit to 10 MB
-	if err != nil {
+	// Limit to 10 MB
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		http.Error(w, constants.PARSE_ERROR, http.StatusBadRequest)
 		return
 	}

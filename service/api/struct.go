@@ -275,4 +275,5 @@ func (r *Reaction) FromDatabase(dr database.Reaction) {
 	r.ReactionID = dr.ReactionID
 	r.Unicode = dr.Unicode
 	r.Reactor = (*User)(dr.Reactor)
+	r.Count = dr.Count
 }

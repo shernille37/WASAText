@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS Reaction (
 
 	PRIMARY KEY (pk),
 	UNIQUE(reactionID),
-	UNIQUE(userID, messageID, emoji),
+	UNIQUE(userID, messageID),
 	FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
 	FOREIGN KEY (messageID) REFERENCES Message(messageID) ON DELETE CASCADE,
 	FOREIGN KEY (emoji) REFERENCES Emoji(unicode) ON DELETE CASCADE

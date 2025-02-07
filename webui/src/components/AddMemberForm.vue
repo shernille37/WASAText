@@ -10,6 +10,10 @@ export default {
     LoadingSpinner,
     ErrorMsg,
   },
+  props: {
+    conversationID: String,
+  },
+  emits: ["refresh-conversation"],
   data() {
     return {
       authStore,
@@ -41,15 +45,6 @@ export default {
     },
   },
   methods: {
-    async getUsers() {
-      await this.authStore.getUsers();
-
-      // Just display the members that are NOT already selected (NOT in selectedMembers)
-      this.suggestedMembers = this.users.data.filter(
-        (user) =>
-          !this.conversation.data.members.some((u) => u.userID === user.userID)
-      );
-    },
     handleAddMember(user) {
       this.selectedMembers.push(user);
 
@@ -76,14 +71,31 @@ export default {
       };
 
       await conversationStore.addMembersToGroup(data);
+
+      this.conversationStore.getConversation(this.conversationID);
     },
     close() {
       this.conversationStore.addMemberFlag =
         !this.conversationStore.addMemberFlag;
     },
   },
-  mounted() {
-    this.getUsers();
+  watch: {
+    "conversation.error": {
+      handler() {
+        setTimeout(() => {
+          this.conversationStore.conversation.error = null;
+        }, 3000);
+      },
+      deep: true,
+    },
+  },
+  async mounted() {
+    await this.authStore.getUsers();
+    // Just display the members that are NOT already selected (NOT in selectedMembers)
+    this.suggestedMembers = this.users.data.filter(
+      (user) =>
+        !this.conversation.data.members.some((u) => u.userID === user.userID)
+    );
   },
 };
 </script>
@@ -97,10 +109,7 @@ export default {
     <ErrorMsg msg="error" />
   </div>
 
-  <div
-    v-else-if="show"
-    class="h-100 w-100 d-flex justify-content-center align-items-center"
-  >
+  <div class="h-100 w-100 d-flex justify-content-center align-items-center">
     <div class="position-relative p-2 bg-info w-50 rounded-2">
       <p class="fw-semibold text-center">Add People</p>
       <p

@@ -28,7 +28,7 @@ export default {
   methods: {
     selectConveration(conversationID) {
       this.conversationStore.addConversationFlag = false;
-      // To avoid race conditions
+
       this.$nextTick(() => (this.selectedConversation = conversationID));
     },
   },

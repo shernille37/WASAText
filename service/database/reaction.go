@@ -9,7 +9,7 @@ import (
 )
 
 type ReactionBody struct {
-	Unicode string `json:"unicode"`
+	Unicode string
 }
 
 func (db *appdbimpl) ListEmojis() ([]string, error) {
@@ -95,10 +95,11 @@ func (db *appdbimpl) AddReaction(userID uuid.UUID, messageID uuid.UUID, rb React
 	`
 
 	const queryResponse = `
-		SELECT r.reactionID, r.emoji, u.userID, u.username, u.image 
+		SELECT r.reactionID, r.emoji, u.userID, u.username, u.image, COUNT(r.emoji) as count 
 		FROM Reaction r, User u
 		WHERE r.messageID = ? AND r.reactionID = ? AND 
-		r.userID = u.userID;
+		r.userID = u.userID
+		GROUP BY r.emoji;
 	`
 
 	tx, err := db.c.Begin()
@@ -126,7 +127,7 @@ func (db *appdbimpl) AddReaction(userID uuid.UUID, messageID uuid.UUID, rb React
 	}
 
 	var u User
-	if err = tx.QueryRow(queryResponse, messageID, reactionID).Scan(&res.ReactionID, &res.Unicode, &u.UserID, &u.Username, &u.Image); err != nil {
+	if err = tx.QueryRow(queryResponse, messageID, reactionID).Scan(&res.ReactionID, &res.Unicode, &u.UserID, &u.Username, &u.Image, &res.Count); err != nil {
 		return res, err
 	}
 

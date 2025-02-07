@@ -105,6 +105,7 @@ export default {
             v-if="emojiClick"
             :senderID="authStore.user.data.userID"
             :conversationID="conversation.conversationID"
+            :messageID="message.messageID"
           />
 
           <i class="bi bi-info-circle"></i>

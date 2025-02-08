@@ -1,5 +1,6 @@
 <script>
 import { conversationStore } from "../stores/conversationStore";
+import { messageStore } from "../stores/messageStore";
 import Conversation from "./Conversation.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
 
@@ -12,6 +13,7 @@ export default {
   data() {
     return {
       conversationStore,
+      messageStore,
     };
   },
   computed: {
@@ -34,6 +36,7 @@ export default {
     handleSelectConversation(conversationID) {
       this.$emit("select-conversation", conversationID);
       this.conversationStore.addMemberFlag = false;
+      this.messageStore.replyMessage = null;
     },
   },
 };

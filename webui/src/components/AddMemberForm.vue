@@ -71,8 +71,6 @@ export default {
       };
 
       await conversationStore.addMembersToGroup(data);
-
-      this.conversationStore.getConversation(this.conversationID);
     },
     close() {
       this.conversationStore.addMemberFlag =

@@ -14,6 +14,11 @@ export default {
       fileToUpload: null,
     };
   },
+  computed: {
+    replyMessage() {
+      return this.messageStore.replyMessage;
+    },
+  },
   methods: {
     openFile() {
       this.$refs.file.click();
@@ -27,7 +32,6 @@ export default {
         alert("Please insert a message or an image");
         return;
       }
-
       const data = {
         conversationID: this.conversationID,
         message: this.message,
@@ -75,10 +79,20 @@ export default {
         ></i>
         <img :src="image" alt="Image" width="150" />
       </div>
+
       <!-- Reply Preview -->
-      <!-- <div>
-        <p class="fs-6 ms-4 bg-light p-2">Reply Preview</p>
-      </div> -->
+      <div v-if="replyMessage" class="ms-4 bg-light p-2">
+        <div class="fs-7 d-flex align-items-center">
+          <i class="bi bi-reply text-black"></i>
+          <p>
+            Replying to
+            {{ replyMessage.isOwner ? "Yourself" : replyMessage.senderName }}
+          </p>
+        </div>
+        <p class="fs-6">{{ replyMessage.message }}</p>
+      </div>
+
+      <!-- Main Form -->
       <form
         @submit.prevent="handleSubmit"
         class="d-flex flex-grow-1 ms-3 p-1 rounded-4"

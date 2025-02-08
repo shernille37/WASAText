@@ -1,5 +1,6 @@
 <script>
 import { authStore } from "../stores/authStore";
+import { messageStore } from "../stores/messageStore";
 import EmojiPicker from "./EmojiPicker.vue";
 
 export default {
@@ -11,6 +12,7 @@ export default {
     return {
       apiUrl: import.meta.env.VITE_API_URL,
       authStore,
+      messageStore,
       emojiClick: false,
     };
   },
@@ -31,10 +33,29 @@ export default {
     isGroup() {
       return this.conversation.type === "group";
     },
+    isForwarded() {
+      return this.message.messageType === "forward";
+    },
   },
   methods: {
     toggleEmojiPicker() {
       this.emojiClick = !this.emojiClick;
+    },
+    replyToMessage() {
+      this.messageStore.replyMessage = {
+        messageID: this.message.messageID,
+        senderName: this.message.senderName,
+        message: this.message.message,
+        isOwner: this.isOwner,
+      };
+    },
+    handleDeleteMessage() {
+      if (confirm("Are you sure?")) {
+        this.messageStore.deleteMessage(
+          this.conversation.conversationID,
+          this.message.messageID
+        );
+      }
     },
   },
 };
@@ -54,9 +75,11 @@ export default {
         {{ message.senderName }}
       </p>
 
+      <p v-show="isForwarded">Forwarded</p>
+
       <p v-show="isReply" class="text-end">
         {{ isOwner ? "You" : message.senderName }} replied to
-        {{ isRecipientOwner ? "You" : message.replyRecipientName }}
+        {{ isRecipientOwner ? "Yourself" : message.replyRecipientName }}
       </p>
 
       <div
@@ -97,7 +120,7 @@ export default {
             isOwner ? 'end-100' : 'start-100'
           }`"
         >
-          <i class="bi bi-reply text-black"></i>
+          <i class="bi bi-reply text-black" @click="replyToMessage"></i>
 
           <i @click="toggleEmojiPicker" class="bi bi-emoji-smile"></i>
           <EmojiPicker
@@ -109,7 +132,11 @@ export default {
             @toggle-emoji-picker="toggleEmojiPicker"
           />
 
-          <i class="bi bi-info-circle"></i>
+          <i
+            v-if="isOwner"
+            class="bi bi-trash3"
+            @click="handleDeleteMessage"
+          ></i>
         </div>
 
         <!-- Reactions -->

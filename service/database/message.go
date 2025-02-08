@@ -34,9 +34,8 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 
 	const queryReactions = `
 		SELECT r.emoji, COUNT(r.emoji) as count
-		FROM Reaction r, User u, Message m
-		WHERE r.messageID = ? AND r.messageID = m.messageID AND 
-		r.userID = u.userID AND m.conversationID = ?
+		FROM Reaction r
+		WHERE r.messageID = ?
 		GROUP BY r.emoji;
 	`
 
@@ -52,10 +51,6 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 		var m Message
 		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.SenderName, &m.ConversationID, &m.Timestamp, &m.MessageType, &m.MessageStatus, &m.Message, &m.HasImage, &m.Image, &m.ReplyMessageID, &m.ReplyRecipientName, &m.ReplyMessage); err != nil {
 			return nil, err
-		}
-
-		if m.ReplyMessageID == nil {
-			m.ReplyMessage = nil
 		}
 
 		rowReactions, err := db.c.Query(queryReactions, m.MessageID, m.ConversationID)
@@ -263,9 +258,9 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 
 	sourceMessage.MessageType = "forward"
 
-	if !sourceMessage.HasImage {
-		sourceMessage.Image = nil
-	}
+	// if !sourceMessage.HasImage {
+	// 	sourceMessage.Image = nil
+	// }
 
 	if _, err = tx.Exec(queryForward, newMessageID, senderID, fmb.Destination, sourceMessage.MessageType, sourceMessage.HasImage, sourceMessage.Message, sourceMessage.Image); err != nil {
 		return err

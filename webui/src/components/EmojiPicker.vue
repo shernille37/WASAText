@@ -50,6 +50,7 @@ export default {
   methods: {
     async clickEmoji(emoji) {
       this.$emit("toggle-emoji-picker");
+
       // Check if the auth user has already reacted to the message
       const userReaction = this.reactions.data.find(
         (reaction) => reaction.reactor.userID === this.owner

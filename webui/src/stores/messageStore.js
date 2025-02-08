@@ -12,6 +12,8 @@ export const messageStore = reactive({
     sendMessageLoading: false,
   },
 
+  replyMessage: null,
+
   async getMessages(conversationID) {
     try {
       this.messages.loading = true;
@@ -24,6 +26,7 @@ export const messageStore = reactive({
 
       this.messages.loading = false;
       this.messages.data = res.data;
+      console.log("Messages", res.data);
     } catch (error) {
       this.messages.loading = false;
       this.messages.error = error.response.data;
@@ -42,6 +45,9 @@ export const messageStore = reactive({
       const resSendMessage = await axios.post(
         `/conversations/${data.conversationID}/messages`,
         {
+          replyMessageID: this.replyMessage
+            ? this.replyMessage.messageID
+            : null,
           message: data.message,
           image: resUploadImage,
         },
@@ -55,9 +61,31 @@ export const messageStore = reactive({
 
       this.messages.data.push(resSendMessage.data);
       this.messages.sendMessageLoading = false;
+      this.replyMessage = null;
     } catch (error) {
       console.error(error.response.data);
       this.messages.sendMessageLoading = false;
+      this.messages.error = error.response.data;
+    }
+  },
+
+  async deleteMessage(conversationID, messageID) {
+    try {
+      await axios.delete(
+        `/conversations/${conversationID}/messages/${messageID}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      // Update UI
+      this.messages.data = this.messages.data.filter(
+        (message) => message.messageID !== messageID
+      );
+    } catch (error) {
       this.messages.error = error.response.data;
     }
   },

@@ -120,6 +120,8 @@ export const conversationStore = reactive({
         }
       );
 
+      this.conversation.data.members.push(...res.data);
+
       this.conversation.loading = false;
       this.addMemberFlag = false;
     } catch (error) {

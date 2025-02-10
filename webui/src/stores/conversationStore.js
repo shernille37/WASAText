@@ -129,4 +129,46 @@ export const conversationStore = reactive({
       this.conversation.error = error.response.data;
     }
   },
+
+  async editGroupConversation(groupImage, groupName) {
+    let promises = [];
+    let resUploadImage = null;
+    try {
+      if (groupImage) {
+        resUploadImage = await uploadImage(groupImage);
+        const updateGroupImage = axios.put(
+          `/group-conversations/${this.conversation.data.conversationID}/photo`,
+          {
+            groupImage: resUploadImage,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${authStore.user.data.userID}`,
+            },
+          }
+        );
+
+        promises.push(updateGroupImage);
+      }
+      if (groupName) {
+        const updateGroupName = axios.put(
+          `/group-conversations/${this.conversation.data.conversationID}/name`,
+          {
+            groupName: groupName,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${authStore.user.data.userID}`,
+            },
+          }
+        );
+
+        promises.push(updateGroupName);
+      }
+
+      await Promise.all(promises);
+    } catch (error) {
+      this.user.error = error.response.data;
+    }
+  },
 });

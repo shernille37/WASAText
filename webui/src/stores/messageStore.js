@@ -26,7 +26,6 @@ export const messageStore = reactive({
 
       this.messages.loading = false;
       this.messages.data = res.data;
-      console.log("Messages", res.data);
     } catch (error) {
       this.messages.loading = false;
       this.messages.error = error.response.data;
@@ -59,7 +58,6 @@ export const messageStore = reactive({
         }
       );
 
-      this.messages.data.push(resSendMessage.data);
       this.messages.sendMessageLoading = false;
       this.replyMessage = null;
     } catch (error) {

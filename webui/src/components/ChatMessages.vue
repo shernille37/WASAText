@@ -65,6 +65,12 @@ export default {
       this.conversationStore.addMemberFlag =
         !this.conversationStore.addMemberFlag;
     },
+    goToEditGroupConversation() {
+      if (this.conversation.data.group)
+        this.$router.push(
+          `/group-conversations/${this.conversation.data.conversationID}/edit`
+        );
+    },
   },
 
   watch: {
@@ -124,6 +130,12 @@ export default {
               : conversation.data.group.groupName
           }}
         </p>
+        <i
+          v-if="conversation.data.group"
+          role="button"
+          class="bi bi-pencil-square ms-2"
+          @click="goToEditGroupConversation"
+        ></i>
       </div>
 
       <i

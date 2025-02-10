@@ -1,5 +1,5 @@
 <script>
-import { authStore } from "../stores/authStore";
+import { conversationStore } from "../stores/conversationStore";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import ErrorMsg from "../components/ErrorMsg.vue";
 
@@ -11,25 +11,25 @@ export default {
   },
   data() {
     return {
-      authStore,
+      conversationStore,
       apiUrl: import.meta.env.VITE_API_URL,
-      username: "",
+      groupName: "",
       image: null,
       fileToUpload: null,
     };
   },
   computed: {
-    user() {
+    conversation() {
       return {
-        data: authStore.user.data,
-        loading: authStore.user.loading,
-        error: authStore.user.error,
+        data: conversationStore.conversation.data,
+        loading: conversationStore.conversation.loading,
+        error: conversationStore.conversation.error,
       };
     },
   },
   methods: {
     openFileUpload() {
-      this.$refs.profileImage.click();
+      this.$refs.groupImage.click();
     },
     handleUploadProfile(e) {
       const file = e.target.files[0];
@@ -40,42 +40,56 @@ export default {
         alert("Please upload a valid image file");
       }
     },
-    handleSubmit() {
-      if (this.fileToUpload || this.username)
-        this.authStore.updateProfile(this.fileToUpload, this.username);
+    async handleSubmit() {
+      if (this.fileToUpload || this.groupName) {
+        await this.conversationStore.editGroupConversation(
+          this.fileToUpload,
+          this.groupName
+        );
+      }
+      this.$router.push("/");
     },
   },
   watch: {
-    "user.error": {
+    "conversation.error": {
       handler() {
         setTimeout(() => {
-          this.authStore.user.error = null;
+          this.conversationStore.conversation.error = null;
         }, 3000);
       },
       deep: true,
     },
   },
+  mounted() {
+    this.conversationStore.getConversation(this.$route.params.conversationID);
+  },
 };
 </script>
 
 <template>
-  <div class="profile d-flex justify-content-center align-items-center">
+  <div v-if="conversation.loading">
+    <LoadingSpinner />
+  </div>
+  <div v-else class="profile d-flex justify-content-center align-items-center">
     <div
-      v-if="user.data"
+      v-if="conversation.data.group"
       class="d-flex flex-column align-items-center justify-content-evenly rounded-3"
     >
-      <ErrorMsg :msg="user.error" />
-      <p class="fs-5">Edit Profile Details</p>
+      <ErrorMsg :msg="conversation.error" />
+      <p class="fs-5">Edit Group Details</p>
 
       <div
-        v-if="user.data.image || image"
-        class="h-50 w-50 d-flex flex-column align-items-center justify-content-evenly"
+        v-if="conversation.data.group.groupImage || image"
+        class="position-relative h-50 w-50 d-flex flex-column align-items-center justify-content-evenly"
       >
         <img v-if="image" :src="image" alt="Profile Preview" />
-        <img v-else :src="`${apiUrl}${user.data.image}`" alt="Profile" />
+        <img
+          v-else
+          :src="`${apiUrl}${conversation.data.group.groupImage}`"
+          alt="Profile"
+        />
       </div>
       <i v-else class="profile-icon bi bi-person-circle"></i>
-
       <i role="button" class="bi bi-pencil-square" @click="openFileUpload"></i>
 
       <input
@@ -84,19 +98,19 @@ export default {
         name="image"
         id="image"
         class="d-none"
-        ref="profileImage"
+        ref="groupImage"
       />
 
       <input
-        v-model="username"
+        v-model="groupName"
         type="text"
-        :placeholder="`${user.data.username}`"
+        :placeholder="`${conversation.data.group.groupName}`"
         class="form-control p-1 w-50"
       />
 
       <button
         class="btn btn-info p-2"
-        :disabled="!image && !username"
+        :disabled="!image && !groupName"
         @click="handleSubmit"
       >
         Save

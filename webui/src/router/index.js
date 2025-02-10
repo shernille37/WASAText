@@ -5,6 +5,7 @@ import Main from "../views/Main.vue";
 import Profile from "../views/Profile.vue";
 
 import { authStore } from "../stores/authStore";
+import EditGroupConversation from "../views/EditGroupConversation.vue";
 
 const routes = [
   {
@@ -21,6 +22,11 @@ const routes = [
         name: "profile",
         path: "profile",
         component: Profile,
+      },
+      {
+        name: "EditGroupConversation",
+        path: "/group-conversations/:conversationID/edit",
+        component: EditGroupConversation,
       },
     ],
     meta: { private: true },

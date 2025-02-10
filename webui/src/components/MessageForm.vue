@@ -45,6 +45,7 @@ export default {
       this.message = "";
       this.image = null;
       this.fileToUpload = null;
+      this.$refs.file.value = "";
     },
     handleFileUpload(e) {
       const file = e.target.files[0];

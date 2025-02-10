@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
@@ -18,11 +19,12 @@ type ImageURL struct {
 	Image string `json:"image"`
 }
 
-var validImages = map[string]bool{
-	".gif":  true,
-	".jpeg": true,
-	".png":  true,
-}
+// var validImages = map[string]bool{
+// 	".gif":  true,
+// 	".jpeg": true,
+// 	".png":  true,
+// 	".jpg":  true,
+// }
 
 var imageDirectory = "/tmp/images"
 
@@ -52,8 +54,23 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 	}
 	defer file.Close()
 
-	// Check if the file has a valid image extension
-	if !validImages[filepath.Ext(handler.Filename)] {
+	// if !validImages[filepath.Ext(handler.Filename)] {
+	// 	http.Error(w, constants.INVALID_IMAGE, http.StatusBadRequest)
+	// 	return
+	// }
+
+	// Check if the file has a valid image extension by checking the MIME Type
+	buffer := make([]byte, 512)
+	if _, err = file.Read(buffer); err != nil {
+		http.Error(w, "Error reading file", http.StatusInternalServerError)
+		return
+	}
+
+	file.Seek(0, 0)
+
+	// Detect MIME type
+	mimeType := http.DetectContentType(buffer)
+	if !strings.HasPrefix(mimeType, "image/") {
 		http.Error(w, constants.INVALID_IMAGE, http.StatusBadRequest)
 		return
 	}

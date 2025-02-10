@@ -40,9 +40,10 @@ export default {
         alert("Please upload a valid image file");
       }
     },
-    handleSubmit() {
+    async handleSubmit() {
       if (this.fileToUpload || this.username)
-        this.authStore.updateProfile(this.fileToUpload, this.username);
+        await this.authStore.updateProfile(this.fileToUpload, this.username);
+      this.$router.push("/");
     },
   },
   watch: {

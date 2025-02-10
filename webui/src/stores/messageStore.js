@@ -58,6 +58,7 @@ export const messageStore = reactive({
         }
       );
 
+      this.messages.data.push(resSendMessage.data);
       this.messages.sendMessageLoading = false;
       this.replyMessage = null;
     } catch (error) {

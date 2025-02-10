@@ -14,9 +14,11 @@ const routes = [
     children: [
       {
         path: "",
+        name: "main",
         component: Main,
       },
       {
+        name: "profile",
         path: "profile",
         component: Profile,
       },

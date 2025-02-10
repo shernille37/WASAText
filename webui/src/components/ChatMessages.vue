@@ -156,7 +156,6 @@ export default {
       ref="chatContainer"
       class="chat-container position-relative d-flex flex-column flex-grow-1 gap-5 p-2 overflow-scroll"
     >
-      <!-- <p class="position-absolute">Hi</p> -->
       <Message
         v-for="message in message.data"
         :key="message.messageID"
@@ -172,12 +171,5 @@ export default {
 <style scoped>
 .chat-container {
   overflow-x: hidden !important;
-}
-
-.chat-container p {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
 }
 </style>

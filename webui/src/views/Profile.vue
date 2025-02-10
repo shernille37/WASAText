@@ -43,7 +43,8 @@ export default {
     async handleSubmit() {
       if (this.fileToUpload || this.username)
         await this.authStore.updateProfile(this.fileToUpload, this.username);
-      this.$router.push("/");
+
+      if (!this.user.error) this.$router.push("/");
     },
   },
   watch: {

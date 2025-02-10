@@ -1,12 +1,15 @@
 <script>
 import { authStore } from "../stores/authStore";
+import { conversationStore } from "../stores/conversationStore";
 import { messageStore } from "../stores/messageStore";
 import EmojiPicker from "./EmojiPicker.vue";
+import ReactionModal from "./ReactionModal.vue";
 
 export default {
   name: "Message",
   components: {
     EmojiPicker,
+    ReactionModal,
   },
   data() {
     return {
@@ -14,6 +17,7 @@ export default {
       authStore,
       messageStore,
       emojiClick: false,
+      reactionsInfoClick: false,
     };
   },
   props: {
@@ -41,6 +45,9 @@ export default {
     toggleEmojiPicker() {
       this.emojiClick = !this.emojiClick;
     },
+    toggleReactionsInfo() {
+      this.reactionsInfoClick = !this.reactionsInfoClick;
+    },
     replyToMessage() {
       this.messageStore.replyMessage = {
         messageID: this.message.messageID,
@@ -58,10 +65,21 @@ export default {
       }
     },
   },
+
+  beforeUnmount() {
+    this.emojiClick = false;
+    this.reactionsInfoClick = false;
+  },
 };
 </script>
 
 <template>
+  <ReactionModal
+    v-if="reactionsInfoClick"
+    :conversation="conversation"
+    :message="message"
+    @close-modal="toggleReactionsInfo"
+  />
   <div
     :class="[
       'message-container',
@@ -149,6 +167,7 @@ export default {
             <div
               role="button"
               class="d-flex justify-content-center align-items-center gap-1 bg-light rounded-2 p-1"
+              @click="toggleReactionsInfo"
             >
               <p>{{ reaction.unicode }}</p>
               <p>{{ reaction.count }}</p>

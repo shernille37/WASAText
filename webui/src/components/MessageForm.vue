@@ -27,6 +27,9 @@ export default {
       this.image = null;
       this.$refs.file.value = "";
     },
+    closeReply() {
+      this.messageStore.replyMessage = null;
+    },
     handleSubmit() {
       if (this.message == "" && !this.fileToUpload) {
         alert("Please insert a message or an image");
@@ -89,6 +92,11 @@ export default {
             Replying to
             {{ replyMessage.isOwner ? "Yourself" : replyMessage.senderName }}
           </p>
+          <i
+            role="button"
+            class="bi bi-x fs-5 text-danger"
+            @click="closeReply"
+          ></i>
         </div>
         <p class="fs-6">{{ replyMessage.message }}</p>
       </div>

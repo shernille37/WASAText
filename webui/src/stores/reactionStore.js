@@ -38,8 +38,11 @@ export const reactionStore = reactive({
         }
       );
 
+      console.log(res.data);
       this.reactions.data = res.data;
+      this.reactions.loading = false;
     } catch (error) {
+      this.reactions.loading = false;
       this.reactions.error = error.response.data;
     }
   },
@@ -73,6 +76,8 @@ export const reactionStore = reactive({
           }
         }
       });
+
+      this.reactions.data.push(res.data);
     } catch (error) {
       this.reactions.error = error.response.data;
     }
@@ -106,6 +111,10 @@ export const reactionStore = reactive({
           }
         }
       });
+
+      this.reactions.data = this.reactions.data.filter(
+        (reaction) => reaction.reactionID !== reactionID
+      );
     } catch (error) {
       this.reactions.error = error.response.data;
     }

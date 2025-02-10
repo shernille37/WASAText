@@ -19,6 +19,12 @@ export default {
       this.authStore.logout();
       this.$router.push("/login");
     },
+    goToProfile() {
+      this.$router.push("/profile");
+    },
+    goToHome() {
+      this.$router.push("/");
+    },
   },
 };
 </script>
@@ -28,7 +34,9 @@ export default {
     class="navbar bg-white py-1 px-4 position-sticky top-0 d-flex justify-content-between align-items-center shadow-sm"
   >
     <div>
-      <p class="fs-2 fw-semibold navbar-brand">WASAText</p>
+      <p role="button" class="fs-2 fw-semibold navbar-brand" @click="goToHome">
+        WASAText
+      </p>
     </div>
 
     <div v-if="user" class="d-flex align-items-center gap-2">
@@ -50,7 +58,13 @@ export default {
         ></i>
         <ul class="dropdown-menu dropdown-menu-end mt-3 z-3">
           <li>
-            <p role="button" class="dropdown-item p-1 rounded-1">Profile</p>
+            <p
+              role="button"
+              class="dropdown-item p-1 rounded-1"
+              @click="goToProfile"
+            >
+              Profile
+            </p>
           </li>
           <li>
             <p

@@ -8,9 +8,9 @@ export default {
 </script>
 
 <template>
-  <div class="alert alert-danger p-1" role="alert">
+  <p class="alert alert-danger p-1" role="alert">
     {{ msg }}
-  </div>
+  </p>
 </template>
 
 <style></style>

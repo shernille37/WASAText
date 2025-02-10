@@ -1,11 +1,13 @@
 import { reactive } from "vue";
 import axios from "../services/axios";
+import { uploadImage } from "../utils/upload";
 
 export const authStore = reactive({
   user: {
     data: null,
     loading: false,
     error: null,
+    success: false,
   },
 
   userList: {
@@ -60,6 +62,50 @@ export const authStore = reactive({
     } catch (error) {
       this.userList.loading = false;
       this.userList.error = error.response.data;
+    }
+  },
+
+  async updateProfile(imageFile, username) {
+    let promises = [];
+    let resUploadImage = null;
+    try {
+      if (imageFile) {
+        resUploadImage = await uploadImage(imageFile);
+        const updateProfileImage = axios.put(
+          `/users/${this.user.data.userID}/image`,
+          {
+            image: resUploadImage,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${this.user.data.userID}`,
+            },
+          }
+        );
+
+        promises.push(updateProfileImage);
+      }
+      if (username) {
+        const updateUsername = axios.put(
+          `/users/${this.user.data.userID}/username`,
+          {
+            username: username,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${this.user.data.userID}`,
+            },
+          }
+        );
+
+        promises.push(updateUsername);
+      }
+
+      await Promise.all(promises);
+      if (imageFile) this.user.data.image = resUploadImage;
+      if (username) this.user.data.username = username;
+    } catch (error) {
+      this.user.error = error.response.data;
     }
   },
 });

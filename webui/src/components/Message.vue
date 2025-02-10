@@ -95,8 +95,8 @@ export default {
 
       <p v-show="isForwarded">Forwarded</p>
 
-      <p v-show="isReply" class="text-end">
-        {{ isOwner ? "You" : message.senderName }} replied to
+      <p v-show="isReply" :class="`${isOwner ? 'text-end' : 'text-start'}`">
+        {{ isOwner ? "You" : "" }} replied to
         {{ isRecipientOwner ? "Yourself" : message.replyRecipientName }}
       </p>
 

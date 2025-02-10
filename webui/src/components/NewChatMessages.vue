@@ -205,7 +205,12 @@ export default {
           :key="user.userID"
           @click="handleAddMember(user)"
         >
-          <img v-if="user.image" :src="`${apiUrl}${user.image}`" alt="" />
+          <img
+            v-if="user.image"
+            :src="`${apiUrl}${user.image}`"
+            alt=""
+            class="profile-image"
+          />
           <i v-else class="bi bi-person-circle fs-3"></i>
           <p>{{ user.username }}</p>
         </div>

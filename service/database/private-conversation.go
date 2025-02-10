@@ -66,8 +66,8 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	var res Conversation
 
 	const queryMessage = `
-		INSERT INTO Message(messageID, senderID, conversationID, message, image)
-		VALUES (?,?,?,?,?);
+		INSERT INTO Message(messageID, senderID, conversationID, message, image, hasImage)
+		VALUES (?,?,?,?,?, ?);
 	`
 
 	const queryAddConversation = `
@@ -136,7 +136,11 @@ func (db *appdbimpl) AddPrivateChat(senderID uuid.UUID, mpb MessagePrivateBody) 
 	}
 
 	// Add Message
-	if _, err = tx.Exec(queryMessage, messageID, senderID, convID, mpb.Message, mpb.Image); err != nil {
+	var hasImage bool
+	if mpb.Image != nil {
+		hasImage = true
+	}
+	if _, err = tx.Exec(queryMessage, messageID, senderID, convID, mpb.Message, mpb.Image, hasImage); err != nil {
 		return res, err
 	}
 

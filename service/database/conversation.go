@@ -1,6 +1,9 @@
 package database
 
 import (
+	"database/sql"
+	"errors"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -31,10 +34,12 @@ func (db *appdbimpl) ListConversation(id uuid.UUID) ([]Conversation, error) {
 
 	for idx := range res {
 		lm := &LatestMessage{}
-		if err := db.c.QueryRow(queryLatestMessage, res[idx].ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image); err != nil {
-			return nil, err
+		err := db.c.QueryRow(queryLatestMessage, res[idx].ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image)
+		if errors.Is(err, sql.ErrNoRows) {
+			res[idx].LatestMessage = nil
+		} else {
+			res[idx].LatestMessage = lm
 		}
-		res[idx].LatestMessage = lm
 	}
 
 	return res, nil
@@ -99,11 +104,11 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 
 	// Query Latest Message
 	var lm LatestMessage
-	if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image); err != nil {
-		return res, err
+	if err := db.c.QueryRow(queryLatestMessage, conversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image); errors.Is(err, sql.ErrNoRows) {
+		res.LatestMessage = nil
+	} else {
+		res.LatestMessage = &lm
 	}
-
-	res.LatestMessage = &lm
 
 	// Query Members
 	rows, err := db.c.Query(queryMembers, conversationID, id)

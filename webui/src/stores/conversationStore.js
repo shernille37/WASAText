@@ -27,6 +27,8 @@ export const conversationStore = reactive({
           Authorization: `Bearer ${authStore.user.data.userID}`,
         },
       });
+
+      console.log(res.data);
       this.conversations.loading = false;
       this.conversations.data = res.data;
     } catch (error) {
@@ -168,7 +170,7 @@ export const conversationStore = reactive({
 
       await Promise.all(promises);
     } catch (error) {
-      this.user.error = error.response.data;
+      this.conversation.error = error.response.data;
     }
   },
 });

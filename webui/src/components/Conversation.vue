@@ -51,7 +51,11 @@ export default {
           }}
         </p>
 
-        <i v-if="conversation.latestMessage.image" class="fs-5 bi bi-image"></i>
+        <p v-if="!conversation.latestMessage">No messages</p>
+        <i
+          v-else-if="conversation.latestMessage.image"
+          class="fs-5 bi bi-image"
+        ></i>
         <p v-else class="fs-6">
           {{
             conversation.latestMessage.message.length <= 20
@@ -71,7 +75,9 @@ export default {
           >
             {{ conversation.type }}
           </p>
-          <p class="ms-5">{{ conversation.latestMessage.timestamp }}</p>
+          <p v-if="conversation.latestMessage" class="ms-5">
+            {{ conversation.latestMessage.timestamp }}
+          </p>
         </div>
       </div>
     </div>

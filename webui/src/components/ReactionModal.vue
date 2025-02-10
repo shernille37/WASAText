@@ -69,9 +69,9 @@ export default {
 
 <style scoped>
 #reaction-modal {
-  position: absolute;
+  position: fixed;
   top: 50%;
-  left: 50%;
+  left: 60%;
   transform: translate(-50%, -50%);
   z-index: 1;
   min-height: 100px;

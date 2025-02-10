@@ -2,6 +2,7 @@ import { reactive } from "vue";
 import axios from "../services/axios";
 
 import { authStore } from "../stores/authStore";
+import { conversationStore } from "./conversationStore";
 import { uploadImage } from "../utils/upload";
 
 export const messageStore = reactive({
@@ -24,6 +25,7 @@ export const messageStore = reactive({
         },
       });
 
+      console.log(res.data);
       this.messages.loading = false;
       this.messages.data = res.data;
     } catch (error) {
@@ -61,6 +63,20 @@ export const messageStore = reactive({
       this.messages.data.push(resSendMessage.data);
       this.messages.sendMessageLoading = false;
       this.replyMessage = null;
+
+      // Update latest message
+      conversationStore.conversations.data.map((conversation) => {
+        if (
+          conversation.conversationID === resSendMessage.data.conversationID
+        ) {
+          const { image, message, timestamp } = resSendMessage.data;
+          conversation.latestMessage = {
+            image,
+            message,
+            timestamp,
+          };
+        }
+      });
     } catch (error) {
       console.error(error.response.data);
       this.messages.sendMessageLoading = false;
@@ -84,6 +100,24 @@ export const messageStore = reactive({
       this.messages.data = this.messages.data.filter(
         (message) => message.messageID !== messageID
       );
+
+      // Update latest message
+      conversationStore.conversations.data.map((conversation) => {
+        if (conversation.conversationID === conversationID) {
+          const latestMessage =
+            this.messages.data[this.messages.data.length - 1];
+          if (latestMessage) {
+            const { image, message, timestamp } = latestMessage;
+            conversation.latestMessage = {
+              image,
+              message,
+              timestamp,
+            };
+          } else {
+            conversation.latestMessage = null;
+          }
+        }
+      });
     } catch (error) {
       this.messages.error = error.response.data;
     }

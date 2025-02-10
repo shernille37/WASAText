@@ -47,7 +47,7 @@ export default {
           this.groupName
         );
       }
-      this.$router.push("/");
+      if (!this.conversation.error) this.$router.push("/");
     },
   },
   watch: {

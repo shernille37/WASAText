@@ -104,7 +104,7 @@ export default {
         class="bg-light rounded-2 text-black px-1 py-1 text-end"
         v-if="isReply"
       >
-        <i v-if="message.hasImage" class="fs-4 bi bi-image"></i>
+        <i v-if="message.image" class="fs-4 bi bi-image"></i>
         <p v-else>
           {{
             message.replyMessage.length <= 20
@@ -118,7 +118,7 @@ export default {
         <!-- Image -->
         <img
           class="image"
-          v-if="message.hasImage"
+          v-if="message.image"
           :src="`${apiUrl}${message.image}`"
           alt="Image"
         />

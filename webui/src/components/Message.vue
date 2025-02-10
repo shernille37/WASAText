@@ -101,7 +101,7 @@ export default {
       </p>
 
       <div
-        class="bg-light rounded-2 text-black px-1 py-1 text-end"
+        class="bg-slate rounded-2 text-black px-1 py-1 text-end"
         v-if="isReply"
       >
         <i v-if="message.image" class="fs-4 bi bi-image"></i>

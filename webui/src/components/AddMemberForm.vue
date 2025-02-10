@@ -16,9 +16,9 @@ export default {
   emits: ["refresh-conversation"],
   data() {
     return {
+      apiUrl: import.meta.env.VITE_API_URL,
       authStore,
       conversationStore,
-      apiUrl: import.meta.env.API_URL,
       suggestedMembers: [],
       selectedMembers: [],
     };
@@ -141,20 +141,30 @@ export default {
           :key="user.userID"
           @click="handleRemoveSelected(user)"
         >
-          <img v-if="user.image" :src="`${apiUrl}${user.image}`" alt="" />
-          <i class="bi bi-person-circle fs-3"></i>
+          <img
+            v-if="user.image"
+            :src="`${apiUrl}${user.image}`"
+            alt="Profile Image"
+            class="profile-image"
+          />
+          <i v-else class="bi bi-person-circle fs-3"></i>
           <p>{{ user.username }}</p>
         </div>
       </div>
 
       <div
         role="button"
-        class="d-flex gap-3 p-2 hover-bg-light rounded-2"
+        class="d-flex gap-3 p-2 hover-bg-light rounded-2 align-items-center"
         v-for="user in suggestedMembers"
         :key="user.userID"
         @click="handleAddMember(user)"
       >
-        <img v-if="user.image" :src="`${apiUrl}${user.image}`" alt="" />
+        <img
+          v-if="user.image"
+          :src="`${apiUrl}${user.image}`"
+          alt="Profile Picture"
+          class="profile-image"
+        />
         <i v-else class="bi bi-person-circle fs-3"></i>
         <p>{{ user.username }}</p>
       </div>

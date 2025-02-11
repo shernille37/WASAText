@@ -61,6 +61,12 @@ export default {
         }
       });
     },
+    async handleLeaveConversation() {
+      if (confirm("Are you sure?"))
+        await this.conversationStore.leaveGroupConversation(
+          this.conversationID
+        );
+    },
     toggleAddMemberForm() {
       this.conversationStore.addMemberFlag =
         !this.conversationStore.addMemberFlag;
@@ -76,9 +82,11 @@ export default {
   watch: {
     conversationID: {
       handler(id) {
-        this.conversationStore.getConversation(id);
-        this.messageStore.getMessages(id);
-        this.scrollToBottom();
+        if (id != null) {
+          this.conversationStore.getConversation(id);
+          this.messageStore.getMessages(id);
+          this.scrollToBottom();
+        }
       },
     },
     "message.data": {
@@ -138,20 +146,28 @@ export default {
         ></i>
       </div>
 
-      <i
-        v-if="conversation.data.group"
-        role="button"
-        class="bi bi-person-plus-fill rounded-circle hover-bg-light fs-5 p-1 mb-1"
-        @click="toggleAddMemberForm"
-      ></i>
+      <div class="d-flex gap-2">
+        <i
+          v-if="conversation.data.group"
+          role="button"
+          class="bi bi-person-plus-fill rounded-circle hover-bg-light fs-5 p-1 mb-1"
+          @click="toggleAddMemberForm"
+        ></i>
+        <i
+          role="button"
+          v-if="conversation.data.group"
+          class="bi bi-box-arrow-right rounded-circle hover-bg-light fs-5 p-1 mb-1"
+          @click="handleLeaveConversation"
+        ></i>
+      </div>
     </div>
 
-    <div v-if="conversation.showAddMember">
-      <AddMemberForm :conversationID="conversationID" />
-    </div>
+    <AddMemberForm
+      v-if="conversation.showAddMember"
+      :conversationID="conversationID"
+    />
 
     <!-- Messages -->
-
     <div
       ref="chatContainer"
       class="chat-container position-relative d-flex flex-column flex-grow-1 gap-5 p-2 overflow-scroll"

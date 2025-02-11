@@ -244,7 +244,7 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 
 	const queryForward = `
 		INSERT INTO Message(messageID, senderID, conversationID, forwardSourceMessageID, messageType, hasImage, message, image)
-		VALUES (?,?,?,?,?,?,?, ?);
+		VALUES (?,?,?,?,?,?,?,?);
 	`
 
 	const queryAddConversation = `
@@ -317,10 +317,11 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 	}
 
 	var conversationID uuid.UUID
+	// If a new conversation is Added
 	if fmb.ReceiverID != nil && conversationExist == nil {
 		conversationID = newConversationID
 	} else if fmb.ReceiverID != nil && conversationExist != nil {
-		// Query the existing conversationID
+		// Query the existing private conversation
 		if err = tx.QueryRow(queryExistingConversation, senderID, fmb.ReceiverID).Scan(&conversationID); err != nil {
 			return res, err
 		}

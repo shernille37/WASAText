@@ -14,6 +14,7 @@ export const conversationStore = reactive({
     data: null,
     loading: true,
     error: null,
+    leaveGroupConversationError: null,
   },
 
   selectedConversation: false,
@@ -29,7 +30,6 @@ export const conversationStore = reactive({
         },
       });
 
-      console.log(res.data);
       this.conversations.loading = false;
       this.conversations.data = res.data;
     } catch (error) {
@@ -172,6 +172,26 @@ export const conversationStore = reactive({
       await Promise.all(promises);
     } catch (error) {
       this.conversation.error = error.response.data;
+    }
+  },
+
+  async leaveGroupConversation(conversationID) {
+    try {
+      await axios.delete(
+        `/group-conversations/${this.conversation.data.conversationID}/members`,
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      this.conversations.data = this.conversations.data.filter(
+        (conversation) => conversation.conversationID !== conversationID
+      );
+      this.selectedConversation = null;
+    } catch (error) {
+      this.conversation.leaveGroupConversationError = error.response.data;
     }
   },
 });

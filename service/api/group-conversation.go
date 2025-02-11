@@ -229,7 +229,7 @@ func (rt *_router) leaveGroupConversation(w http.ResponseWriter, r *http.Request
 	}
 
 	if err := rt.db.LeaveGroupConversation(ctx.UserID, conversationID); err != nil {
-		ctx.Logger.WithError(err).Error("Can't delete message")
+		ctx.Logger.WithError(err).Error("Can't leave conversation")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

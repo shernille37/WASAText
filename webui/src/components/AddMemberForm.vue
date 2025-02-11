@@ -99,83 +99,87 @@ export default {
 </script>
 
 <template>
-  <div v-if="conversation.loading">
-    <LoadingSpinner />
-  </div>
+  <div id="addMemberContainer">
+    <div v-if="conversation.loading">
+      <LoadingSpinner />
+    </div>
 
-  <div v-else-if="conversation.error">
-    <ErrorMsg msg="error" />
-  </div>
+    <div v-else-if="conversation.error">
+      <ErrorMsg :msg="conversation.error" />
+    </div>
 
-  <div class="h-100 w-100 d-flex justify-content-center align-items-center">
-    <div class="position-relative p-2 bg-info w-50 rounded-2">
-      <p class="fw-semibold text-center">Add People</p>
-      <p
-        v-if="!this.suggestedMembers.length && !this.selectedMembers.length"
-        class="text-center"
-      >
-        All users in the system is already part of this group
-      </p>
-      <i
-        role="button"
-        class="position-absolute bi bi-x fs-3 end-0 top-0"
-        @click="close"
-      ></i>
-      <form @submit.prevent="handleSubmit">
-        <input
-          type="text"
-          name="addMember"
-          id="addMember"
-          class="form-control p-1 mt-3 mb-3"
-          autocomplete="off"
-          placeholder="Add People"
-        />
-      </form>
-
-      <div class="d-flex gap-3">
-        <div
+    <div class="d-flex justify-content-center align-items-center">
+      <div class="position-relative p-2 bg-info w-50 rounded-2">
+        <p class="fw-semibold text-center">Add People</p>
+        <p
+          v-if="!this.suggestedMembers.length && !this.selectedMembers.length"
+          class="text-center"
+        >
+          All users in the system is already part of this group
+        </p>
+        <i
           role="button"
-          id="selected-members"
-          class="p-2 hover-bg-light rounded-2 text-center"
-          v-for="user in selectedMembers"
-          :key="user.userID"
-          @click="handleRemoveSelected(user)"
-        >
-          <img
-            v-if="user.image"
-            :src="`${apiUrl}${user.image}`"
-            alt="Profile Image"
-            class="profile-image"
+          class="position-absolute bi bi-x fs-3 end-0 top-0"
+          @click="close"
+        ></i>
+        <form @submit.prevent="handleSubmit">
+          <input
+            type="text"
+            name="addMember"
+            id="addMember"
+            class="form-control p-1 mt-3 mb-3"
+            autocomplete="off"
+            placeholder="Add People"
           />
-          <i v-else class="bi bi-person-circle fs-3"></i>
-          <p>{{ user.username }}</p>
+        </form>
+
+        <div class="d-flex gap-3">
+          <div
+            role="button"
+            id="selected-members"
+            class="p-2 hover-bg-light rounded-2 text-center"
+            v-for="user in selectedMembers"
+            :key="user.userID"
+            @click="handleRemoveSelected(user)"
+          >
+            <img
+              v-if="user.image"
+              :src="`${apiUrl}${user.image}`"
+              alt="Profile Image"
+              class="profile-image"
+            />
+            <i v-else class="bi bi-person-circle fs-3"></i>
+            <p>{{ user.username }}</p>
+          </div>
         </div>
-      </div>
 
-      <div
-        role="button"
-        class="d-flex gap-3 p-2 hover-bg-light rounded-2 align-items-center"
-        v-for="user in suggestedMembers"
-        :key="user.userID"
-        @click="handleAddMember(user)"
-      >
-        <img
-          v-if="user.image"
-          :src="`${apiUrl}${user.image}`"
-          alt="Profile Picture"
-          class="profile-image"
-        />
-        <i v-else class="bi bi-person-circle fs-3"></i>
-        <p>{{ user.username }}</p>
-      </div>
+        <div id="suggestedMembersContainer" class="overflow-scroll">
+          <div
+            role="button"
+            class="d-flex gap-3 p-2 hover-bg-light rounded-2 align-items-center"
+            v-for="user in suggestedMembers"
+            :key="user.userID"
+            @click="handleAddMember(user)"
+          >
+            <img
+              v-if="user.image"
+              :src="`${apiUrl}${user.image}`"
+              alt="Profile Picture"
+              class="profile-image"
+            />
+            <i v-else class="bi bi-person-circle fs-3"></i>
+            <p>{{ user.username }}</p>
+          </div>
+        </div>
 
-      <div>
-        <button
-          class="btn btn-primary w-50 mx-auto d-block"
-          @click="handleSubmit"
-        >
-          Add
-        </button>
+        <div>
+          <button
+            class="btn btn-primary w-50 mx-auto d-block mt-2"
+            @click="handleSubmit"
+          >
+            Add
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -184,5 +188,22 @@ export default {
 <style scoped>
 #selected-members p {
   font-size: 12px;
+}
+
+#addMemberContainer {
+  position: fixed;
+  top: 50%;
+  left: 60%;
+
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  min-height: 100px;
+
+  min-width: 700px;
+  max-width: 500px;
+}
+
+#suggestedMembersContainer {
+  max-height: 200px;
 }
 </style>

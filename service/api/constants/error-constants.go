@@ -1,6 +1,7 @@
 package constants
 
 const INVALID_INPUT = "Invalid Input"
+const INVALID_BODY = "Invalid Body"
 const PARSE_ERROR = "Parse Error"
 const UNAUTHORIZED = "Unauthorized"
 const INTERNAL_SERVER_ERROR = "Internal Server Error"

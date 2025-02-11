@@ -5,7 +5,7 @@ import NewChatMessages from "../components/NewChatMessages.vue";
 import { conversationStore } from "../stores/conversationStore";
 
 export default {
-  name: "Main",
+  name: "MainDashboard",
   components: {
     Sidebar,
     ChatMessages,

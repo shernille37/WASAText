@@ -1,15 +1,16 @@
 <script>
 import { authStore } from "../stores/authStore";
-import { conversationStore } from "../stores/conversationStore";
 import { messageStore } from "../stores/messageStore";
 import EmojiPicker from "./EmojiPicker.vue";
 import ReactionModal from "./ReactionModal.vue";
+import ForwardModal from "./ForwardModal.vue";
 
 export default {
   name: "Message",
   components: {
     EmojiPicker,
     ReactionModal,
+    ForwardModal,
   },
   data() {
     return {
@@ -18,6 +19,7 @@ export default {
       messageStore,
       emojiClick: false,
       reactionsInfoClick: false,
+      forwardModalClick: false,
     };
   },
   props: {
@@ -30,6 +32,9 @@ export default {
     },
     isRecipientOwner() {
       return this.message.replyRecipientName === authStore.user.data.username;
+    },
+    isForwardedMessageOwner() {
+      return this.message.forwardedFromName === authStore.user.data.username;
     },
     isReply() {
       return !!this.message.replyMessageID;
@@ -47,6 +52,9 @@ export default {
     },
     toggleReactionsInfo() {
       this.reactionsInfoClick = !this.reactionsInfoClick;
+    },
+    toggleForwardModal() {
+      this.forwardModalClick = !this.forwardModalClick;
     },
     replyToMessage() {
       this.messageStore.replyMessage = {
@@ -80,6 +88,12 @@ export default {
     :message="message"
     @close-modal="toggleReactionsInfo"
   />
+  <ForwardModal
+    v-if="forwardModalClick"
+    :conversation="conversation"
+    :message="message"
+    @close-forward-modal="toggleForwardModal"
+  />
   <div
     :class="[
       'message-container',
@@ -93,7 +107,10 @@ export default {
         {{ message.senderName }}
       </p>
 
-      <p v-show="isForwarded">Forwarded</p>
+      <p v-show="isForwarded">
+        Forwarded from
+        {{ isForwardedMessageOwner ? "Yourself" : message.forwardedFromName }}
+      </p>
 
       <p v-show="isReply" :class="`${isOwner ? 'text-end' : 'text-start'}`">
         {{ isOwner ? "You" : "" }} replied to
@@ -139,6 +156,7 @@ export default {
           }`"
         >
           <i class="bi bi-reply text-black" @click="replyToMessage"></i>
+          <i class="bi bi-fast-forward" @click="toggleForwardModal"></i>
 
           <i @click="toggleEmojiPicker" class="bi bi-emoji-smile"></i>
           <EmojiPicker
@@ -186,21 +204,20 @@ p:not(.message) {
 }
 
 .icons {
-  width: 0px;
-  opacity: 0;
+  width: 120px;
   font-size: 20px;
   bottom: 50%;
   transform: translateY(50%);
   cursor: pointer;
-  transition: width 0.5s ease, opacity 0.1s ease;
+  /* transition: width 0.5s ease, opacity 0.1s ease; */
 }
 
-.message:hover ~ .icons,
+/* .message:hover ~ .icons,
 .image:hover ~ .icons,
 .icons:hover {
   width: 100px;
   opacity: 1;
-}
+} */
 
 .image {
   max-width: 100%;

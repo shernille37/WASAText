@@ -43,6 +43,7 @@ type Message struct {
 	ReplyMessageID     *uuid.UUID `json:"replyMessageID"`
 	ReplyMessage       *string    `json:"replyMessage"`
 	ReplyRecipientName *string    `json:"replyRecipientName"`
+	ForwardedFromName  *string    `json:"forwardedFromName"`
 	Timestamp          string     `json:"timestamp"`
 	HasImage           bool       `json:"hasImage"`
 	MessageType        string     `json:"messageType"`
@@ -89,6 +90,7 @@ func (m *Message) ToDatabase() database.Message {
 		ReplyMessageID:     m.ReplyMessageID,
 		ReplyMessage:       m.ReplyMessage,
 		ReplyRecipientName: m.ReplyRecipientName,
+		ForwardedFromName:  m.ForwardedFromName,
 		Timestamp:          m.Timestamp,
 		HasImage:           m.HasImage,
 		MessageType:        m.MessageType,
@@ -120,6 +122,7 @@ func (m *Message) FromDatabase(mess database.Message) {
 	m.ReplyMessageID = mess.ReplyMessageID
 	m.ReplyMessage = mess.ReplyMessage
 	m.ReplyRecipientName = mess.ReplyRecipientName
+	m.ForwardedFromName = mess.ForwardedFromName
 	m.Timestamp = mess.Timestamp
 	m.HasImage = mess.HasImage
 	m.MessageType = mess.MessageType

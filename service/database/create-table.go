@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS Message (
 	senderID TEXT NOT NULL,
 	conversationID TEXT NOT NULL,
 	replyMessageID TEXT,
+	forwardSourceMessageID TEXT,
 	timestamp TEXT NOT NULL DEFAULT current_timestamp,
 	messageType TEXT NOT NULL CHECK(messageType IN ('default', 'reply', 'forward')) DEFAULT 'default',
 	hasImage INTEGER DEFAULT 0,

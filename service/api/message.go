@@ -18,8 +18,9 @@ type MessageBody struct {
 }
 
 type ForwardMessageBody struct {
-	Source      uuid.UUID `json:"source"`
-	Destination uuid.UUID `json:"destination"`
+	Source      uuid.UUID  `json:"source"`
+	Destination *uuid.UUID `json:"destination"`
+	ReceiverID  *uuid.UUID `json:"receiverID"`
 }
 
 func (rt *_router) listMessages(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -195,24 +196,45 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	// Atleast one of them is NOT NULL
+	if (fmess.Destination == nil) != (fmess.ReceiverID == nil) {
+		http.Error(w, constants.INVALID_BODY, http.StatusBadRequest)
+		return
+	}
+
 	// Check if user is part of source conversation
 	if err := rt.db.CheckConversationMembership(fmess.Source, []uuid.UUID{ctx.UserID}); err != nil {
+		ctx.Logger.WithError(err).Error("Error Here!")
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	// Check if user is part of the destination conversation
-	if err := rt.db.CheckConversationMembership(fmess.Destination, []uuid.UUID{ctx.UserID}); err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
+	if fmess.Destination != nil {
+		if err := rt.db.CheckConversationMembership(*fmess.Destination, []uuid.UUID{ctx.UserID}); err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+	} else {
+		// Check user existence
+		if _, err := rt.db.GetUserByID(fmess.ReceiverID.String()); err != nil {
+			http.Error(w, constants.NO_USER, http.StatusBadRequest)
+			return
+		}
 	}
-	if err := rt.db.ForwardMessage(ctx.UserID, messageID, fmess.ToDatabase()); err != nil {
+
+	var res Conversation
+	dbConversation, err := rt.db.ForwardMessage(ctx.UserID, messageID, fmess.ToDatabase())
+	if err != nil {
 		ctx.Logger.WithError(err).Error("Can't Forward Message")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	res.FromDatabase(dbConversation)
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(res)
 
 }
 
@@ -228,5 +250,6 @@ func (fmb *ForwardMessageBody) ToDatabase() database.ForwardMessageBody {
 	return database.ForwardMessageBody{
 		Source:      fmb.Source,
 		Destination: fmb.Destination,
+		ReceiverID:  fmb.ReceiverID,
 	}
 }

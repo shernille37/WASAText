@@ -1,12 +1,10 @@
 <script>
 import { authStore } from "../stores/authStore";
-import LoadingSpinner from "../components/LoadingSpinner.vue";
 import ErrorMsg from "../components/ErrorMsg.vue";
 
 export default {
   name: "Profile",
   components: {
-    LoadingSpinner,
     ErrorMsg,
   },
   data() {

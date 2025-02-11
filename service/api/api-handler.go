@@ -52,7 +52,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// Special routes
 	// Serve File Images
-	rt.router.Handler("GET", "/images/*filepath", http.StripPrefix("/images/", http.FileServer(http.Dir("/tmp/images"))))
+	rt.router.Handler("GET", "/images/*filepath", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
 	rt.router.GET("/emojis", rt.wrap(rt.listEmojis, false))
 
 	return rt.router

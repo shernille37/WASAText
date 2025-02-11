@@ -45,8 +45,8 @@ export default {
       <h4>Reactions</h4>
       <i role="button" class="bi bi-x fs-5 text-danger" @click="closeModal"></i>
     </div>
-
-    <div class="d-flex flex-column gap-3">
+    <LoadingSpinner v-if="reactions.loading" />
+    <div v-else class="d-flex flex-column gap-3">
       <div
         v-for="reaction in reactions.data"
         :key="reaction.reactionID"

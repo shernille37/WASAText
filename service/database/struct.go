@@ -40,6 +40,7 @@ type Message struct {
 	ReplyMessageID     *uuid.UUID
 	ReplyMessage       *string
 	ReplyRecipientName *string
+	ForwardedFromName  *string
 	Timestamp          string
 	HasImage           bool
 	MessageType        string

@@ -25,7 +25,6 @@ export const messageStore = reactive({
         },
       });
 
-      console.log(res.data);
       this.messages.loading = false;
       this.messages.data = res.data;
     } catch (error) {

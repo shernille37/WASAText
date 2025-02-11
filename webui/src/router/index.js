@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Login from "../views/Login.vue";
 import Home from "../views/Home.vue";
-import Main from "../views/Main.vue";
+import MainDashboard from "../views/MainDashboard.vue";
 import Profile from "../views/Profile.vue";
 
 import { authStore } from "../stores/authStore";
@@ -15,8 +15,8 @@ const routes = [
     children: [
       {
         path: "",
-        name: "main",
-        component: Main,
+        name: "main-dashboard",
+        component: MainDashboard,
       },
       {
         name: "profile",

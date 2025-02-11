@@ -19,20 +19,13 @@ type ImageURL struct {
 	Image string `json:"image"`
 }
 
-// var validImages = map[string]bool{
-// 	".gif":  true,
-// 	".jpeg": true,
-// 	".png":  true,
-// 	".jpg":  true,
-// }
-
-var imageDirectory = "/tmp/images"
+var imageDirectory = "./images"
 
 func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Create the image directory if it doesn't exist with permission (0755)
 	if err := os.MkdirAll(imageDirectory, 0755); err != nil {
-		http.Error(w, "Failed to create directory", http.StatusBadRequest)
+		http.Error(w, "Failed to create /app/images directory", http.StatusBadRequest)
 		return
 	}
 
@@ -53,11 +46,6 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 		return
 	}
 	defer file.Close()
-
-	// if !validImages[filepath.Ext(handler.Filename)] {
-	// 	http.Error(w, constants.INVALID_IMAGE, http.StatusBadRequest)
-	// 	return
-	// }
 
 	// Check if the file has a valid image extension by checking the MIME Type
 	buffer := make([]byte, 512)
@@ -83,8 +71,8 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 	}
 
 	uniqueFilename := fmt.Sprintf("%s-%s", fileID.String(), handler.Filename)
-	// Create and Save file to /tmp/images
-	dstPath := filepath.Join("/tmp/images", uniqueFilename)
+	// Create and Save file to /app/images
+	dstPath := filepath.Join("./images", uniqueFilename)
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		http.Error(w, "Unable to create file", http.StatusInternalServerError)

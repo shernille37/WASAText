@@ -14,22 +14,28 @@ type MessageBody struct {
 }
 
 type ForwardMessageBody struct {
-	Source      uuid.UUID `json:"source"`
-	Destination uuid.UUID `json:"destination"`
+	Source      uuid.UUID
+	Destination *uuid.UUID
+	ReceiverID  *uuid.UUID
 }
 
 func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 	var res []Message
 
 	const queryMessages = `
-		SELECT m.messageID, m.senderID, u.username ,m.conversationID, m.timestamp, m.messageType,m.messageStatus, m.message, m.hasImage ,m.image,
-		m.replyMessageID,u1.username, m1.message
+		SELECT m.messageID, m.senderID, u.username,m.conversationID, m.timestamp, m.messageType,m.messageStatus, m.message, m.hasImage ,m.image,
+		m.replyMessageID,u1.username, m1.message, u2.username
 		FROM (
+		( 
+		(
 		(Message m LEFT JOIN Message m1 ON m.replyMessageID = m1.messageID) 
 		LEFT JOIN User u ON m.senderID = u.userID
 		)
-		LEFT JOIN User u1 ON m1.senderID = u1.userID
-		WHERE m.conversationID = ?
+		LEFT JOIN User u1 ON m1.senderID = u1.userID )
+		LEFT JOIN Message m2 ON m.forwardSourceMessageID = m2.messageID )
+		LEFT JOIN User u2 ON m2.senderID = u2.userID
+
+		WHERE m.conversationID = ?;
 	`
 
 	const queryReactions = `
@@ -49,7 +55,7 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 
 	for rows.Next() {
 		var m Message
-		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.SenderName, &m.ConversationID, &m.Timestamp, &m.MessageType, &m.MessageStatus, &m.Message, &m.HasImage, &m.Image, &m.ReplyMessageID, &m.ReplyRecipientName, &m.ReplyMessage); err != nil {
+		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.SenderName, &m.ConversationID, &m.Timestamp, &m.MessageType, &m.MessageStatus, &m.Message, &m.HasImage, &m.Image, &m.ReplyMessageID, &m.ReplyRecipientName, &m.ReplyMessage, &m.ForwardedFromName); err != nil {
 			return nil, err
 		}
 
@@ -218,7 +224,9 @@ func (db *appdbimpl) ListReaders(conversationID uuid.UUID, messageID uuid.UUID) 
 
 }
 
-func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb ForwardMessageBody) error {
+func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb ForwardMessageBody) (Conversation, error) {
+
+	var res Conversation
 
 	const queryMessage = `
 		SELECT m.message, m.hasImage, m.image
@@ -227,15 +235,26 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 	`
 
 	const queryForward = `
-		INSERT INTO Message(messageID, senderID, conversationID, messageType, hasImage, message, image)
-		VALUES (?,?,?,?,?,?,?);
+		INSERT INTO Message(messageID, senderID, conversationID, forwardSourceMessageID, messageType, hasImage, message, image)
+		VALUES (?,?,?,?,?,?,?, ?);
+	`
+
+	const queryAddConversation = `
+	INSERT INTO Conversation(conversationID, conversationType) VALUES
+	(?,'private');
+	`
+
+	const queryAddMembers = `
+	INSERT INTO Members(userID, conversationID) VALUES
+	(?,?);
+
 	`
 
 	var sourceMessage Message
 
 	tx, err := db.c.Begin()
 	if err != nil {
-		return err
+		return res, err
 	}
 
 	defer func() {
@@ -247,29 +266,57 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 	}()
 
 	if err = tx.QueryRow(queryMessage, messageID, fmb.Source).Scan(&sourceMessage.Message, &sourceMessage.HasImage, &sourceMessage.Image); err != nil {
-		return err
+		return res, err
 	}
 
 	newMessageID, err := uuid.NewV4()
-
 	if err != nil {
-		return err
+		return res, err
 	}
 
 	sourceMessage.MessageType = "forward"
+	var newConversationID uuid.UUID
 
-	// if !sourceMessage.HasImage {
-	// 	sourceMessage.Image = nil
-	// }
+	if fmb.ReceiverID != nil {
 
-	if _, err = tx.Exec(queryForward, newMessageID, senderID, fmb.Destination, sourceMessage.MessageType, sourceMessage.HasImage, sourceMessage.Message, sourceMessage.Image); err != nil {
-		return err
+		// Add new private conversation
+		newConversationID, err = uuid.NewV4()
+
+		if err != nil {
+			return res, err
+		}
+		if _, err = tx.Exec(queryAddConversation, newConversationID); err != nil {
+			return res, err
+		}
+
+		// Add Members
+		mems := [2]uuid.UUID{senderID, *fmb.ReceiverID}
+		for _, id := range mems {
+
+			if _, err = tx.Exec(queryAddMembers, id, newConversationID); err != nil {
+				return res, err
+			}
+
+		}
+	}
+
+	var conversationID uuid.UUID
+	if fmb.ReceiverID != nil {
+		conversationID = newConversationID
+	} else {
+		conversationID = *fmb.Destination
+	}
+
+	if _, err = tx.Exec(queryForward, newMessageID, senderID, conversationID, messageID, sourceMessage.MessageType, sourceMessage.HasImage, sourceMessage.Message, sourceMessage.Image); err != nil {
+		return res, err
 	}
 
 	if err = tx.Commit(); err != nil {
-		return err
+		return res, err
 	}
 
-	return nil
+	res.ConversationID = conversationID
+
+	return res, nil
 
 }

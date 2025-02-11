@@ -266,6 +266,7 @@ export default {
         <LoadingSpinner />
       </div>
       <div v-else class="row">
+        <!-- Suggested Members -->
         <div class="col-3 d-flex flex-column">
           <div
             role="button"

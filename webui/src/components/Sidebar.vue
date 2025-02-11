@@ -79,7 +79,11 @@ export default {
     >
       <h3 class="fw-bold d-none d-sm-block">Chats</h3>
 
-      <div class="btn-group" role="group" aria-label="Basic example">
+      <div
+        class="btn-group d-none d-xl-block"
+        role="group"
+        aria-label="Basic example"
+      >
         <button
           type="button"
           class="btn btn-info p-1"

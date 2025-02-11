@@ -19,12 +19,12 @@ export const conversationStore = reactive({
     data: [],
     loading: true,
     error: null,
+    leaveGroupConversationError: null,
   },
   conversation: {
     data: null,
     loading: true,
     error: null,
-    leaveGroupConversationError: null,
   },
   conversationMembers: {
     data: [],
@@ -283,7 +283,7 @@ export const conversationStore = reactive({
       );
       this.selectedConversation = null;
     } catch (error) {
-      this.conversation.leaveGroupConversationError = error.response.data;
+      this.groupConversations.leaveGroupConversationError = error.response.data;
     }
   },
 

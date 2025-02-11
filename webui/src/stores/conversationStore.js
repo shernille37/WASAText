@@ -22,7 +22,7 @@ export const conversationStore = reactive({
   addMemberFlag: false,
 
   resetFields() {
-    this.selectedConversation = false;
+    this.selectedConversation = null;
     this.addConversationFlag = false;
     this.addMemberFlag = false;
   },
@@ -36,11 +36,14 @@ export const conversationStore = reactive({
         },
       });
 
+      // Update messages to delivered!
+      await this.updateMessageToDelivered();
+
       this.conversations.loading = false;
       this.conversations.data = res.data;
     } catch (error) {
       this.conversations.loading = false;
-      this.conversations.error = error.toString();
+      this.conversations.error = error.response.data;
     }
   },
 
@@ -198,6 +201,44 @@ export const conversationStore = reactive({
       this.selectedConversation = null;
     } catch (error) {
       this.conversation.leaveGroupConversationError = error.response.data;
+    }
+  },
+
+  async updateMessageToDelivered() {
+    // Gather all promises
+
+    for (const conversation of this.conversations.data) {
+      try {
+        await axios.put(
+          `/conversations/${conversation.conversationID}/messages/deliver`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${authStore.user.data.userID}`,
+            },
+          }
+        );
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
+  },
+
+  async updateMessageToRead() {
+    for (const conversation of this.conversations.data) {
+      try {
+        await axios.put(
+          `/conversations/${conversation.conversationID}/messages/read`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${authStore.user.data.userID}`,
+            },
+          }
+        );
+      } catch (error) {
+        throw new Error(error);
+      }
     }
   },
 });

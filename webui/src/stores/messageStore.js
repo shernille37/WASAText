@@ -29,6 +29,8 @@ export const messageStore = reactive({
         },
       });
 
+      await conversationStore.updateMessageToRead();
+
       this.messages.loading = false;
       this.messages.data = res.data;
     } catch (error) {

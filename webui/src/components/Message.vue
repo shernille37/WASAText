@@ -28,13 +28,16 @@ export default {
   },
   computed: {
     isOwner() {
-      return this.message.senderID === authStore.user.data.userID;
+      if (authStore.user.data)
+        return this.message.senderID === authStore.user.data.userID;
     },
     isRecipientOwner() {
-      return this.message.replyRecipientName === authStore.user.data.username;
+      if (authStore.user.data)
+        return this.message.replyRecipientName === authStore.user.data.username;
     },
     isForwardedMessageOwner() {
-      return this.message.forwardedFromName === authStore.user.data.username;
+      if (authStore.user.data)
+        return this.message.forwardedFromName === authStore.user.data.username;
     },
     isReply() {
       return !!this.message.replyMessageID;
@@ -155,6 +158,16 @@ export default {
             isOwner ? 'end-100' : 'start-100'
           }`"
         >
+          <div v-if="isOwner && (message.timeRead || message.timeDelivered)">
+            <i
+              v-if="message.timeRead"
+              class="bi bi-check2-all fs-5 text-primary"
+            ></i>
+            <i
+              v-else-if="message.timeDelivered"
+              class="bi bi-check2 fs-5 text-primary"
+            ></i>
+          </div>
           <i class="bi bi-reply text-black" @click="replyToMessage"></i>
           <i class="bi bi-fast-forward" @click="toggleForwardModal"></i>
 
@@ -204,7 +217,7 @@ p:not(.message) {
 }
 
 .icons {
-  width: 120px;
+  width: 130px;
   font-size: 20px;
   bottom: 50%;
   transform: translateY(50%);
@@ -224,5 +237,9 @@ p:not(.message) {
   max-height: 500px;
   object-fit: contain;
   display: block;
+}
+
+#checkmarks {
+  bottom: -50px;
 }
 </style>

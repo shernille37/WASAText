@@ -3,6 +3,7 @@ import { conversationStore } from "../stores/conversationStore";
 import { messageStore } from "../stores/messageStore";
 import AddMemberForm from "./AddMemberForm.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import MembersModal from "./MembersModal.vue";
 import Message from "./Message.vue";
 import MessageForm from "./MessageForm.vue";
 
@@ -16,6 +17,7 @@ export default {
     MessageForm,
     LoadingSpinner,
     AddMemberForm,
+    MembersModal,
   },
   data() {
     return {
@@ -33,6 +35,7 @@ export default {
         loading: this.conversationStore.conversation.loading,
         error: this.conversationStore.conversation.error,
         showAddMember: this.conversationStore.addMemberFlag,
+        showMemberList: this.conversationStore.membersListFlag,
       };
     },
     message() {
@@ -86,8 +89,14 @@ export default {
         );
     },
     toggleAddMemberForm() {
+      this.conversationStore.membersListFlag = false;
       this.conversationStore.addMemberFlag =
         !this.conversationStore.addMemberFlag;
+    },
+    toggleMembersList() {
+      this.conversationStore.addMemberFlag = false;
+      this.conversationStore.membersListFlag =
+        !this.conversationStore.membersListFlag;
     },
     goToEditGroupConversation() {
       if (this.conversation.data.group)
@@ -120,7 +129,7 @@ export default {
       this.scrollToBottom();
     }
 
-    this.startPolling();
+    // this.startPolling();
   },
   beforeUnmount() {
     this.stopPolling();
@@ -179,6 +188,12 @@ export default {
         <i
           v-if="conversation.data.group"
           role="button"
+          class="bi bi-info-circle rounded-circle hover-bg-light fs-5 p-1 mb-1"
+          @click="toggleMembersList"
+        ></i>
+        <i
+          v-if="conversation.data.group"
+          role="button"
           class="bi bi-person-plus-fill rounded-circle hover-bg-light fs-5 p-1 mb-1"
           @click="toggleAddMemberForm"
         ></i>
@@ -193,6 +208,11 @@ export default {
 
     <AddMemberForm
       v-if="conversation.showAddMember"
+      :conversationID="conversationID"
+    />
+
+    <MembersModal
+      v-if="conversation.showMemberList"
       :conversationID="conversationID"
     />
 

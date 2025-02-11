@@ -87,7 +87,7 @@ export default {
   async mounted() {
     await this.conversationStore.getConversations();
 
-    this.startPolling();
+    // this.startPolling();
   },
   beforeUnmount() {
     this.stopPolling();

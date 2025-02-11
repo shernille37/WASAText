@@ -13,6 +13,12 @@ export const messageStore = reactive({
     sendMessageLoading: false,
   },
 
+  readers: {
+    data: [],
+    loading: true,
+    error: null,
+  },
+
   replyMessage: null,
 
   resetFields() {
@@ -162,6 +168,26 @@ export const messageStore = reactive({
       });
     } catch (error) {
       this.messages.error = error.response.data;
+    }
+  },
+
+  async getReaders(conversationID, messageID) {
+    try {
+      this.readers.loading = true;
+      const resReaders = await axios.get(
+        `/conversations/${conversationID}/messages/${messageID}/readers`,
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      this.readers.loading = false;
+      this.readers.data = resReaders.data;
+    } catch (error) {
+      this.readers.loading = false;
+      this.readers.error = error.response.data;
     }
   },
 });

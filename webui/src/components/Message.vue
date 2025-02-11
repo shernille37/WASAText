@@ -4,6 +4,7 @@ import { messageStore } from "../stores/messageStore";
 import EmojiPicker from "./EmojiPicker.vue";
 import ReactionModal from "./ReactionModal.vue";
 import ForwardModal from "./ForwardModal.vue";
+import ReadersModal from "./ReadersModal.vue";
 
 export default {
   name: "Message",
@@ -11,6 +12,7 @@ export default {
     EmojiPicker,
     ReactionModal,
     ForwardModal,
+    ReadersModal,
   },
   data() {
     return {
@@ -20,6 +22,7 @@ export default {
       emojiClick: false,
       reactionsInfoClick: false,
       forwardModalClick: false,
+      readerModalClick: false,
     };
   },
   props: {
@@ -59,6 +62,9 @@ export default {
     toggleForwardModal() {
       this.forwardModalClick = !this.forwardModalClick;
     },
+    toggleReaderModal() {
+      this.readerModalClick = !this.readerModalClick;
+    },
     replyToMessage() {
       this.messageStore.replyMessage = {
         messageID: this.message.messageID,
@@ -96,6 +102,12 @@ export default {
     :conversation="conversation"
     :message="message"
     @close-forward-modal="toggleForwardModal"
+  />
+  <ReadersModal
+    v-if="readerModalClick"
+    :conversation="conversation"
+    :message="message"
+    @close-reader-modal="toggleReaderModal"
   />
   <div
     :class="[
@@ -162,6 +174,7 @@ export default {
             <i
               v-if="message.timeRead"
               class="bi bi-check2-all fs-5 text-primary"
+              @click="toggleReaderModal"
             ></i>
             <i
               v-else-if="message.timeDelivered"

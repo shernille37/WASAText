@@ -38,7 +38,6 @@ export const reactionStore = reactive({
         }
       );
 
-      console.log(res.data);
       this.reactions.data = res.data;
       this.reactions.loading = false;
     } catch (error) {

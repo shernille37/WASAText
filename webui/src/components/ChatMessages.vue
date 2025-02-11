@@ -20,6 +20,8 @@ export default {
   data() {
     return {
       apiUrl: __API_URL__,
+      pollingInterval: null,
+      POLLING_DELAY: 5000,
       conversationStore,
       messageStore,
     };
@@ -52,6 +54,22 @@ export default {
     },
   },
   methods: {
+    async refresh() {
+      if (this.conversationID) {
+        this.conversationStore.getConversation(this.conversationID);
+        this.messageStore.getMessages(this.conversationID);
+        this.scrollToBottom();
+      }
+    },
+    startPolling() {
+      this.pollingInterval = setInterval(this.refresh, this.POLLING_DELAY);
+    },
+    stopPolling() {
+      if (this.pollingInterval) {
+        clearInterval(this.pollingInterval);
+        this.pollingInterval = null;
+      }
+    },
     scrollToBottom() {
       this.$nextTick(() => {
         const chatContainer = this.$refs.chatContainer;
@@ -81,12 +99,10 @@ export default {
 
   watch: {
     conversationID: {
-      handler(id) {
-        if (id != null) {
-          this.conversationStore.getConversation(id);
-          this.messageStore.getMessages(id);
-          this.scrollToBottom();
-        }
+      async handler(newID) {
+        await this.conversationStore.getConversation(this.conversationID);
+        await this.messageStore.getMessages(this.conversationID);
+        this.scrollToBottom();
       },
     },
     "message.data": {
@@ -95,6 +111,19 @@ export default {
       },
       deep: true,
     },
+  },
+
+  async mounted() {
+    if (this.conversationID) {
+      await this.conversationStore.getConversation(this.conversationID);
+      await this.messageStore.getMessages(this.conversationID);
+      this.scrollToBottom();
+    }
+
+    this.startPolling();
+  },
+  beforeUnmount() {
+    this.stopPolling();
   },
 };
 </script>

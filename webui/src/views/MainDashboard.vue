@@ -52,7 +52,10 @@ export default {
       @add-conversation="selectConversation"
       v-if="addConversationFlag"
     />
-    <ChatMessages v-else :conversationID="localSelectedConversation" />
+    <ChatMessages
+      v-else-if="localSelectedConversation"
+      :conversationID="localSelectedConversation"
+    />
   </main>
 </template>
 

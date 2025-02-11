@@ -116,8 +116,8 @@ export default {
           return;
         }
 
-        if (this.selectedMembers.length + 1 <= 2) {
-          alert("Members should be more than 2");
+        if (this.selectedMembers.length + 1 < 2) {
+          alert("Members should atleast be 2");
           return;
         }
       }
@@ -132,7 +132,8 @@ export default {
 
       const res = await this.conversationStore.addConversation(data);
       this.resetFields();
-      if (res) this.$emit("add-conversation", res.conversationID);
+      if (!this.conversations.error)
+        this.$emit("add-conversation", res.conversationID);
     },
 
     resetFields() {

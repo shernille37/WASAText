@@ -12,6 +12,8 @@ export default {
   },
   data() {
     return {
+      pollingInterval: null,
+      POLLING_DELAY: 5000,
       conversationStore,
       messageStore,
       conversationType: "all",
@@ -47,10 +49,24 @@ export default {
       };
     },
   },
-  mounted() {
-    this.conversationStore.getConversations();
-  },
   methods: {
+    async refresh() {
+      if (this.conversationType === "all")
+        await this.conversationStore.getConversations();
+      else if (this.conversationType === "private")
+        await this.conversationStore.getPrivateConversations();
+      else await this.conversationStore.getGroupConversations();
+    },
+
+    startPolling() {
+      this.pollingInterval = setInterval(this.refresh, this.POLLING_DELAY);
+    },
+    stopPolling() {
+      if (this.pollingInterval) {
+        clearInterval(this.pollingInterval);
+        this.pollingInterval = null;
+      }
+    },
     toggleAddConversation() {
       this.conversationStore.addConversationFlag =
         !this.conversationStore.addConversationFlag;
@@ -67,6 +83,14 @@ export default {
         await this.conversationStore.getPrivateConversations();
       else await this.conversationStore.getGroupConversations();
     },
+  },
+  async mounted() {
+    await this.conversationStore.getConversations();
+
+    this.startPolling();
+  },
+  beforeUnmount() {
+    this.stopPolling();
   },
 };
 </script>

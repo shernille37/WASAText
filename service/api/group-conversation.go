@@ -65,7 +65,7 @@ func (rt *_router) addGroupConversation(w http.ResponseWriter, r *http.Request, 
 	}
 
 	// Check that members are atleast 2
-	if len(mess.Members) < 2 {
+	if len(mess.Members)+1 < 2 {
 		http.Error(w, "Members should atleast be 2", http.StatusBadRequest)
 		return
 	}

@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS Message (
 	messageType TEXT NOT NULL CHECK(messageType IN ('default', 'reply', 'forward')) DEFAULT 'default',
 	hasImage INTEGER DEFAULT 0,
 	messageStatus TEXT NOT NULL CHECK(messageStatus IN ('delivered', 'read', 'sent')) DEFAULT 'sent',
-	timeRead TEXT,
 	timeDelivered TEXT,
+	timeRead TEXT,
 	message TEXT NOT NULL,
 	image TEXT,
 
@@ -61,9 +61,21 @@ CREATE TABLE IF NOT EXISTS Message (
 CREATE TABLE IF NOT EXISTS Reader (
 	userID TEXT NOT NULL,
 	messageID TEXT NOT NULL,
-	timestamp TEXT NOT NULL,
+	timestamp TEXT NOT NULL DEFAULT current_timestamp,
 
-	PRIMARY KEY (userID, messageID)
+	PRIMARY KEY (userID, messageID),
+	FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
+	FOREIGN KEY (messageID) REFERENCES Message(messageID) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Deliver (
+	userID TEXT NOT NULL,
+	messageID TEXT NOT NULL,
+	timestamp TEXT NOT NULL DEFAULT current_timestamp,
+
+	PRIMARY KEY (userID, messageID),
+	FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
+	FOREIGN KEY (messageID) REFERENCES Message(messageID) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Emoji (

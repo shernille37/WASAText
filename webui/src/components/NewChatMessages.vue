@@ -14,9 +14,9 @@ export default {
   },
   data() {
     return {
+      apiUrl: __API_URL__,
       authStore,
       conversationStore,
-      apiUrl: import.meta.env.VITE_API_URL,
       conversationType: null,
       groupName: null,
       groupImage: null,

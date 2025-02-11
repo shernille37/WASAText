@@ -96,6 +96,7 @@ func (m *Message) ToDatabase() database.Message {
 		MessageType:        m.MessageType,
 		MessageStatus:      m.MessageStatus,
 		TimeDelivered:      m.TimeDelivered,
+		TimeRead:           m.TimeRead,
 		Message:            m.Message,
 		Image:              m.Image,
 		Reactions:          reactions,
@@ -128,6 +129,7 @@ func (m *Message) FromDatabase(mess database.Message) {
 	m.MessageType = mess.MessageType
 	m.MessageStatus = mess.MessageStatus
 	m.TimeDelivered = mess.TimeDelivered
+	m.TimeRead = mess.TimeRead
 	m.Message = mess.Message
 	m.Image = mess.Image
 	m.Reactions = reactions

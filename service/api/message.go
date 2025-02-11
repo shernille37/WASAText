@@ -238,6 +238,42 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 
 }
 
+func (rt *_router) updateMessageToDelivered(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	conversationID, err := uuid.FromString(ps.ByName("chatId"))
+	if err != nil {
+		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
+		return
+	}
+
+	if err := rt.db.UpdateMessageToDelivered(ctx.UserID, conversationID); err != nil {
+		ctx.Logger.WithError(err).Error("Can't update conversation to delivered")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}
+
+func (rt *_router) updateMessageToRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	conversationID, err := uuid.FromString(ps.ByName("chatId"))
+	if err != nil {
+		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
+		return
+	}
+
+	if err := rt.db.UpdateMessageToRead(ctx.UserID, conversationID); err != nil {
+		ctx.Logger.WithError(err).Error("Can't update conversation to read")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}
+
 func (mb *MessageBody) ToDatabase() database.MessageBody {
 	return database.MessageBody{
 		ReplyMessageID: mb.ReplyMessageID,

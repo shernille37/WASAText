@@ -26,6 +26,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/conversations/:chatId/messages", rt.wrap(rt.addMessage, true))
 	rt.router.DELETE("/conversations/:chatId/messages/:messageId", rt.wrap(rt.deleteMessage, true))
 	rt.router.GET("/conversations/:chatId/messages/:messageId/readers", rt.wrap(rt.listReaders, true))
+	rt.router.PUT("/conversations/:chatId/messages/deliver", rt.wrap(rt.updateMessageToDelivered, true))
+	rt.router.PUT("/conversations/:chatId/messages/read", rt.wrap(rt.updateMessageToRead, true))
 
 	rt.router.POST("/messages/:messageId/forward", rt.wrap(rt.forwardMessage, true))
 

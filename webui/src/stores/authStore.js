@@ -2,6 +2,9 @@ import { reactive } from "vue";
 import axios from "../services/axios";
 import { uploadImage } from "../utils/upload";
 
+import { conversationStore } from "./conversationStore";
+import { messageStore } from "./messageStore";
+
 export const authStore = reactive({
   user: {
     data: null,
@@ -45,6 +48,9 @@ export const authStore = reactive({
     this.userList.data = null;
     this.userList.loading = false;
     this.userList.error = null;
+
+    conversationStore.resetFields();
+    messageStore.resetFields();
   },
 
   async getUsers() {

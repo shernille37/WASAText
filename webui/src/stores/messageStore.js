@@ -13,12 +13,11 @@ export const messageStore = reactive({
     sendMessageLoading: false,
   },
 
-  forwardedMessage: {
-    data: null,
-    error: null,
-  },
-
   replyMessage: null,
+
+  resetFields() {
+    this.replyMessage = null;
+  },
 
   async getMessages(conversationID) {
     try {

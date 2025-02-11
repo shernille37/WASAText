@@ -21,6 +21,12 @@ export const conversationStore = reactive({
   addConversationFlag: false,
   addMemberFlag: false,
 
+  resetFields() {
+    this.selectedConversation = false;
+    this.addConversationFlag = false;
+    this.addMemberFlag = false;
+  },
+
   async getConversations() {
     try {
       this.conversations.loading = true;

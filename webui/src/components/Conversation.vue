@@ -3,7 +3,7 @@ export default {
   name: "Conversation",
   data() {
     return {
-      apiUrl: import.meta.env.VITE_API_URL,
+      apiUrl: __API_URL__,
     };
   },
   props: {

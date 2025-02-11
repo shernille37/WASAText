@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -23,7 +24,7 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 	var res []Message
 
 	const queryMessages = `
-		SELECT m.messageID, m.senderID, u.username,m.conversationID, m.timestamp, m.messageType,m.messageStatus, m.message, m.hasImage ,m.image,
+		SELECT m.messageID, m.senderID, u.username,m.conversationID, m.timestamp, m.timeDelivered, m.timeRead, m.messageType,m.messageStatus, m.message, m.hasImage ,m.image,
 		m.replyMessageID,u1.username, m1.message, u2.username
 		FROM (
 		( 
@@ -55,7 +56,7 @@ func (db *appdbimpl) ListMessages(conversationID uuid.UUID) ([]Message, error) {
 
 	for rows.Next() {
 		var m Message
-		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.SenderName, &m.ConversationID, &m.Timestamp, &m.MessageType, &m.MessageStatus, &m.Message, &m.HasImage, &m.Image, &m.ReplyMessageID, &m.ReplyRecipientName, &m.ReplyMessage, &m.ForwardedFromName); err != nil {
+		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.SenderName, &m.ConversationID, &m.Timestamp, &m.TimeDelivered, &m.TimeRead, &m.MessageType, &m.MessageStatus, &m.Message, &m.HasImage, &m.Image, &m.ReplyMessageID, &m.ReplyRecipientName, &m.ReplyMessage, &m.ForwardedFromName); err != nil {
 			return nil, err
 		}
 
@@ -345,5 +346,185 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 	res.Members = nil
 
 	return res, nil
+
+}
+
+func (db *appdbimpl) UpdateMessageToDelivered(senderID uuid.UUID, conversationID uuid.UUID) error {
+
+	const queryMessages = `
+	SELECT mess.messageID
+	FROM Message mess
+	WHERE mess.conversationID = ? AND mess.senderID <> ? AND mess.messageStatus = 'sent';
+	`
+
+	const queryMarkDelivered = `
+		INSERT OR IGNORE INTO Deliver(userID, messageID)
+		VALUES (?,?);
+	`
+
+	// If this query return 1, then it means the message has been delivered
+	const queryCountDeliverInstance = `
+		SELECT COUNT(DISTINCT m.userID)
+		FROM Members m
+		WHERE m.conversationID = ? AND
+		m.userID NOT IN (
+			SELECT d.userID from Deliver d WHERE d.messageID = ?
+		);
+	`
+
+	const queryUpdateMessage = `
+		UPDATE Message
+		SET messageStatus = 'delivered', timeDelivered = current_timestamp
+		WHERE messageID = ?;
+	`
+
+	tx, err := db.c.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				err = fmt.Errorf("%w -- Rollback Failed: %w", err, rbErr)
+			}
+		}
+	}()
+
+	rows, err := tx.Query(queryMessages, conversationID, senderID)
+
+	if err != nil {
+		// If no message found return
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var messageID uuid.UUID
+		if err = rows.Scan(&messageID); err != nil {
+			return err
+		}
+
+		if _, err := tx.Exec(queryMarkDelivered, senderID, messageID); err != nil {
+			return err
+		}
+
+		var deliverInstances int
+		if err := tx.QueryRow(queryCountDeliverInstance, conversationID, messageID).Scan(&deliverInstances); err != nil {
+			return err
+		}
+
+		if deliverInstances == 1 {
+			if _, err := tx.Exec(queryUpdateMessage, messageID); err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if err = rows.Err(); err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (db *appdbimpl) UpdateMessageToRead(senderID uuid.UUID, conversationID uuid.UUID) error {
+
+	const queryMessages = `
+	SELECT mess.messageID
+	FROM Message mess
+	WHERE mess.conversationID = ? AND mess.senderID <> ? AND mess.messageStatus = 'delivered';
+	`
+
+	const queryMarkRead = `
+		INSERT OR IGNORE INTO Reader(userID, messageID)
+		VALUES (?,?);
+	`
+
+	// If this query return 1, then it means the message has been delivered
+	const queryCountReaderInstance = `
+		SELECT COUNT(DISTINCT m.userID)
+		FROM Members m
+		WHERE m.conversationID = ? AND
+		m.userID NOT IN (
+			SELECT r.userID from Reader r WHERE r.messageID = ?
+		);
+	`
+
+	const queryUpdateMessage = `
+		UPDATE Message
+		SET messageStatus = 'read', timeRead = current_timestamp
+		WHERE messageID = ?;
+	`
+
+	tx, err := db.c.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				err = fmt.Errorf("%w -- Rollback Failed: %w", err, rbErr)
+			}
+		}
+	}()
+
+	rows, err := tx.Query(queryMessages, conversationID, senderID)
+
+	if err != nil {
+		// If no message found return
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var messageID uuid.UUID
+		if err = rows.Scan(&messageID); err != nil {
+			return err
+		}
+
+		if _, err := tx.Exec(queryMarkRead, senderID, messageID); err != nil {
+			return err
+		}
+
+		var readerInstances int
+		if err := tx.QueryRow(queryCountReaderInstance, conversationID, messageID).Scan(&readerInstances); err != nil {
+			return err
+		}
+
+		if readerInstances == 1 {
+			if _, err := tx.Exec(queryUpdateMessage, messageID); err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if err = rows.Err(); err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
 
 }

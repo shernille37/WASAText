@@ -9,8 +9,8 @@ export default {
   },
   data() {
     return {
+      apiUrl: __API_URL__,
       authStore,
-      apiUrl: import.meta.env.VITE_API_URL,
       username: "",
       image: null,
       fileToUpload: null,

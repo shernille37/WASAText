@@ -11,8 +11,8 @@ export default {
   },
   data() {
     return {
+      apiUrl: __API_URL__,
       conversationStore,
-      apiUrl: import.meta.env.VITE_API_URL,
       groupName: "",
       image: null,
       fileToUpload: null,

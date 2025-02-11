@@ -14,14 +14,36 @@ export default {
     return {
       conversationStore,
       messageStore,
+      conversationType: "all",
     };
   },
   computed: {
     conversations() {
+      const data =
+        this.conversationType === "all"
+          ? this.conversationStore.conversations.data
+          : this.conversationType === "private"
+          ? this.conversationStore.privateConversations.data
+          : this.conversationStore.groupConversations.data;
+
+      const loading =
+        this.conversationType === "all"
+          ? this.conversationStore.conversations.loading
+          : this.conversationType === "private"
+          ? this.conversationStore.privateConversations.loading
+          : this.conversationStore.groupConversations.loading;
+
+      const error =
+        this.conversationType === "all"
+          ? this.conversationStore.conversations.error
+          : this.conversationType === "private"
+          ? this.conversationStore.privateConversations.error
+          : this.conversationStore.groupConversations.error;
+
       return {
-        data: this.conversationStore.conversations.data,
-        loading: this.conversationStore.conversations.loading,
-        error: this.conversationStore.conversations.error,
+        data,
+        loading,
+        error,
       };
     },
   },
@@ -38,6 +60,13 @@ export default {
       this.conversationStore.addMemberFlag = false;
       this.messageStore.replyMessage = null;
     },
+    async toggleConversationType(type) {
+      this.conversationType = type;
+      if (type === "all") await this.conversationStore.getConversations();
+      else if (type === "private")
+        await this.conversationStore.getPrivateConversations();
+      else await this.conversationStore.getGroupConversations();
+    },
   },
 };
 </script>
@@ -49,6 +78,31 @@ export default {
       class="d-flex justify-content-center justify-content-sm-between align-items-center p-2"
     >
       <h3 class="fw-bold d-none d-sm-block">Chats</h3>
+
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button
+          type="button"
+          class="btn btn-info p-1"
+          @click="toggleConversationType('all')"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          @click="toggleConversationType('private')"
+        >
+          Private
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="toggleConversationType('group')"
+        >
+          Group
+        </button>
+      </div>
+
       <i
         role="button"
         class="bi bi-plus-circle fs-5 hover-bg-light rounded-circle"

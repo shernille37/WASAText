@@ -1,6 +1,8 @@
 package database
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid"
@@ -27,6 +29,14 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]Conversation, erro
 		WHERE m.conversationID = ? AND m.userID = u.userID AND m.userID <> ?;
 	`
 
+	const queryLatestMessage = `
+	SELECT m.timestamp, m.message, m.image
+	FROM Message m 
+	WHERE m.conversationID = ?
+	ORDER BY m.timestamp DESC
+	LIMIT 1;
+	`
+
 	rows, err := db.c.Query(queryPrivateConversation, id)
 
 	if err != nil {
@@ -39,6 +49,7 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]Conversation, erro
 		var c Conversation
 		var pc PrivateConversation
 		var u User
+		lm := &LatestMessage{}
 
 		if err = rows.Scan(&c.ConversationID, &c.Type); err != nil {
 			return nil, err
@@ -47,6 +58,15 @@ func (db *appdbimpl) ListPrivateConversation(id uuid.UUID) ([]Conversation, erro
 		// Fetch chatmate
 		if err = db.c.QueryRow(queryChatmate, c.ConversationID, id).Scan(&u.UserID, &u.Username, &u.Image); err != nil {
 			return nil, err
+		}
+
+		// Fetch LatestMessage
+		err = db.c.QueryRow(queryLatestMessage, c.ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image)
+
+		if errors.Is(err, sql.ErrNoRows) {
+			lm = nil
+		} else {
+			c.LatestMessage = lm
 		}
 
 		pc.User = &u

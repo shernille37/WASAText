@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -28,6 +29,14 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]Conversation, error)
 	WHERE c.conversationType = 'group' AND u.userID = ? AND c.conversationID = m.conversationID AND m.userID = u.userID;
 	`
 
+	const queryLatestMessage = `
+	SELECT m.timestamp, m.message, m.image
+	FROM Message m 
+	WHERE m.conversationID = ?
+	ORDER BY m.timestamp DESC
+	LIMIT 1;
+	`
+
 	rows, err := db.c.Query(queryGroupConversation, id)
 	if err != nil {
 		return nil, err
@@ -38,11 +47,22 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]Conversation, error)
 	for rows.Next() {
 		var c Conversation
 		var gc GroupConversation
+		lm := &LatestMessage{}
 
 		if err = rows.Scan(&c.ConversationID, &c.Type, &gc.GroupName, &gc.GroupImage); err != nil {
 			return nil, err
 		}
+
+		// Fetch LatestMessage
+		err = db.c.QueryRow(queryLatestMessage, c.ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image)
+
+		if errors.Is(err, sql.ErrNoRows) {
+			lm = nil
+		} else {
+			c.LatestMessage = lm
+		}
 		c.Group = &gc
+
 		res = append(res, c)
 	}
 

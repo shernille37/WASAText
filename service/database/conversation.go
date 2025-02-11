@@ -11,14 +11,6 @@ func (db *appdbimpl) ListConversation(id uuid.UUID) ([]Conversation, error) {
 
 	var res []Conversation
 
-	const queryLatestMessage = `
-	SELECT m.timestamp, m.message, m.image
-	FROM Message m 
-	WHERE m.conversationID = ?
-	ORDER BY m.timestamp DESC
-	LIMIT 1;
-	`
-
 	personalConversations, err1 := db.ListPrivateConversation(id)
 	groupConversations, err2 := db.ListGroupConversation(id)
 
@@ -31,16 +23,6 @@ func (db *appdbimpl) ListConversation(id uuid.UUID) ([]Conversation, error) {
 
 	res = append(res, personalConversations...)
 	res = append(res, groupConversations...)
-
-	for idx := range res {
-		lm := &LatestMessage{}
-		err := db.c.QueryRow(queryLatestMessage, res[idx].ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image)
-		if errors.Is(err, sql.ErrNoRows) {
-			res[idx].LatestMessage = nil
-		} else {
-			res[idx].LatestMessage = lm
-		}
-	}
 
 	return res, nil
 

@@ -10,6 +10,16 @@ export const conversationStore = reactive({
     loading: true,
     error: null,
   },
+  privateConversations: {
+    data: [],
+    loading: true,
+    error: null,
+  },
+  groupConversations: {
+    data: [],
+    loading: true,
+    error: null,
+  },
   conversation: {
     data: null,
     loading: true,
@@ -69,6 +79,46 @@ export const conversationStore = reactive({
     }
   },
 
+  async getPrivateConversations() {
+    try {
+      this.privateConversations.loading = true;
+      const res = await axios.get("/private-conversations", {
+        headers: {
+          Authorization: `Bearer ${authStore.user.data.userID}`,
+        },
+      });
+
+      // Update messages to delivered!
+      await this.updateMessageToDelivered();
+
+      this.privateConversations.loading = false;
+      this.privateConversations.data = res.data;
+    } catch (error) {
+      this.privateConversations.loading = false;
+      this.privateConversations.error = error.response.data;
+    }
+  },
+
+  async getGroupConversations() {
+    try {
+      this.groupConversations.loading = true;
+      const res = await axios.get("/group-conversations", {
+        headers: {
+          Authorization: `Bearer ${authStore.user.data.userID}`,
+        },
+      });
+
+      // Update messages to delivered!
+      await this.updateMessageToDelivered();
+
+      this.groupConversations.loading = false;
+      this.groupConversations.data = res.data;
+    } catch (error) {
+      this.groupConversations.loading = false;
+      this.groupConversations.error = error.response.data;
+    }
+  },
+
   async addConversation(data) {
     this.conversation.loading = true;
 
@@ -115,6 +165,11 @@ export const conversationStore = reactive({
 
       this.conversations.loading = false;
       this.conversations.data.push(resAddConversation.data);
+
+      if (data.conversationType === "group")
+        this.groupConversations.data.push(resAddConversation.data);
+      else this.privateConversations.data.push(resAddConversation.data);
+
       return resAddConversation.data;
     } catch (error) {
       this.conversations.loading = false;
@@ -221,6 +276,9 @@ export const conversationStore = reactive({
       );
 
       this.conversations.data = this.conversations.data.filter(
+        (conversation) => conversation.conversationID !== conversationID
+      );
+      this.groupConversations.data = this.groupConversations.data.filter(
         (conversation) => conversation.conversationID !== conversationID
       );
       this.selectedConversation = null;

@@ -130,9 +130,9 @@ export default {
         members: this.selectedMembers.map((member) => member.userID),
       };
 
-      const res = await conversationStore.addConversation(data);
+      const res = await this.conversationStore.addConversation(data);
       this.resetFields();
-      if (res) this.$emit("add-conversation", res.conversationID);
+      if (res) this.conversationStore.selectedConversation = res.conversationID;
     },
 
     resetFields() {

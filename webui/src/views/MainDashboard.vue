@@ -14,20 +14,26 @@ export default {
   data() {
     return {
       conversationStore,
-      selectedConversation: null,
-      addConversation: false,
+      localSelectedConversation: null,
     };
   },
   computed: {
     addConversationFlag() {
       return this.conversationStore.addConversationFlag;
     },
+    selectedConversation() {
+      return this.conversationStore.selectedConversation;
+    },
   },
-  methods: {
-    selectConveration(conversationID) {
-      this.conversationStore.addConversationFlag = false;
-
-      this.$nextTick(() => (this.selectedConversation = conversationID));
+  watch: {
+    selectedConversation: {
+      handler(newSelectedConversation) {
+        this.conversationStore.addConversationFlag = false;
+        this.$nextTick(
+          () => (this.localSelectedConversation = newSelectedConversation)
+        );
+      },
+      deep: true,
     },
   },
 };
@@ -35,12 +41,9 @@ export default {
 
 <template>
   <main class="d-flex">
-    <Sidebar @select-conversation="selectConveration" />
-    <NewChatMessages
-      v-if="addConversationFlag"
-      @add-conversation="selectConveration"
-    />
-    <ChatMessages v-else :conversationID="selectedConversation" />
+    <Sidebar />
+    <NewChatMessages v-if="addConversationFlag" />
+    <ChatMessages v-else :conversationID="localSelectedConversation" />
   </main>
 </template>
 

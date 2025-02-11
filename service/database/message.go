@@ -234,6 +234,14 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 		WHERE m.messageID = ? AND m.conversationID = ?; 
 	`
 
+	const queryExistingConversation = `
+		SELECT c.conversationID
+		FROM Conversation c, Members m1, Members m2
+		WHERE c.conversationType = 'private' AND c.conversationID = m1.conversationID AND 
+		m1.userID = ? AND c.conversationID = m2.conversationID AND 
+		m2.userID = ?;
+	`
+
 	const queryForward = `
 		INSERT INTO Message(messageID, senderID, conversationID, forwardSourceMessageID, messageType, hasImage, message, image)
 		VALUES (?,?,?,?,?,?,?, ?);
@@ -277,36 +285,50 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 	sourceMessage.MessageType = "forward"
 	var newConversationID uuid.UUID
 
+	var conversationExist error
 	if fmb.ReceiverID != nil {
 
-		// Add new private conversation
-		newConversationID, err = uuid.NewV4()
+		conversationExist = db.CheckExistingConversation(senderID, *fmb.ReceiverID)
 
-		if err != nil {
-			return res, err
-		}
-		if _, err = tx.Exec(queryAddConversation, newConversationID); err != nil {
-			return res, err
-		}
+		// Check if NO conversation already exists
+		if conversationExist == nil {
+			// Add new private conversation
+			newConversationID, err = uuid.NewV4()
 
-		// Add Members
-		mems := [2]uuid.UUID{senderID, *fmb.ReceiverID}
-		for _, id := range mems {
-
-			if _, err = tx.Exec(queryAddMembers, id, newConversationID); err != nil {
+			if err != nil {
+				return res, err
+			}
+			if _, err = tx.Exec(queryAddConversation, newConversationID); err != nil {
 				return res, err
 			}
 
+			// Add Members
+			mems := [2]uuid.UUID{senderID, *fmb.ReceiverID}
+			for _, id := range mems {
+
+				if _, err = tx.Exec(queryAddMembers, id, newConversationID); err != nil {
+					return res, err
+				}
+
+			}
+
 		}
+
 	}
 
 	var conversationID uuid.UUID
-	if fmb.ReceiverID != nil {
+	if fmb.ReceiverID != nil && conversationExist == nil {
 		conversationID = newConversationID
+	} else if fmb.ReceiverID != nil && conversationExist != nil {
+		// Query the existing conversationID
+		if err = tx.QueryRow(queryExistingConversation, senderID, fmb.ReceiverID).Scan(&conversationID); err != nil {
+			return res, err
+		}
 	} else {
 		conversationID = *fmb.Destination
 	}
 
+	// Execute forward message (Add message)
 	if _, err = tx.Exec(queryForward, newMessageID, senderID, conversationID, messageID, sourceMessage.MessageType, sourceMessage.HasImage, sourceMessage.Message, sourceMessage.Image); err != nil {
 		return res, err
 	}
@@ -315,7 +337,11 @@ func (db *appdbimpl) ForwardMessage(senderID uuid.UUID, messageID uuid.UUID, fmb
 		return res, err
 	}
 
-	res.ConversationID = conversationID
+	res, err = db.GetConversation(senderID, conversationID)
+	if err != nil {
+		return res, err
+	}
+	res.Members = nil
 
 	return res, nil
 

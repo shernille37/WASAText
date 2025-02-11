@@ -111,7 +111,7 @@ func (db *appdbimpl) GetConversation(id uuid.UUID, conversationID uuid.UUID) (Co
 	}
 
 	// Query Members
-	rows, err := db.c.Query(queryMembers, conversationID, id)
+	rows, err := db.c.Query(queryMembers, conversationID)
 
 	if err != nil {
 		return res, err

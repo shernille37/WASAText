@@ -13,6 +13,11 @@ export const messageStore = reactive({
     sendMessageLoading: false,
   },
 
+  forwardedMessage: {
+    data: null,
+    error: null,
+  },
+
   replyMessage: null,
 
   async getMessages(conversationID) {
@@ -80,6 +85,43 @@ export const messageStore = reactive({
       console.error(error.response.data);
       this.messages.sendMessageLoading = false;
       this.messages.error = error.response.data;
+    }
+  },
+
+  async forwardMessage(
+    messageID,
+    sourceConversationID,
+    receiverUserID,
+    receiverConversationID
+  ) {
+    try {
+      const resForward = await axios.post(
+        `/messages/${messageID}/forward`,
+        {
+          source: sourceConversationID,
+          destination: receiverConversationID,
+          receiverID: receiverUserID,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      // If the forward resulted in a new conversation
+      if (
+        !conversationStore.conversations.data.some(
+          (conversation) =>
+            conversation.conversationID === resForward.data.conversationID
+        )
+      )
+        conversationStore.conversations.data.push(resForward.data);
+
+      conversationStore.selectedConversation = resForward.data.conversationID;
+    } catch (error) {
+      this.forwardedMessage.error = error.response.data;
     }
   },
 

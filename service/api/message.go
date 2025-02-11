@@ -197,7 +197,7 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Atleast one of them is NOT NULL
-	if (fmess.Destination == nil) != (fmess.ReceiverID == nil) {
+	if (fmess.Destination == nil) == (fmess.ReceiverID == nil) {
 		http.Error(w, constants.INVALID_BODY, http.StatusBadRequest)
 		return
 	}

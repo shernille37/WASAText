@@ -16,6 +16,7 @@ export const conversationStore = reactive({
     error: null,
   },
 
+  selectedConversation: false,
   addConversationFlag: false,
   addMemberFlag: false,
 

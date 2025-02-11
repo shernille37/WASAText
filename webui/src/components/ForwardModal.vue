@@ -1,5 +1,6 @@
 <script>
 import { conversationStore } from "../stores/conversationStore";
+import { messageStore } from "../stores/messageStore";
 import { authStore } from "../stores/authStore";
 import LoadingSpinner from "./LoadingSpinner.vue";
 export default {
@@ -16,12 +17,17 @@ export default {
       apiUrl: import.meta.env.VITE_API_URL,
       conversationStore,
       authStore,
+      messageStore,
+      selectedUser: null,
+      selectedGroup: null,
     };
   },
   computed: {
     conversations() {
       return {
-        data: this.conversationStore.conversations.data,
+        data: this.conversationStore.conversations.data.filter(
+          (conversation) => conversation.group
+        ),
         loading: this.conversationStore.conversations.loading,
         error: this.conversationStore.conversations.error,
       };
@@ -35,18 +41,49 @@ export default {
     },
   },
   methods: {
+    selectUser(userID) {
+      // Deselect if already selected
+      if (this.selectedUser === userID) this.resetFields();
+      else {
+        this.selectedUser = userID;
+        this.selectedGroup = null;
+      }
+    },
+    selectGroup(conversationID) {
+      if (this.selectedGroup === conversationID) this.resetFields();
+      else {
+        this.selectedGroup = conversationID;
+        this.selectedUser = null;
+      }
+    },
+    async handleForward() {
+      if (this.selectedGroup === null && this.selectedUser === null) {
+        alert("Please select atleast one recipient");
+        return;
+      }
+      // Forward the message
+      await this.messageStore.forwardMessage(
+        this.message.messageID,
+        this.conversation.conversationID,
+        this.selectedUser,
+        this.selectedGroup
+      );
+
+      this.closeModal();
+      this.resetFields();
+    },
+    isSelected(id) {
+      return this.selectedUser === id || this.selectedGroup === id;
+    },
     closeModal() {
       this.$emit("close-forward-modal");
     },
-    isPrivate(conversation) {
-      return !!conversation.private;
+    hasGroupImage(conversation) {
+      return !!conversation.group.groupImage;
     },
-    hasImage(conversation) {
-      if (this.isPrivate(conversation)) {
-        return !!conversation.private.user.image;
-      } else {
-        return !!conversation.group.groupImage;
-      }
+    resetFields() {
+      this.selectedUser = null;
+      this.selectedGroup = null;
     },
   },
   async mounted() {
@@ -73,31 +110,56 @@ export default {
       <!-- Existing Conversations -->
       <div
         role="button"
-        class="d-flex justify-content-evenly align-items-center"
+        :class="`d-flex justify-content-evenly align-items-center rounded-3 p-1 ${
+          isSelected(conversation.conversationID) ? 'bg-info' : ''
+        }`"
         v-for="conversation in conversations.data"
         :key="conversation.conversationID"
+        @click="selectGroup(conversation.conversationID)"
       >
         <img
-          v-if="hasImage(conversation)"
-          :src="`${apiUrl}${
-            isPrivate(conversation)
-              ? conversation.private.user.image
-              : conversation.group.groupImage
-          }`"
+          v-if="hasGroupImage(conversation)"
+          :src="`${apiUrl}${conversation.group.groupImage}`"
           alt="Profile Image"
           class="profile-image"
         />
         <i v-else class="bi bi-person-circle fs-3"></i>
 
         <p>
-          {{
-            isPrivate(conversation)
-              ? conversation.private.user.username
-              : conversation.group.groupName
-          }}
+          {{ conversation.group.groupName }}
+        </p>
+      </div>
+
+      <!-- Other users -->
+
+      <div
+        role="button"
+        :class="`d-flex justify-content-evenly align-items-center rounded-3 p-1 ${
+          isSelected(user.userID) ? 'bg-info' : ''
+        }`"
+        v-for="user in users.data"
+        :key="user.userID"
+        @click="selectUser(user.userID)"
+      >
+        <img
+          v-if="user.image"
+          :src="`${apiUrl}${user.image}`"
+          alt="Profile Image"
+          class="profile-image"
+        />
+        <i v-else class="bi bi-person-circle fs-3"></i>
+
+        <p>
+          {{ user.username }}
         </p>
       </div>
     </div>
+    <button
+      class="btn btn-info p-1 d-block mx-auto mt-3"
+      @click="handleForward"
+    >
+      Forward
+    </button>
   </div>
 </template>
 
@@ -109,7 +171,7 @@ export default {
   transform: translate(-50%, -50%);
   z-index: 1;
   min-height: 100px;
-  max-height: 300px;
+  max-height: 380px;
 
   min-width: 300px;
   max-width: 500px;

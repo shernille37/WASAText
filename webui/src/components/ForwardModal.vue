@@ -2,15 +2,11 @@
 import { conversationStore } from "../stores/conversationStore";
 import { messageStore } from "../stores/messageStore";
 import { authStore } from "../stores/authStore";
-import LoadingSpinner from "./LoadingSpinner.vue";
 export default {
   name: "ForwardModal",
   props: {
     message: Object,
     conversation: Object,
-  },
-  components: {
-    LoadingSpinner,
   },
   data() {
     return {

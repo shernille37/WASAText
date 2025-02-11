@@ -24,19 +24,19 @@ export default {
     };
   },
   computed: {
+    members() {
+      return {
+        data: this.conversationStore.conversationMembers.data,
+        loading: this.conversationStore.conversationMembers.loading,
+        error: this.conversationStore.conversationMembers.error,
+      };
+    },
+
     users() {
       return {
         data: this.authStore.userList.data,
         loading: this.authStore.userList.loading,
         error: this.authStore.userList.error,
-      };
-    },
-
-    conversation() {
-      return {
-        data: this.conversationStore.conversation.data,
-        loading: this.conversationStore.conversation.loading,
-        error: this.conversationStore.conversation.error,
       };
     },
 
@@ -89,10 +89,10 @@ export default {
   },
   async mounted() {
     await this.authStore.getUsers();
-    // Just display the members that are NOT already selected (NOT in selectedMembers)
+    await this.conversationStore.getMembers(this.conversationID);
+    // Just display the members that are NOT currently members
     this.suggestedMembers = this.users.data.filter(
-      (user) =>
-        !this.conversation.data.members.some((u) => u.userID === user.userID)
+      (user) => !this.members.data.some((u) => u.userID === user.userID)
     );
   },
 };
@@ -100,12 +100,12 @@ export default {
 
 <template>
   <div id="addMemberContainer">
-    <div v-if="conversation.loading">
+    <div v-if="members.loading">
       <LoadingSpinner />
     </div>
 
-    <div v-else-if="conversation.error">
-      <ErrorMsg :msg="conversation.error" />
+    <div v-else-if="members.error">
+      <ErrorMsg :msg="members.error" />
     </div>
 
     <div class="d-flex justify-content-center align-items-center">

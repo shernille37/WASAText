@@ -16,6 +16,11 @@ export const conversationStore = reactive({
     error: null,
     leaveGroupConversationError: null,
   },
+  conversationMembers: {
+    data: [],
+    loading: true,
+    error: null,
+  },
 
   selectedConversation: false,
   addConversationFlag: false,
@@ -117,6 +122,26 @@ export const conversationStore = reactive({
     }
   },
 
+  async getMembers(conversationID) {
+    try {
+      this.conversationMembers.loading = true;
+      const resMembers = await axios.get(
+        `/group-conversations/${conversationID}/members`,
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+
+      this.conversationMembers.loading = false;
+      this.conversationMembers.data = resMembers.data;
+    } catch (error) {
+      this.conversationMembers.loading = false;
+      this.conversationMembers.error = error.response.data;
+    }
+  },
+
   async addMembersToGroup(data) {
     try {
       this.conversation.loading = true;
@@ -205,8 +230,6 @@ export const conversationStore = reactive({
   },
 
   async updateMessageToDelivered() {
-    // Gather all promises
-
     for (const conversation of this.conversations.data) {
       try {
         await axios.put(

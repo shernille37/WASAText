@@ -54,7 +54,10 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 		return
 	}
 
-	file.Seek(0, 0)
+	if _, err := file.Seek(0, 0); err != nil {
+		http.Error(w, "Error file seek", http.StatusInternalServerError)
+		return
+	}
 
 	// Detect MIME type
 	mimeType := http.DetectContentType(buffer)

@@ -212,7 +212,7 @@ export const conversationStore = reactive({
         }
       );
 
-      this.conversation.data.members.push(...res.data);
+      this.conversationMembers.data.push(...res.data);
 
       this.conversation.loading = false;
       this.addMemberFlag = false;

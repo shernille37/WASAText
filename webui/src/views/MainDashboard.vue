@@ -36,13 +36,22 @@ export default {
       deep: true,
     },
   },
+  methods: {
+    selectConversation(conversationID) {
+      this.conversationStore.addConversationFlag = false;
+      this.$nextTick(() => (this.localSelectedConversation = conversationID));
+    },
+  },
 };
 </script>
 
 <template>
   <main class="d-flex">
-    <Sidebar />
-    <NewChatMessages v-if="addConversationFlag" />
+    <Sidebar @select-conversation="selectConversation" />
+    <NewChatMessages
+      @add-conversation="selectConversation"
+      v-if="addConversationFlag"
+    />
     <ChatMessages v-else :conversationID="localSelectedConversation" />
   </main>
 </template>

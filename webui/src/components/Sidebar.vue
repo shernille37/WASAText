@@ -56,7 +56,7 @@ export default {
         !this.conversationStore.addConversationFlag;
     },
     handleSelectConversation(conversationID) {
-      this.conversationStore.selectedConversation = conversationID;
+      this.$emit("select-conversation", conversationID);
       this.conversationStore.addMemberFlag = false;
       this.messageStore.replyMessage = null;
     },

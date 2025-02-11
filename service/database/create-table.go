@@ -101,3 +101,14 @@ CREATE TABLE IF NOT EXISTS Reaction (
 );
 
 `
+
+const initial_emojis = `
+	INSERT OR IGNORE INTO Emoji(unicode)
+	VALUES 
+	('👍'),
+	('👎'),
+	('💙'),
+	('😂');
+`
+
+const database_structure = create_table + initial_emojis

@@ -25,5 +25,9 @@ func startDatabase(logger logrus.FieldLogger, filename string) (database.AppData
 		return nil, err
 	}
 
+	if _, err = dbconn.Exec("PRAGMA journal_mode=WAL;"); err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }

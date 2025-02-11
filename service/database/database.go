@@ -95,7 +95,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}
 
 	// CREATE THE DATABASE STRUCTURE
-	_, err := db.Exec(create_table)
+	_, err := db.Exec(database_structure)
 	if err != nil {
 		return nil, err
 	}

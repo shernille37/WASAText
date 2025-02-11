@@ -132,7 +132,7 @@ export default {
 
       const res = await this.conversationStore.addConversation(data);
       this.resetFields();
-      if (res) this.conversationStore.selectedConversation = res.conversationID;
+      if (res) this.$emit("add-conversation", res.conversationID);
     },
 
     resetFields() {

@@ -569,6 +569,48 @@ paths:
         "500":
           description: Internal Server Error
 
+  /conversations/{chatId}/messages/deliver:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
+    put:
+      summary: Update messages of a conversation to delivered
+      description: |
+        Update all of the messages not associated to the auth user
+        of a conversation to delivered
+
+      tags: ["Messages"]
+
+      operationId: updateMessageToDeliver
+
+      responses:
+        "204":
+          description: Update successfuly
+
+        "500":
+          description: Internal Server Error
+
+  /conversations/{chatId}/messages/read:
+    parameters:
+      - $ref: "#/components/parameters/ConversationID"
+
+    put:
+      summary: Update messages of a conversation to read
+      description: |
+        Update all of the messages not associated to the auth user
+        of a conversation to read
+
+      tags: ["Messages"]
+
+      operationId: updateMessageToRead
+
+      responses:
+        "204":
+          description: Update successfuly
+
+        "500":
+          description: Internal Server Error
+
   /conversations/{chatId}/messages/{messageId}/reactions:
     parameters:
       - $ref: "#/components/parameters/ConversationID"

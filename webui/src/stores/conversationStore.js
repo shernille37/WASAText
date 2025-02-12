@@ -306,21 +306,19 @@ export const conversationStore = reactive({
     }
   },
 
-  async updateMessageToRead() {
-    for (const conversation of this.conversations.data) {
-      try {
-        await axios.put(
-          `/conversations/${conversation.conversationID}/messages/read`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${authStore.user.data.userID}`,
-            },
-          }
-        );
-      } catch (error) {
-        throw new Error(error);
-      }
+  async updateMessageToRead(conversationID) {
+    try {
+      await axios.put(
+        `/conversations/${conversationID}/messages/read`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.user.data.userID}`,
+          },
+        }
+      );
+    } catch (error) {
+      throw new Error(error);
     }
   },
 });

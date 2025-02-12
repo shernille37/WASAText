@@ -24,6 +24,8 @@ export default {
       searchMembers: "",
       suggestedMembers: [],
       selectedMembers: [],
+
+      readOnlyMembers: [],
     };
   },
   computed: {
@@ -43,6 +45,17 @@ export default {
     },
   },
   watch: {
+    searchMembers(newVal) {
+      if (!newVal) {
+        this.suggestedMembers = [...this.readOnlyMembers];
+        return;
+      }
+      const query = new RegExp(this.searchMembers, "i");
+
+      this.suggestedMembers = this.readOnlyMembers.filter((member) =>
+        query.test(member.username)
+      );
+    },
     "conversations.error": {
       handler() {
         setTimeout(() => {
@@ -53,6 +66,16 @@ export default {
     },
   },
   methods: {
+    async getUsers() {
+      await this.authStore.getUsers();
+      // Just display the members that are NOT already selected (NOT in selectedMembers)
+      this.suggestedMembers = this.users.data.filter(
+        (user) => !this.selectedMembers.some((u) => u.userID === user.userID)
+      );
+
+      // Copy this to the readonly members to perform filterings
+      this.readOnlyMembers = [...this.suggestedMembers];
+    },
     openGroupImageUpload() {
       this.$refs.group_image.click();
     },
@@ -69,13 +92,6 @@ export default {
       } else {
         alert("Please upload a valid image file");
       }
-    },
-    async getUsers() {
-      await this.authStore.getUsers();
-      // Just display the members that are NOT already selected (NOT in selectedMembers)
-      this.suggestedMembers = this.users.data.filter(
-        (user) => !this.selectedMembers.some((u) => u.userID === user.userID)
-      );
     },
     handleRemoveSelected(user) {
       // Remove the user from the selected Members

@@ -19,8 +19,11 @@ export default {
       apiUrl: __API_URL__,
       authStore,
       conversationStore,
+      searchMembers: "",
       suggestedMembers: [],
       selectedMembers: [],
+
+      readOnlyMembers: [],
     };
   },
   computed: {
@@ -78,6 +81,17 @@ export default {
     },
   },
   watch: {
+    searchMembers(newVal) {
+      if (!newVal) {
+        this.suggestedMembers = [...this.readOnlyMembers];
+        return;
+      }
+      const query = new RegExp(this.searchMembers, "i");
+
+      this.suggestedMembers = this.readOnlyMembers.filter((member) =>
+        query.test(member.username)
+      );
+    },
     "conversation.error": {
       handler() {
         setTimeout(() => {
@@ -94,6 +108,8 @@ export default {
     this.suggestedMembers = this.users.data.filter(
       (user) => !this.members.data.some((u) => u.userID === user.userID)
     );
+
+    this.readOnlyMembers = [...this.suggestedMembers];
   },
 };
 </script>
@@ -112,7 +128,7 @@ export default {
       <div class="position-relative p-2 bg-info w-50 rounded-2">
         <p class="fw-semibold text-center">Add People</p>
         <p
-          v-if="!this.suggestedMembers.length && !this.selectedMembers.length"
+          v-if="!this.readOnlyMembers.length && !this.selectedMembers.length"
           class="text-center"
         >
           All users in the system is already part of this group
@@ -130,6 +146,7 @@ export default {
             class="form-control p-1 mt-3 mb-3"
             autocomplete="off"
             placeholder="Add People"
+            v-model="searchMembers"
           />
         </form>
 

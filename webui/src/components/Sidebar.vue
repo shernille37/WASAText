@@ -87,7 +87,7 @@ export default {
   async mounted() {
     await this.conversationStore.getConversations();
 
-    // this.startPolling();
+    this.startPolling();
   },
   beforeUnmount() {
     this.stopPolling();
@@ -110,7 +110,7 @@ export default {
       >
         <button
           type="button"
-          class="btn btn-info p-1"
+          class="btn btn-info"
           @click="toggleConversationType('all')"
         >
           All

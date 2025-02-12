@@ -35,7 +35,7 @@ export const messageStore = reactive({
         },
       });
 
-      await conversationStore.updateMessageToRead();
+      await conversationStore.updateMessageToRead(conversationID);
 
       this.messages.loading = false;
       this.messages.data = res.data;

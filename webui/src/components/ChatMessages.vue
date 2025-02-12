@@ -129,7 +129,7 @@ export default {
       this.scrollToBottom();
     }
 
-    // this.startPolling();
+    this.startPolling();
   },
   beforeUnmount() {
     this.stopPolling();

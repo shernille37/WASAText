@@ -128,7 +128,8 @@ export default {
       </p>
 
       <p v-show="isReply" :class="`${isOwner ? 'text-end' : 'text-start'}`">
-        {{ isOwner ? "You" : "" }} replied to
+        {{ isOwner ? "You" : isGroup ? "" : message.replyRecipientName }}
+        replied to
         {{ isRecipientOwner ? "Yourself" : message.replyRecipientName }}
       </p>
 

@@ -99,7 +99,6 @@ export default {
           @click="closeModal"
         ></i>
       </div>
-      <input type="text" placeholder="Search" class="form-control p-1 my-2" />
     </div>
 
     <div class="content d-flex flex-column gap-3 overflow-scroll">

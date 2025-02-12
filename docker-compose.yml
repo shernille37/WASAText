@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  backend:
+    image: docker.io/shernille37/backend:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./images:/app/images
+
+  frontend:
+    image: docker.io/shernille37/frontend:latest
+    ports:
+      - "8080:80"

@@ -6,7 +6,8 @@
     "build-dev": "yarn install --immutable --immutable-cache && vite build --mode development",
     "build-prod": "yarn install --immutable --immutable-cache && vite build --mode production",
     "build-embed": "yarn install --immutable --immutable-cache && vite build --mode production --base=/dashboard/",
-    "preview": "vite preview --port 4173"
+    "preview": "vite preview --port 4173",
+    "build": "vite build --mode production"
   },
   "dependencies": {
     "axios": "0.28.0",

@@ -14,7 +14,7 @@ export default {
     senderID: String,
     conversationID: String,
   },
-  emits: ["toggle-emoji-picker"],
+  emits: ["user-reacted"],
   data() {
     return {
       reactionStore,
@@ -49,7 +49,7 @@ export default {
 
   methods: {
     async clickEmoji(emoji) {
-      this.$emit("toggle-emoji-picker");
+      this.$emit("user-reacted");
 
       // Check if the auth user has already reacted to the message
       const userReaction = this.reactions.data.find(

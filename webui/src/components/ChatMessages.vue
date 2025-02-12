@@ -23,7 +23,7 @@ export default {
     return {
       apiUrl: __API_URL__,
       pollingInterval: null,
-      POLLING_DELAY: 5000,
+      POLLING_DELAY: 3000,
       conversationStore,
       messageStore,
     };
@@ -112,6 +112,8 @@ export default {
         await this.conversationStore.getConversation(this.conversationID);
         await this.messageStore.getMessages(this.conversationID);
         this.scrollToBottom();
+
+        if (!this.pollingInterval) this.startPolling();
       },
     },
     "message.data": {
@@ -226,10 +228,16 @@ export default {
         :key="message.messageID"
         :message="message"
         :conversation="conversation.data"
+        @stop-polling="stopPolling"
+        @start-polling="startPolling"
       />
     </div>
 
-    <MessageForm :conversationID="conversationID" />
+    <MessageForm
+      :conversationID="conversationID"
+      @stop-polling="stopPolling"
+      @start-polling="startPolling"
+    />
   </div>
 </template>
 

@@ -22,6 +22,7 @@ export default {
   methods: {
     openFile() {
       this.$refs.file.click();
+      this.stopPolling();
     },
     closeFile() {
       this.image = null;
@@ -45,6 +46,8 @@ export default {
         this.$emit("add-conversation", data);
       } else messageStore.sendMessage(data);
 
+      this.$emit("start-polling");
+
       this.message = "";
       this.image = null;
       this.fileToUpload = null;
@@ -59,6 +62,9 @@ export default {
       } else {
         alert("Please upload a valid image file");
       }
+    },
+    stopPolling() {
+      this.$emit("stop-polling");
     },
   },
 };
@@ -126,6 +132,7 @@ export default {
           }`"
           class="form-control p-1"
           autocomplete="off"
+          @focus="stopPolling"
         />
 
         <button type="submit" class="d-none">Hidden Submit</button>

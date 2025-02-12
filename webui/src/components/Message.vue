@@ -14,6 +14,7 @@ export default {
     ForwardModal,
     ReadersModal,
   },
+  emits: ["start-polling", "stop-polling"],
   data() {
     return {
       apiUrl: __API_URL__,
@@ -55,15 +56,19 @@ export default {
   methods: {
     toggleEmojiPicker() {
       this.emojiClick = !this.emojiClick;
+      this.stopPolling();
     },
     toggleReactionsInfo() {
       this.reactionsInfoClick = !this.reactionsInfoClick;
+      this.stopPolling();
     },
     toggleForwardModal() {
       this.forwardModalClick = !this.forwardModalClick;
+      this.stopPolling();
     },
     toggleReaderModal() {
       this.readerModalClick = !this.readerModalClick;
+      this.stopPolling();
     },
     replyToMessage() {
       this.messageStore.replyMessage = {
@@ -74,12 +79,36 @@ export default {
       };
     },
     handleDeleteMessage() {
+      this.stopPolling();
       if (confirm("Are you sure?")) {
         this.messageStore.deleteMessage(
           this.conversation.conversationID,
           this.message.messageID
         );
       }
+      this.startPolling();
+    },
+    handleUserReacted() {
+      this.emojiClick = !this.emojiClick;
+      this.startPolling();
+    },
+    handleCloseReaction() {
+      this.reactionsInfoClick = !this.reactionsInfoClick;
+      this.startPolling();
+    },
+    handleCloseForward() {
+      this.forwardModalClick = !this.forwardModalClick;
+      this.startPolling();
+    },
+    handleCloseReader() {
+      this.readerModalClick = !this.readerModalClick;
+      this.startPolling();
+    },
+    stopPolling() {
+      this.$emit("stop-polling");
+    },
+    startPolling() {
+      this.$emit("start-polling");
     },
   },
 
@@ -95,19 +124,19 @@ export default {
     v-if="reactionsInfoClick"
     :conversation="conversation"
     :message="message"
-    @close-modal="toggleReactionsInfo"
+    @close-reaction-modal="handleCloseReaction"
   />
   <ForwardModal
     v-if="forwardModalClick"
     :conversation="conversation"
     :message="message"
-    @close-forward-modal="toggleForwardModal"
+    @close-forward-modal="handleCloseForward"
   />
   <ReadersModal
     v-if="readerModalClick"
     :conversation="conversation"
     :message="message"
-    @close-reader-modal="toggleReaderModal"
+    @close-reader-modal="handleCloseReader"
   />
   <div
     :class="[
@@ -192,7 +221,7 @@ export default {
             :senderID="authStore.user.data.userID"
             :conversationID="conversation.conversationID"
             :messageID="message.messageID"
-            @toggle-emoji-picker="toggleEmojiPicker"
+            @user-reacted="handleUserReacted"
           />
 
           <i

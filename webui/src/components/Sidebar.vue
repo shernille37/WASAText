@@ -13,7 +13,7 @@ export default {
   data() {
     return {
       pollingInterval: null,
-      POLLING_DELAY: 5000,
+      POLLING_DELAY: 3000,
       conversationStore,
       messageStore,
       conversationType: "all",

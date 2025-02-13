@@ -57,7 +57,7 @@ func (db *appdbimpl) ListGroupConversation(id uuid.UUID) ([]Conversation, error)
 		err = db.c.QueryRow(queryLatestMessage, c.ConversationID).Scan(&lm.Timestamp, &lm.Message, &lm.Image)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			lm = nil
+			c.LatestMessage = nil
 		} else {
 			c.LatestMessage = lm
 		}

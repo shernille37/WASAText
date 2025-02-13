@@ -34,14 +34,17 @@ export default {
     isOwner() {
       if (authStore.user.data)
         return this.message.senderID === authStore.user.data.userID;
+      else return null;
     },
     isRecipientOwner() {
       if (authStore.user.data)
         return this.message.replyRecipientName === authStore.user.data.username;
+      else return null;
     },
     isForwardedMessageOwner() {
       if (authStore.user.data)
         return this.message.forwardedFromName === authStore.user.data.username;
+      else return null;
     },
     isReply() {
       return !!this.message.replyMessageID;
@@ -216,7 +219,6 @@ export default {
 
           <i @click="toggleEmojiPicker" class="bi bi-emoji-smile"></i>
           <EmojiPicker
-            @mouseleave="toggleEmojiPicker"
             v-if="emojiClick"
             :senderID="authStore.user.data.userID"
             :conversationID="conversation.conversationID"

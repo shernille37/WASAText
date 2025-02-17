@@ -18,7 +18,10 @@ EXPOSE 3000 4000
 WORKDIR /app/
 COPY --from=builder /app/webapi ./
 
-RUN mkdir -p /app/images && chmod 777 /app/images
+RUN mkdir -p /app/images && chmod 775 /app/images
+RUN mkdir -p /app/db && chmod 775 /app/db
 
 ### Executable command
+ENV CFG_DB_FILENAME='/app/db/wasatext.db'
+ENV CFG_STATIC_FILE_FILENAME='/app/images'
 CMD ["/app/webapi"]

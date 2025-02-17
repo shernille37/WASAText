@@ -6,9 +6,14 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./images:/app/images
+      - image:/app/images
+      - database:/app/db
 
   frontend:
     image: docker.io/shernille37/frontend:latest
     ports:
       - "8080:80"
+
+volumes:
+  image:
+  database:

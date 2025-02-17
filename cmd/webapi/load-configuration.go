@@ -28,6 +28,10 @@ type WebAPIConfiguration struct {
 	DB    struct {
 		Filename string `conf:"default:/tmp/wasatext.db"`
 	}
+
+	StaticFile struct {
+		Filename string `conf:"default:/tmp/images"`
+	}
 }
 
 // loadConfiguration creates a WebAPIConfiguration starting from flags, environment variables and configuration file.

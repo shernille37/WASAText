@@ -70,8 +70,9 @@ func run() error {
 	serverErrors := make(chan error, 1)
 
 	apirouter, err := api.New(api.Config{
-		Logger:   logger,
-		Database: db,
+		Logger:     logger,
+		Database:   db,
+		StaticFile: cfg.StaticFile.Filename,
 	})
 
 	if err != nil {

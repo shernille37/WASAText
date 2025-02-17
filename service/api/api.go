@@ -17,6 +17,8 @@ type Config struct {
 
 	// Database is the instance of database.AppDatabase where data are saved
 	Database database.AppDatabase
+
+	StaticFile string
 }
 
 type Router interface {
@@ -28,6 +30,7 @@ type _router struct {
 	router     *httprouter.Router
 	db         database.AppDatabase
 	baseLogger logrus.FieldLogger
+	staticFile string
 }
 
 func New(cfg Config) (Router, error) {
@@ -48,6 +51,7 @@ func New(cfg Config) (Router, error) {
 		router:     router,
 		baseLogger: cfg.Logger,
 		db:         cfg.Database,
+		staticFile: cfg.StaticFile,
 	}, nil
 }
 

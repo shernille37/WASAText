@@ -19,12 +19,10 @@ type ImageURL struct {
 	Image string `json:"image"`
 }
 
-var imageDirectory = "./images"
-
-func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Create the image directory if it doesn't exist with permission (0755)
-	if err := os.MkdirAll(imageDirectory, 0755); err != nil {
+	if err := os.MkdirAll(rt.staticFile, 0755); err != nil {
 		http.Error(w, "Failed to create /app/images directory", http.StatusBadRequest)
 		return
 	}
@@ -75,7 +73,7 @@ func uploadImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, c
 
 	uniqueFilename := fmt.Sprintf("%s-%s", fileID.String(), handler.Filename)
 	// Create and Save file to /app/images
-	dstPath := filepath.Join("./images", uniqueFilename)
+	dstPath := filepath.Join(rt.staticFile, uniqueFilename)
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		http.Error(w, "Unable to create file", http.StatusInternalServerError)

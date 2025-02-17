@@ -50,11 +50,11 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:userId/username", rt.wrap(rt.updateUsername, true))
 	rt.router.PUT("/users/:userId/image", rt.wrap(rt.updateUserImage, true))
 
-	rt.router.POST("/upload", rt.wrap(uploadImage, true))
+	rt.router.POST("/upload", rt.wrap(rt.uploadImage, true))
 
 	// Special routes
 	// Serve File Images
-	rt.router.Handler("GET", "/images/*filepath", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
+	rt.router.Handler("GET", "/images/*filepath", http.StripPrefix("/images/", http.FileServer(http.Dir(rt.staticFile))))
 	rt.router.GET("/emojis", rt.wrap(rt.listEmojis, false))
 
 	return rt.router

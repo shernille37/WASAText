@@ -102,7 +102,6 @@ func (rt *_router) updateGroupName(w http.ResponseWriter, r *http.Request, ps ht
 		return
 	}
 
-	// TODO: Check if it's a group
 	if err := rt.db.UpdateGroupName(conversationID, gb.GroupName); err != nil {
 		ctx.Logger.WithError(err).Error("Can't update")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -128,7 +127,7 @@ func (rt *_router) updateGroupImage(w http.ResponseWriter, r *http.Request, ps h
 		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
 		return
 	}
-	// TODO: Check if it's a group
+
 	if err := rt.db.UpdateGroupImage(conversationID, gb.GroupImage); err != nil {
 		ctx.Logger.WithError(err).Error("Can't update")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -148,7 +147,6 @@ func (rt *_router) listGroupMembers(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 
-	// Check if conversationID is a group
 	m, err := rt.db.ListGroupMembers(conversationID)
 
 	if err != nil {
@@ -219,8 +217,6 @@ func (rt *_router) leaveGroupConversation(w http.ResponseWriter, r *http.Request
 		http.Error(w, constants.PARSE_ERROR, http.StatusInternalServerError)
 		return
 	}
-
-	// TODO: Check if it's a group
 
 	// Check if the user is part of the group
 	if err := rt.db.CheckConversationMembership(conversationID, []uuid.UUID{ctx.UserID}); err != nil {

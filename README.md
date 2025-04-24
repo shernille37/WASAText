@@ -12,10 +12,11 @@
 - Converastion Filter
 - Reply to Chat
 - React to Chat
-- Forward Chats 
+- Forward Chats
+- Delete Chats
 - Image sending (File upload)
 - User profile
-- Chats made "real-time" using Polling
+- Chats made "real-time" by Polling
 
 ## Technologies Used
   <p>

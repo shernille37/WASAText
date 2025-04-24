@@ -5,15 +5,32 @@
 
 ## Features
 
-- Shopping Cart
-- Product reviews and ratings
-- Product pagination
-- Product search feature
-- Image Upload with Cloudinary
-- User profile with orders
-- Admin product management
-- Admin user management
-- Admin Order details page
-- Checkout process (shipping, payment method, etc)
-- Payment with Stripe
-- Database seeder (products & users)
+- User Login
+- Create conversations (Private or Group)
+- Converastion Filter
+- Reply to Chat
+- React to Chat
+- Forward Chats 
+- Image sending (File upload)
+- User profile
+- Chats made "real-time" using Polling
+
+ ## Usage
+
+Add a `.env` file in the `frontend/` and add the following
+
+```
+NODE_ENV=development
+PORT=5000
+MONGO_URI= YOUR MONGO URI
+JWT_SECRET= YOUR JWT SECRET
+STRIPE_SECRET_KEY= YOUR STRIPE SECRET KEY
+CLIENT_URL=http://localhost:3000
+SERVER_URL=http://localhost:8000
+CLOUDINARY_NAME= YOUR CLOUDINARY NAME
+CLOUDINARY_API_KEY= YOUR CLOUDINARY API KEY
+CLOUDINARY_API_SECRET= YOUR CLOUDINARY API SECRET
+PAGINATION_LIMIT= YOUR PAGINATION LIMIT
+
+```
+

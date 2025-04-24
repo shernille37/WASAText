@@ -18,8 +18,7 @@ export default {
     async handleSubmit() {
       if (this.username != "") await this.authStore.login(this.username);
       else alert("Please enter a username");
-
-      this.$router.push("/");
+      if (!this.authStore.user.error) this.$router.push("/");
     },
   },
 };

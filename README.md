@@ -17,10 +17,10 @@
 
 ## Technologies Used
   <p>
-      <a href="#"><img alt="VueJS" src="https://img.shields.io/badge/VueJS-20232a.svg?logo=vuedotjs&logoColor=%2361DAFB"></a>
-      <a href="#"><img alt="Bootstrap" src="https://img.shields.io/badge/Bootstrap-38B2AC?logo=bootstrap&logoColor=white"></a>
-      <a href="#"><img alt="GoLang" src="https://img.shields.io/badge/Go-38B2AC?logo=go&logoColor=white"></a>
-      <a href="#"><img alt="SQLite" src="https://img.shields.io/badge/SQLite-38B2AC?logo=sqlite&logoColor=white"></a>
+      <a href="#"><img alt="VueJS" src="https://img.shields.io/badge/VueJS-42B883.svg?logo=vuedotjs&logoColor=%2361DAFB"></a>
+      <a href="#"><img alt="Bootstrap" src="https://img.shields.io/badge/Bootstrap-007BFF?logo=bootstrap&logoColor=white"></a>
+      <a href="#"><img alt="GoLang" src="https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white"></a>
+      <a href="#"><img alt="SQLite" src="https://img.shields.io/badge/SQLite-007BFF?logo=sqlite&logoColor=white"></a>
    
   </p>
 

@@ -39,5 +39,5 @@ Open [http://localhost:5173](http://localhost:5173) with your browser to see the
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License
 

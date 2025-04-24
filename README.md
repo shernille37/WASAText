@@ -3,6 +3,8 @@
 
 > A full stack web application that lets you chat with users
 
+<img src="./webui/public/screen.png">
+
 ## Features
 
 - User Login

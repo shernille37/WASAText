@@ -1,5 +1,5 @@
 # WASAText Chat Application
-<p>My final project in my university course named WASA(Web And Software Architecture)</p>
+## My final project in my university course named WASA(Web And Software Architecture)
 
 > A full stack web application that lets you chat with users
 
